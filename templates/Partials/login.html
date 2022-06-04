@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-md-10 mx-auto col-lg-6">
+    <form class="p-4 rounded-3 border bg-light" id="login-form" method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <p class="text-center h2 pb-4 tk-rustica">LOGIN</p>
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="id_username" placeholder="username">
+      </div>
+      <div class="form-floating mb-3">
+        <input type="password" class="form-control" id="id_password" placeholder="password">
+      </div>
+      <div class="checkbox mb-3">
+        <label>
+          <input type="checkbox" value="remember-me"> Remember me </input>
+        </label>
+      </div>
+      <input type="submit" class="w-100 btn btn-lg btn-primary" type="submit" value="Login"></input>
+      <input type="hidden" name="text" value="{{ next }}"></input>
+      <hr class="my-4"></hr>
+      {% if form.errors %}
+      <small class="text-danger">Your username and password did not match. Please try again.</small>
+      {% endif %}
+    </form>
+  </div>
+{% endblock %}

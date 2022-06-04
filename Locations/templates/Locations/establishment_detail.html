@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ area }}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-2 tk-rig-solid-bold-inline">{{ area }}</h1>
+  </div>
+  {% for division in area.division_set.all %}
+  <div class="container">
+    <div class="row tk-rustica">
+      <h3 class="p-1 h3 border-top border-primary">{{ division }} Night</h3>
+      <div class="row pb-2">
+        <div class="col">{{ division.divisionManager.first_name }} {{ division.divisionManager.last_name }}</div>
+        <div class="col text-end">{{ division.divisionManager.profile.phoneNumber }}</div>
+      </div>
+      <div class="row">
+        <div class="col">Player Fee: ${{ division.playerFee|floatformat:2|intcomma }}</div>
+      </div>
+      <div class="row">
+        <div class="col">Maximum Teams: {{ division.capacity }}</div>
+      </div>
+      <div class="row">
+        <div class="row pt-2 ms-1">Registered Teams:</div>
+        {% for team in division.team_set.all %}
+        <div class="row mx-1">
+          <div class="col">{{team}}</div>
+          <div class="col text-end">{{team.rating}}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="row my-3"></div>
+    </div>
+  </div>
+  {% endfor %}
+  <br>
+  <br>
+  <div class="row">
+    <div class="col-4">
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,17 @@
+asgiref==3.5.2
+black==22.3.0
+click==8.1.3
+Django==4.0.5
+django-appconf==1.0.5
+django-compressor==4.0
+django-phonenumber-field==6.1.0
+django-recurrence==1.11.1
+mypy-extensions==0.4.3
+pathspec==0.9.0
+platformdirs==2.5.2
+python-dateutil==2.8.2
+rcssmin==1.1.0
+rjsmin==1.2.0
+six==1.16.0
+sqlparse==0.4.2
+tomli==2.0.1
