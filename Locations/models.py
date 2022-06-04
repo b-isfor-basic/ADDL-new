@@ -113,8 +113,7 @@ class Establishment(models.Model):
         return ' '.join(visibleAddress)
 
     def get_area_divisions(self):
-        e = Establishment.objects.get(id=self.id)
-        return e.division_set.all()
+        return Establishment.division_set.all(self)
 
     def __str__(self):
         return f'{self.number} - {self.name}'

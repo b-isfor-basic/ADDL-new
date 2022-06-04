@@ -11,7 +11,7 @@
         Typekit.load({ async: true });
       } catch (e) {}
     </script>
-    <title>{% block title %}ADDL Portal{% endblock %}</title>
+    <title>ADDL | {% block title %}Portal{% endblock %}</title>
     <!--
       <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"></link>
     -->
@@ -31,48 +31,48 @@
   </head>
 
   <body class="bg-indigo-50 flex flex-col min-h-screen">
-    <nav class="bg-white flex w-full fixed-top">
-      <div class="w-full m-5 grid grid-rows-1">
-        <a class="tk-rig-solid-bold-inline inline-flex items-center" href="{% url 'home' %}">
-        <svg width="40" height="40" fill="currentColor" class="bi mr-1 fill-indigo-600">
+    <nav class="bg-white shadow-md shadow-indigo-400/40 sticky top-0">
+      <div class="w-full mx-auto px-4 pt-4">
+        <a class="tk-rig-solid-bold-halftone inline-flex items-center" href="{% url 'home' %}">
+        <svg width="40" height="40" fill="currentColor" class="bi mr-1 fill-red-600">
           <use xlink:href="#bullseye">
           </use>
           <span class="text-4xl">ADDL</span>
         </svg>
         </a>
-        <div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+        <div class="tk-objektiv-mk2 uppercase text-sm font-light text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
           <ul class="flex flex-wrap -mb-px justify-evenly">
-            <li class="mr-2">
+            <li>
                 <a href="{% url 'home' %}" 
                 {% if request.resolver_match.url_name == 'home' %}
-                class="inline-block p-4 text-indigo-600 rounded-t-lg border-b-2 border-indigo-600 active dark:text-indigo-500 dark:border-indigo-500" aria-current="page"
+                class="inline-block p-2 text-indigo-600 rounded-t-lg border-b-2 border-indigo-600 active dark:text-indigo-500 dark:border-indigo-500" aria-current="page"
                 {% else %}
-                class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+                class="inline-block p-2 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
                 {% endif %}
                 >Home</a>
             </li>
-            <li class="mr-2">
+            <li>
                 <a href="{% url 'all_areas' %}" 
                 {% if request.resolver_match.url_name == 'all_areas' %}
-                class="inline-block p-4 text-indigo-600 rounded-t-lg border-b-2 border-indigo-600 active dark:text-indigo-500 dark:border-indigo-500" aria-current="page"
+                class="inline-block p-2 text-indigo-600 rounded-t-lg border-b-2 border-indigo-600 active dark:text-indigo-500 dark:border-indigo-500" aria-current="page"
                 {% else %}
-                class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+                class="inline-block p-2 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
                 {% endif %}>Locations</a>
             </li>
-            <li class="mr-2">
-                <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">Login</a>
+            <li>
+                <a href="#" class="inline-block p-2 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">Login</a>
             </li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <main class="flex-auto">
+    <main class="flex-auto px-3 mt-2">
       {% block content %} 
       {% endblock %}
     </main>
 
-    <div class="relative  block bg-indigo-900">
+    <div class="relative  block bg-red-600">
       <div class="text-center bg-dark tk-rustica p-2">
         <p class="text-white">Website Design by Brittney Smith</p>
         <p class="text-white">
