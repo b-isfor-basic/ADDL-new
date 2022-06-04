@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Scoresheet{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="tk-objective-mk2 font-extrabold text-2xl">
+      <h1>Atlanta Doubles Dart League</h1>
+    </div>
+    <div class="tk-objective-mk2 font-normal text-lg">
+      <h2>Match Play Scoresheet</h2>
+    </div>
+    <form action="{% url 'Scores:new' match.id %}" method="post">
+    {% csrf_token %}
+    <div class="row d-flex">
+      <fieldset>
+        <div class="col">
+          <legend><h3>{{ match.away_team }}</h3></legend>
+        </div>
+        <hr class="vr">
+        <div class="col">
+          <legend><h3>{{ match.home_team }}</h3></legend>
+        </div>
+      </fieldset>
+    </div>
+    </form>
+  </div>
+{% endblock content %}
