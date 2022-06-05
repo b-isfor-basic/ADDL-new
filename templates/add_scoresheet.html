@@ -10,8 +10,8 @@
     <div class="tk-objective-mk2 font-normal text-lg">
       <h2>Match Play Scoresheet</h2>
     </div>
-    <form action="{% url 'Scores:new' match.id %}" method="post">
     {% csrf_token %}
+    <form action="{% url 'Scores:add' match.id %}" method="post">
     <div class="row d-flex">
       <fieldset>
         <div class="col">
