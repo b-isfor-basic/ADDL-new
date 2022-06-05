@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     # Installed packages
+    'django_extensions',
     'phonenumber_field',
     'recurrence',
     'compressor',
@@ -74,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'Locations.custom_context_processor.area_renderer'
             ],
         },
     },
@@ -153,3 +155,11 @@ COMPRESS_ROOT = BASE_DIR / 'static'
 COMPRESS_ENABLED = True
 
 STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+
+# Django Extensions Graph Models
+# https://django-extensions.readthedocs.io/en/latest/graph_models.html
+
+GRAPH_MODELS = {
+  'all_applications': True,
+  'group_models': True,
+}

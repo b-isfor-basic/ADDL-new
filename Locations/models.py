@@ -122,6 +122,10 @@ class Establishment(models.Model):
         return reverse("area", kwargs={"pk": self.id})
 
 
+def all_areas():
+    return Establishment.objects.all()
+
+
 class Division(models.Model):
     WEEKDAY_CHOICES = [
         ('Monday', 'Monday'),

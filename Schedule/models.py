@@ -62,3 +62,4 @@ class Match(models.Model):
             else:
                 result = self.awayTeam
         return result
+
