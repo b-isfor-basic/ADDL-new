@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
   <div class="row p-2">
-    <h1 class="tk-rig-solid-bold-halftone text-5xl pt-2">Locations</h1>
+    <h1 class="tk-rig-solid-bold-halftone text-center text-5xl pt-2">Locations</h1>
   </div>
   {% if all_areas %}
   {% for area in all_areas %}
@@ -18,19 +18,23 @@
       <p class="text-gray-700 text-base mb-4 tk-objektiv-mk2 font-light flex-wrap">
         {{ area.get_address }}
       </p>
-      <div class="justify-evenly inline">
+      <div class="row-span-full tk-objektiv uppercase justify-items-stretch">
         <a href="{% url 'area' area.id %}">
-          <button type="button" class="inline-block z-10 items-center p-1 text-sm text-indigo-600 bg-indigo-100 border border-indigo-500 rounded-full shadow-md shadow-indigo-500/30 focus:border-blue-500 focus:ring-opacity-40 hover:shadow-indigo-600/50 hover:bg-indigo-600 hover:text-white">
-            More Info
+          <button type="button" class="col-auto p-[2px] rounded-full bg-gradient-to-br from-pink-500 via-red-500 to-orange-500 hover:text-white active:text-opacity-75 focus:outline-none focus:ring">
+            <span class="block px-3 py-3 tk-objektiv uppercase text-sm font-light bg-white rounded-full hover:bg-transparent">
+              More Info
+            </span>
           </button>
         </a>
-        <a href="#">
-          <button type="button" class="inline-block z-10 items-center p-1 text-sm text-indigo-600 bg-indigo-100 border border-indigo-500 rounded-full shadow-md shadow-indigo-500/30 focus:border-blue-500 focus:ring-opacity-40 hover:shadow-indigo-600/50 hover:bg-indigo-600 hover:text-white">
+        <a href="{% url 'schedule' %}">
+          <button type="button" class="col-auto p-[2px] rounded-full bg-gradient-to-br from-pink-500 via-red-500 to-orange-500 hover:text-white active:text-opacity-75 focus:outline-none focus:ring">
+            <span class="block px-3 py-3 tk-objektiv uppercase text-sm font-light bg-white rounded-full hover:bg-transparent">
             Schedule
           </button>
         </a>
-        <a href="#">
-          <button type="button" class="inline-block z-10 items-center p-1 text-sm text-indigo-600 bg-indigo-100 border border-indigo-500 rounded-full shadow-md shadow-indigo-500/30 focus:border-blue-500 focus:ring-opacity-40 hover:shadow-indigo-600/50 hover:bg-indigo-600 hover:text-white">
+        <a href="{% url 'standings' %}">
+          <button type="button" class="col-auto p-[2px] rounded-full bg-gradient-to-br from-pink-500 via-red-500 to-orange-500 hover:text-white active:text-opacity-75 focus:outline-none focus:ring">
+            <span class="block px-3 py-3 tk-objektiv uppercase text-sm font-light bg-white rounded-full hover:bg-transparent">
             Standings
           </button>
         </a>

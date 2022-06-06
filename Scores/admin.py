@@ -1,4 +1,4 @@
 from django.contrib import admin
-from .models import PlayerScore, TeamScore
+# from .models import PlayerStats, TeamStats
 
-admin.site.register([PlayerScore, TeamScore])
+# admin.site.register([PlayerStats, TeamStats])

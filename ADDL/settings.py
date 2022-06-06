@@ -46,10 +46,10 @@ INSTALLED_APPS = [
     'recurrence',
     'compressor',
     # Created packages
-    'Scores',
-    'Locations',
-    'Schedule',
-    'Members',
+    'Scores.apps.ScoresConfig',
+    'Locations.apps.LocationsConfig',
+    'Schedule.apps.ScheduleConfig',
+    'Members.apps.MembersConfig',
 ]
 
 MIDDLEWARE = [
@@ -90,9 +90,9 @@ WSGI_APPLICATION = 'ADDL.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'addl',
-        'USER': 'leagueapp',
-        'PASSWORD': '2wsx#EDC',
+        'NAME': 'ADDL',
+        'USER': 'brittney',
+        'PASSWORD': '',
         'HOST': '',
         'PORT': '5432',
     }
@@ -135,7 +135,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 # STATICFILES_DIRS = [BASE_DIR / 'templates/static/']
-# STATIC_ROOT = './static/'
+STATIC_ROOT = './static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -151,9 +151,7 @@ PHONENUMBER_DEFAULT_REGION = 'US'
 # https://flowbite.com/docs/getting-started/django/
 
 COMPRESS_ROOT = BASE_DIR / 'static'
-
 COMPRESS_ENABLED = True
-
 STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 
 # Django Extensions Graph Models

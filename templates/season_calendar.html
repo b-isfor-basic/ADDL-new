@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if season %}
+<h1>
+    Viewing Season {{ season.number }}
+</h1>
+{% else %}
+<h1>
+    No active seasons.
+</h1>
+{% endif %}
+{% endblock %}
