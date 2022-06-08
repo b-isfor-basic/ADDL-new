@@ -25,5 +25,5 @@ urlpatterns = [
     path('locations/', include('Locations.urls')),
     path('members/', include('Members.urls')),
     path('schedule/', include('Schedule.urls')),
-    path('scores/', include('Scores.urls')),
+    path('scores/', include('Scores.urls'), name='Scores'),
 ]

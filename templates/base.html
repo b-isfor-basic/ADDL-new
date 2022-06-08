@@ -12,9 +12,6 @@
       } catch (e) {}
     </script>
     <title>ADDL | {% block title %}Portal{% endblock %}</title>
-    <!--
-      <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"></link>
-    -->
     {% compress css %}
     <link rel="stylesheet" href="{% static 'src/output.css' %}"></link>
     {% endcompress %}
@@ -30,18 +27,17 @@
     </svg>
   </head>
 
-  <body class="bg-indigo-50 flex flex-col min-h-screen">
-    <nav class="bg-white shadow-md shadow-indigo-400/40 sticky top-0">
+  <body class="bg-slate-50 flex flex-col min-h-screen">
+    <nav class="bg-white shadow-md shadow-indigo-600/40 sticky top-0">
       <div class="w-full mx-auto px-4 pt-4">
-        <a class="tk-rig-solid-bold-halftone inline-flex items-center" href="{% url 'home' %}">
-        <svg width="40" height="40" fill="currentColor" class="bi mr-1 fill-orange-500">
-          <use xlink:href="#bullseye">
-          </use>
-          <span class="text-4xl">ADDL</span>
-        </svg>
+        <a class="tk-rig-solid-bold-halftone flex justify-center items-center" href="{% url 'home' %}">
+          <span class="text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-red-500 to-orange-500">
+            ADDL
+          </span>
         </a>
         <div class="tk-objektiv-mk2 uppercase text-sm font-light text-center text-slate-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
           <ul class="flex flex-wrap -mb-px justify-evenly">
+            <!-- TODO: Change this active link logic to possibly be handled by the view. Update link colors to match new scheme (pink/red/orange).-->
             <li>
                 <a href="{% url 'home' %}" 
                 {% if request.resolver_match.url_name == 'home' %}
@@ -83,7 +79,7 @@
       </div>
     </nav>
 
-    <main class="flex-auto px-3 mt-2">
+    <main class="flex-auto px-3 mt-2 mx-1">
       {% block content %} 
       {% endblock %}
     </main>

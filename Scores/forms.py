@@ -3,26 +3,21 @@ from django.contrib.auth.models import User
 
 
 
-#class BaseStats(forms.Form):
+#class BaseStatsForm(forms.Form):
 #    stars = forms.IntegerField(min_value=0)
 #    perfects = forms.IntegerField(min_value=0)
-#    win = forms.CheckboxInput()
+#    win = forms.IntegerField(max_value=1)
 #
-#class Three01(forms.Form):
+#class Three01Form(forms.Form):
 #    in_thrown = forms.IntegerField(required=False, min_value=2, max_value=170)
 #    out_thrown = forms.IntegerField(required=False, min_value=2, max_value=170)
 #
-#class Five01(forms.Form):
+#class Five01Form(forms.Form):
 #    darts_thrown = forms.IntegerField(min_value=0)
 #    points_left = forms.IntegerField(min_value=0, max_value=501)
 #    out_thrown = forms.IntegerField(min_value=2, max_value=170, required=False)
-#
-#class SglsGame(forms.Form):
-#    player = forms.ModelChoiceField(User)
-#
-#class DblsGame(forms.Form):
-#    team = forms.ModelChoiceField(Team)
-#
+
+
 #class Scoresheet(forms.Form):
 #    match = forms.ModelChoiceField(Match)
 #

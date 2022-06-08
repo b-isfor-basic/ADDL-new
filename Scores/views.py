@@ -7,10 +7,14 @@ from Schedule.models import Match
 #from .forms import Scoresheet
 
 @login_required
-def ScoresheetCreateView(request, pk):
-    match = Match.objects.get(id=pk)
+def ScoresheetCreateView(request, id):
+    match = Match.objects.get(id=id)
+    context = {
+        'match': match,
+    }
 #    form = Scoresheet(request.POST or None, instance=[PlayerScore, TeamScore])
     
 #    if request.method == "POST":
 #        if form.is_valid():
 #            pass
+    return render(request, 'add_scoresheet.html', context)

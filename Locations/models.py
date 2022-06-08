@@ -122,10 +122,6 @@ class Establishment(models.Model):
         return reverse("area", kwargs={"pk": self.id})
 
 
-def all_areas():
-    return Establishment.objects.all()
-
-
 class Division(models.Model):
     WEEKDAY_CHOICES = [
         ('Monday', 'Monday'),
@@ -169,7 +165,7 @@ class Division(models.Model):
     season = models.ForeignKey('Schedule.Season', models.CASCADE)
 
     def __str__(self):
-        return f'{self.matchNight}'
+        return f'Area {self.area.number} - {self.matchNight}'
 
     def get_absolute_url(self):
         return reverse("division_detail", kwargs={"pk": self.id})

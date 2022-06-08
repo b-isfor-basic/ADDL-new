@@ -31,9 +31,11 @@ class Season(models.Model):
 
 class Match(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    season = models.ForeignKey(Season, models.CASCADE)
     division = models.ForeignKey(Division, models.CASCADE)
     weekNum = models.IntegerField(blank=True, null=True)
     matchDate = models.DateField(blank=True, null=True)
+    boards = models.CharField(max_length=4, null=True, blank=True)
     awayTeam = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
@@ -61,5 +63,5 @@ class Match(models.Model):
                 result = self.homeTeam
             else:
                 result = self.awayTeam
-        return result
+            return result
 

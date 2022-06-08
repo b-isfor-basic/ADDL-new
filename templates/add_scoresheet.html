@@ -3,7 +3,7 @@
 {% block title %}Scoresheet{% endblock title %}
 
 {% block content %}
-<div class="container">
+<div class="container text-center">
     <div class="tk-objective-mk2 font-extrabold text-2xl">
       <h1>Atlanta Doubles Dart League</h1>
     </div>
@@ -11,18 +11,17 @@
       <h2>Match Play Scoresheet</h2>
     </div>
     {% csrf_token %}
-    <form action="{% url 'Scores:add' match.id %}" method="post">
-    <div class="row d-flex">
-      <fieldset>
-        <div class="col">
-          <legend><h3>{{ match.away_team }}</h3></legend>
-        </div>
-        <hr class="vr">
-        <div class="col">
-          <legend><h3>{{ match.home_team }}</h3></legend>
-        </div>
-      </fieldset>
+    <div class="flex flex-row gap-2">
+      {% if match %}
+      <div class="block text-center">
+        <h3>{{ match.awayTeam }}</h3>
+      </div>
+      <div class="block text-center">
+        <h3>{{ match.homeTeam }}</h3>
+      </div>
+      {% endif %}
     </div>
+    <form action="{% url 'add_scoresheet' match.id %}" method="post">
     </form>
   </div>
 {% endblock content %}

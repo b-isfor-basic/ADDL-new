@@ -2,5 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.ScheduleView, name='schedule')
+    path('', views.SeasonDetailView, name='schedule'),
+    path('<int:seasonNum>', views.SeasonDetailView, name='schedule'),
+    path('cal/<int:year>/<str:month>/', views.SeasonCalendar, name='calendar'),
+    path('<int:seasonNum>/match/<uuid:matchID>/', views.MatchDetail, name='match_detail')
 ]

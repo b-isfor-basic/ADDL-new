@@ -6,8 +6,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Profile(models.Model):
-    # TODO: Model should extend User model. Possibly need to convert to abstract
-    # user model instead?
+    # TODO: Model should extend User model. Convert to abstract user?
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phoneNumber = PhoneNumberField() 
     
