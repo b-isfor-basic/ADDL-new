@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.auth.models import User
 
 
-
 #class BaseStatsForm(forms.Form):
 #    stars = forms.IntegerField(min_value=0)
 #    perfects = forms.IntegerField(min_value=0)
@@ -24,3 +23,4 @@ from django.contrib.auth.models import User
 
 #   singles_points = forms.IntegerField(min_value=0, max_value=4)
 #   doubles_points = forms.IntegerField(min_value=0, max_value=6)
+

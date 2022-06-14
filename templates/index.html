@@ -1,16 +1,37 @@
 {% extends 'base.html' %} 
-{% block title %}ADDL Portal{% endblock %} 
 
 {% block content %}
-
-<div class="mt-3 mb-6 text-center md:text-left md:justify-end md:flex-wrap-reverse tk-rustica">
-    <h1 class="text-7xl font-black" style="white-space: pre-line">ATLANTA
+<div class="md:inline-flex flex-wrap-reverse my-8 gap-4 align-middle min-w-full justify-center">
+  <div class="text-center md:text-right">
+    <h1 class="text-7xl tk-rustica font-black lg:text-9xl" style="white-space: pre-line">ATLANTA
         DOUBLES
         DART
         LEAGUE
     </h1>
   </div>
+  <div class="bg-violet-800 rounded-lg m-2 mt-4 pt-2 shadow-lg shadow-indigo-500/40">
+    <h2 class="text-2xl text-white text-center tk-objektiv-mk2 font-extralight uppercase">Announcements</h2>
+    <div class="relative rounded-b-lg min-w-full h-modal bg-white px-2 mt-1 pt-1">
+    {% if announcement_list %}
+    {% for item in announcement_list %}
+      <div class="flex-wrap my-2 p-3 border-l-2 border-amber-500">
+        <p class="font-light text-left text-rose-500">{{ item.title|title }}</p>
+        <p class="text-xs text-slate-400">{{ item.date_created|date:"m d y" }}</p>
+        <p class="font-normal text-left text-sm text-black pl-3">{{ item.body }}</p>
+        <p class="text-xs text-right text-slate-400 italic">{{ item.created_by }}</p>
+      </div>
+    {% endfor %}
+    {% else %}
+      <div class="flex-wrap my-2 p-3 border-l-2 border-amber-500">
+        <p class="font-light text-left text-rose-500">
+          Currently No Announcements
+        </p>
+      </div>
+    {% endif %}
+  </div>
+  </div>
 </div>
+    
 
 
 {% endblock %}

@@ -3,6 +3,9 @@ import uuid
 
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
+from django_extensions.db.models import CreationDateTimeField, AutoSlugField
+
 from Locations.models import Division, Establishment
 from Members.models import Team
 
@@ -55,13 +58,30 @@ class Match(models.Model):
 
     def winner(self):
         if self.teamscore_set.all() != None:
-            homeTeamScore = self.teamscore_set.filter('team'==self.homeTeam).matchPoints
-            awayTeamScore = self.teamscore_set.filter('team'==self.awayTeam).matchPoints
+            homeTeamScore = self.teamscore_set.filter(
+                "team" == self.homeTeam
+            ).matchPoints
+            awayTeamScore = self.teamscore_set.filter(
+                "team" == self.awayTeam
+            ).matchPoints
             if homeTeamScore == awayTeamScore:
-                result = 'Tie'
+                result = "Tie"
             elif homeTeamScore > awayTeamScore:
                 result = self.homeTeam
             else:
                 result = self.awayTeam
             return result
 
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=100)
+    title_slug = AutoSlugField(populate_from="title")
+    body = models.TextField()
+    active_date = models.DateTimeField()
+    inactive_date = models.DateTimeField()
+    season = models.ForeignKey(Season, models.CASCADE, blank=True, null=True)
+    created_by = models.ForeignKey(User, models.CASCADE)
+    date_created = CreationDateTimeField()
+
+    def __str__(self):
+        return str(self.title).title()

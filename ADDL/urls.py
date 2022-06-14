@@ -15,11 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic.base import TemplateView
+from Schedule.views import AnnouncementList
 
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='index.html'), name='home'),
+    # TODO: Create view to handle header link active-page highlight logic.
+    path('', AnnouncementList, name='home'),
+    # TODO: Create login page.
     # path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
     path('locations/', include('Locations.urls')),

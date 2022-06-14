@@ -1,33 +1,42 @@
 {% extends 'base.html' %}
 
+{% block title %}Schedule{% endblock title %}
+
 {% block content %}
+{% csrf_token %}
 {% if season %}
-<h1 class="text-center font-black text-xl pt-3">
+<h1 class="text-center font-black text-2xl pt-3">
     Season {{ season.seasonNum }}
 </h1>
 {% for division in divisions %}
-<h2 class="pb-2 pt-5 text-center text-lg tk-objektiv-mk2 uppercase font-light">{{ division }}</h2>
+
+{% endfor %}
+<div id="matchtable" class="p-3">
+{% for division in divisions %}
+<h2 class="pb-2 pt-4 text-center text-lg tk-objektiv-mk2 uppercase font-light">
+    {{ division }}
+</h2>
 <div class="relative overflow-x-auto shadow-lg shadow-indigo-600/40">
     <table class="w-full">
         <thead class="text-xs text-white tk-objektiv-mk2 uppercase bg-indigo-800">
             <tr>
-                <th scope="col" class="px-4 py-3 font-light">Week</th>
-                <th scope="col" class="px-4 py-3 font-light">Match Date</th>
-                <th scope="col" class="px-4 py-3 font-light">Away Team</th>
-                <th scope="col" class="px-4 py-3 font-light">Home Team</th>
-                <th scope="col" class="px-4 py-3 font-light">Boards</th>
-                <th scope="col" class="px-4 py-3 font-light">Results</th>
+                <th scope="col" class="p-2 font-light">Week</th>
+                <th scope="col" class="p-2 font-light">Match Date</th>
+                <th scope="col" class="p-2 font-light">Away Team</th>
+                <th scope="col" class="p-2 font-light">Home Team</th>
+                <th scope="col" class="p-2 font-light">Boards</th>
+                <th scope="col" class="p-2 font-light">Results</th>
             </tr>
         </thead>
         <tbody>
         {% for match in division.match_set.all %}
             <tr class="bg-white border-b hover:bg-slate-50">
-                <td scope="row" class="px-4 py-2 font-medium text-slate-800 whitespace-nowrap">{{match.weekNum}}</td>
-                <td scope="row" class="px-4 py-2 text-center">{{match.matchDate}}</td>
-                <td scope="row" class="px-4 py-2 text-center">{{match.awayTeam}}</td>
-                <td scope="row" class="px-4 py-2 text-center">{{match.homeTeam}}</td>
-                <td scope="row" class="px-4 py-2 text-center">{{match.boards}}</td>
-                <td scope="row" class="px-4 py-2 text-center">
+                <td scope="row" class="p-2 text-sm text-center">{{match.weekNum}}</td>
+                <td scope="row" class="p-2 text-sm text-center">{{ match.matchDate|date:"m.d.y" }}</td>
+                <td scope="row" class="p-2 text-sm text-center">{{ match.awayTeam }}</td>
+                <td scope="row" class="p-2 text-sm text-center">{{ match.homeTeam }}</td>
+                <td scope="row" class="p-2 text-sm text-center">{{ match.boards }}</td>
+                <td scope="row" class="p-2 text-sm text-center">
                     {% if match.teamscore_set %}
                     <span>{{ match.winner }}</span>
                     {% else %}
@@ -42,6 +51,7 @@
     </table>
 </div>
 {% endfor %}
+</div>
 {% else %}
 <h1>
     No active seasons.

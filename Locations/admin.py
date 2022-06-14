@@ -25,3 +25,4 @@ class DivisionAdmin(admin.ModelAdmin):
     list_filter = ('matchNight', 'playerFee')
     list_display = ['area', 'matchNight', 'divisionManager',]
 
+

@@ -13,10 +13,10 @@
     {% csrf_token %}
     <div class="flex flex-row gap-2">
       {% if match %}
-      <div class="block text-center">
+      <div class="">
         <h3>{{ match.awayTeam }}</h3>
       </div>
-      <div class="block text-center">
+      <div class="col-auto text-center">
         <h3>{{ match.homeTeam }}</h3>
       </div>
       {% endif %}

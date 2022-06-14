@@ -21,14 +21,18 @@ class Profile(models.Model):
 
 
 class Team(models.Model):
-    players = models.ManyToManyField(User)
+    player1 = models.ForeignKey(
+        User,
+        models.CASCADE,
+        related_name= 'team_member_1'
+    )
+    player2 = models.ForeignKey(
+        User,
+        models.CASCADE,
+        related_name= 'team_member_2'
+    )
     division = models.ForeignKey('Locations.Division', models.CASCADE)
     season = models.ForeignKey('Schedule.Season', models.CASCADE)
 
-    def display_players(self):
-        return '/'.join(player.last_name for player in self.players.all())
-
-    display_players.short_description = 'Name'
-
     def __str__(self):
-        return self.display_players()
+        return f'{self.player1.last_name}/{self.player2.last_name}'
