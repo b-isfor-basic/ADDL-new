@@ -8,6 +8,7 @@
     "flowbite": "^1.4.7"
   },
   "scripts": {
-    "dev": "webpack --mode development --watch"
+    "dev": "webpack --mode development --watch",
+    "watch": "tailwindcss -i ./static/src/input.css -o ./static/src/output.css --watch"
   }
 }

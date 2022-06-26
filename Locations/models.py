@@ -87,6 +87,7 @@ class Establishment(models.Model):
     state = models.CharField(
         max_length=2,
         choices=States.choices,
+        default="GA",
         null=True,
         blank=True
     )
@@ -140,6 +141,7 @@ class Division(models.Model):
         blank=True
     )
     matchNight = models.CharField(
+        'Match Night',
         choices=WEEKDAY_CHOICES,
         max_length=9,
         null=True,
@@ -162,7 +164,13 @@ class Division(models.Model):
         blank=True,
         null=True,
     )
-    season = models.ForeignKey('Schedule.Season', models.CASCADE)
+    season = models.ForeignKey(
+        'Schedule.Season', 
+        models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    is_active = models.BooleanField('Active?')
 
     def __str__(self):
         return f'Area {self.area.number} - {self.matchNight}'

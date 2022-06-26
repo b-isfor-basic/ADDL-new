@@ -14,8 +14,8 @@
     <title>ADDL | {% block title %}Portal{% endblock title %}</title>
     {% compress css %}
     <link rel="stylesheet" href="{% static 'src/output.css' %}"></link>
-    <script src="{% static 'static/htmx.js' %}"></script>
     {% endcompress %}
+    <script src="{% static 'static/htmx/htmx.js' %}"></script>
     <link rel="stylesheet" href="https://use.typekit.net/ptc0kya.css"></link>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="bullseye" viewBox="0 0 16 16">
@@ -29,57 +29,57 @@
   </head>
 
   <body class="bg-indigo-50/40 flex flex-col min-h-screen">
-    <nav class="bg-white shadow-md shadow-indigo-600/40 sticky top-0">
-      <div class="w-full mx-auto px-4 pt-4">
+    <nav class="bg-white shadow-md shadow-violet-600/40 sticky top-0">
+      <div class="w-3/4 mx-auto pt-4">
         <a class="tk-rig-solid-bold-halftone flex justify-center items-center" href="{% url 'home' %}">
           <span class="text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-tr from-violet-800 via-rose-500 to-amber-500">
             ADDL
           </span>
         </a>
         <div class="tk-objektiv-mk2 uppercase text-sm font-light text-center text-slate-500 border-b border-slate-200 dark:text-slate-400 dark:border-slate-700">
-          <ul class="flex flex-wrap -mb-px justify-evenly">
+          <ul class="inline-flex -mb-px space-x-2 justify-around">
             <li>
                 <a href="{% url 'home' %}" 
                 {% if request.resolver_match.url_name == 'home' %}
-                class="inline-block p-2 text-red-700 rounded-t-lg border-b-2 border-orange-500 active " aria-current="page"
+                class="nav-link-active" aria-current="page"
                 {% else %}
-                class="inline-block p-2 rounded-t-lg border-b-2 border-transparent hover:text-slate-600 hover:border-slate-300 dark:hover:text-slate-300"
+                class="nav-link-inactive"
                 {% endif %}
                 >Home</a>
             </li>
             <li>
                 <a href="{% url 'all_areas' %}" 
                 {% if request.resolver_match.url_name == 'all_areas' %}
-                class="inline-block p-2 text-red-700 rounded-t-lg border-b-2 border-orange-500 active dark:text-indigo-500 dark:border-indigo-500" aria-current="page"
+                class="nav-link-active" aria-current="page"
                 {% else %}
-                class="inline-block p-2 rounded-t-lg border-b-2 border-transparent hover:text-slate-600 hover:border-slate-300 dark:hover:text-slate-300"
+                class="nav-link-inactive"
                 {% endif %}>Bars</a>
             </li>
             <li>
               <a href="{% url 'schedule' %}" 
               {% if request.resolver_match.url_name == 'schedule' %}
-              class="inline-block p-2 text-red-700 rounded-t-lg border-b-2 border-orange-500 active dark:text-indigo-500 dark:border-indigo-500" aria-current="page"
+              class="nav-link-active" aria-current="page"
               {% else %}
-              class="inline-block p-2 rounded-t-lg border-b-2 border-transparent hover:text-slate-600 hover:border-slate-300 dark:hover:text-slate-300"
+              class="nav-link-inactive"
               {% endif %}>Schedule</a>
             </li>
             <li>
               <a href="{% url 'standings' %}" 
               {% if request.resolver_match.url_name == 'standings' %}
-              class="inline-block p-2 text-red-700 rounded-t-lg border-b-2 border-orange-500 active dark:text-indigo-500 dark:border-indigo-500" aria-current="page"
+              class="nav-link-active" aria-current="page"
               {% else %}
-              class="inline-block p-2 rounded-t-lg border-b-2 border-transparent hover:text-slate-600 hover:border-slate-300 dark:hover:text-slate-300"
+              class="nav-link-inactive"
               {% endif %}>Stats</a>
             </li>
             <li>
-                <a href="#" class="inline-block p-2 rounded-t-lg border-b-2 border-transparent hover:text-slate-600 hover:border-slate-300 dark:hover:text-slate-300">Login</a>
+                <a href="#" class="nav-link-inactive">Login</a>
             </li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <main class="flex-auto px-3 mt-2 mx-1">
+    <main class="flex flex-auto min-h-full py-5 px-4 sm:px-6 max-w-6xl mx-auto justify-center">
       {% block content %} 
       {% endblock %}
     </main>

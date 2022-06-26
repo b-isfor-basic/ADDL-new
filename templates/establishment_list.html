@@ -3,14 +3,14 @@
 {% block title %}Locations{% endblock %}
 
 {% block content %}
-<div class="justify-center">
-  <div class="row p-2">
-    <h1 class="tk-rig-solid-bold-halftone text-center text-5xl pt-2">Locations</h1>
+<div class="md:max-w-screen-md">
+  <div class="row-auto pb-4">
+    <h1 class="tk-rustica font-black uppercase text-center text-5xl">Locations</h1>
   </div>
-  {% if all_areas %}
-  {% for area in all_areas %}
-  <div class="flex justify-center">
-    <div class="block p-2 pb-5 rounded-lg shadow-lg shadow-indigo-500/50 bg-white max-w-sm">
+  <div class="flex flex-wrap justify-around">
+    {% if all_areas %}
+    {% for area in all_areas %}
+    <div class="flex-auto m-2 p-2 pb-5 rounded-lg shadow-lg shadow-violet-500/50 bg-white">
       <p class="text-gray-700 text-base tk-objektiv-mk2 font-light uppercase">
         Area {{ area.number }}
       </p>
@@ -18,19 +18,19 @@
       <p class="text-gray-700 text-base mb-4 tk-objektiv-mk2 font-light flex-wrap">
         {{ area.get_address }}
       </p>
-      <div class="relative flex min-w-full justify-center">
+      <div class="relative flex justify-center">
         <a href="{% url 'area' area.id %}">
-          <button type="button" class="col-auto p-[2px] rounded-full bg-gradient-to-tr from-indigo-600 via-pink-500 to-orange-500 hover:text-white active:text-opacity-75 focus:outline-none focus:ring">
-            <span class="block p-2 tk-objektiv uppercase text-sm font-light bg-white rounded-full hover:bg-transparent">
+          <button type="button" class="btn-outer">
+            <span class="tk-objektiv btn-inner">
               More Info
             </span>
           </button>
         </a>
       </div>
     </div>
-  </div>
-  {% endfor %}
-      {% else %}
+    {% endfor %}
+    {% else %}
+    <div class="justify-center">
       <p>No establishments found.</p>
     </div>
     {% endif %}

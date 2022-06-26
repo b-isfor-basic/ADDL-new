@@ -5,20 +5,22 @@
 
 {% block content %}
 
-<div class="container">
-  <div class="row">
-    <h1 class="display-5 pt-2 tk-rig-solid-bold-halftone">{{ area }}</h1>
+<div id="divisionform"></div>
+
+<div class="md:flex md:items-center md:justify-between">
+  <div class="flex-1 min-w-0">
+    <h1 class="font-black pt-2 tk-rustica text-2xl leading-7">{{ area }}</h1>
   </div>
   {% for division in area.division_set.all %}
-  <div class="container">
+  <div class="container m-2">
     <div class="row tk-rustica">
-      <h3 class="p-1 h3 border-top border-primary">{{ division }} Night</h3>
+      <h3 class="text-lg">{{ division.matchNight }} Night</h3>
       <div class="row pb-2">
         <div class="col">{{ division.divisionManager.first_name }} {{ division.divisionManager.last_name }}</div>
         <div class="col text-end">{{ division.divisionManager.profile.phoneNumber }}</div>
       </div>
       <div class="row">
-        <div class="col">Player Fee: ${{ division.playerFee|floatformat:2|intcomma }}</div>
+        <div class="col">Player Fee: ${{ division.playerFee|floatformat:2 }}</div>
       </div>
       <div class="row">
         <div class="col">Maximum Teams: {{ division.capacity }}</div>
@@ -42,6 +44,14 @@
     <div class="col-4">
     </div>
   </div>
+</div>
+
+<div class="row-span-full">
+  <button type="button" hx-get="{% url 'create_division' %}" class="btn-outer" hx-target="#divisionform" hx-swap="innerHTML">
+    <span class="tk-objektiv btn-inner">
+      Request New Division
+    </span>
+  </button>
 </div>
 
 {% endblock %}

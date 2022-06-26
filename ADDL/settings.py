@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'recurrence',
     'compressor',
+    'crispy_forms',
+    'crispy_tailwind',
     # Created packages
     'Scores.apps.ScoresConfig',
     'Locations.apps.LocationsConfig',
@@ -161,3 +163,8 @@ GRAPH_MODELS = {
   'all_applications': True,
   'group_models': True,
 }
+
+# Crispy Froms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+CRISPY_TEMPLATE_PACK = "tailwind"
