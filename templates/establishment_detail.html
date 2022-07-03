@@ -5,19 +5,19 @@
 
 {% block content %}
 
-<div id="divisionform"></div>
+<div id="divisionForm"></div>
 
-<div class="md:flex md:items-center md:justify-between">
-  <div class="flex-1 min-w-0">
-    <h1 class="font-black pt-2 tk-rustica text-2xl leading-7">{{ area }}</h1>
+<div class="flex flex-col align-middle m-3">
+  <div class="block">
+    <h1 class="font-black py-2 tk-rustica text-4xl leading-4">{{ area }}</h1>
   </div>
   {% for division in area.division_set.all %}
-  <div class="container m-2">
+  <div class="flex-col m-2 border-t-2 justify-around align-middle border-violet-500">
     <div class="row tk-rustica">
       <h3 class="text-lg">{{ division.matchNight }} Night</h3>
       <div class="row pb-2">
         <div class="col">{{ division.divisionManager.first_name }} {{ division.divisionManager.last_name }}</div>
-        <div class="col text-end">{{ division.divisionManager.profile.phoneNumber }}</div>
+        <div class="col text-end">{{ division.divisionManager.player.phoneNumber.as_national }}</div>
       </div>
       <div class="row">
         <div class="col">Player Fee: ${{ division.playerFee|floatformat:2 }}</div>
@@ -29,8 +29,8 @@
         <div class="row pt-2 ms-1">Registered Teams:</div>
         {% for team in division.team_set.all %}
         <div class="row mx-1">
-          <div class="col">{{team}}</div>
-          <div class="col text-end">{{team.rating}}</div>
+          <div class="col">{{ team }}</div>
+          <div class="col text-end">{{ team.rating }}</div>
         </div>
         {% endfor %}
       </div>
@@ -42,16 +42,13 @@
   <br>
   <div class="row">
     <div class="col-4">
+      <button type="button" hx-get="{% url 'create_division' %}" class="btn-outer" hx-target="#divisionForm" hx-swap="innerHTML">
+        <span class="tk-objektiv btn-inner">
+          Request New Division
+        </span>
+      </button>
     </div>
   </div>
-</div>
-
-<div class="row-span-full">
-  <button type="button" hx-get="{% url 'create_division' %}" class="btn-outer" hx-target="#divisionform" hx-swap="innerHTML">
-    <span class="tk-objektiv btn-inner">
-      Request New Division
-    </span>
-  </button>
 </div>
 
 {% endblock %}
