@@ -168,3 +168,6 @@ GRAPH_MODELS = {
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
 CRISPY_TEMPLATE_PACK = "tailwind"
+
+# Custom User Model
+AUTH_USER_MODEL = 'Members.Player'

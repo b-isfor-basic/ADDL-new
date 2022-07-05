@@ -1,15 +1,22 @@
 from django.shortcuts import get_object_or_404, render, HttpResponse
+from django.views.generic import ListView
 
 from .models import Establishment, Division
 from .forms import EstablishmentForm, DivisionForm
 
-def establishment_list(request):
+def establishment_list(request, **kwargs):
     all_areas = Establishment.objects.all()
-    context = {
-        'all_areas': all_areas,
-    }
+    if kwargs:
+        is_active = Establishment.objects.filter(is_active=True)
+        context = {
+            'all_areas': is_active,
+        }
+    else:
+        context = {
+            'all_areas': all_areas,
+        }
     return render(request, 'establishment_list.html', context)
-        
+
 
 def establishment_detail(request, pk):
     area = get_object_or_404(Establishment, pk=pk)

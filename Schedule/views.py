@@ -10,11 +10,12 @@ from Locations.models import Establishment, Division
 from .forms import AnnouncementForm, SeasonForm
 
 
-current_season = Season.objects.first().seasonNum
 
 
-def SeasonDetailView(request, seasonNum=current_season, *division):
-    season = Season.objects.get(seasonNum=seasonNum)
+
+def SeasonDetailView(request, *division):
+    current_season = Season.objects.first().seasonNum
+    season = Season.objects.get(seasonNum=current_season)
     if division:
         division = division.id
         matches = Division.objects.get(id=division).match_set.all()
@@ -60,4 +61,7 @@ def create_announcement_form(request):
 
 @login_required
 def MatchCreationView(request):
-    pass
+    season = Season.objects.first()
+    active_divisions = season.division_set.all()
+    for division in active_divisions:
+        division['num_teams']= division.team_set.count()

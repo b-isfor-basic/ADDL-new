@@ -3,12 +3,30 @@
 {% block title %}Locations{% endblock %}
 
 {% block content %}
-<div class="md:max-w-screen-md">
+<div class="md:max-w-screen-lg">
   <div class="row-auto pb-4">
     <h1 class="tk-rustica font-black uppercase text-center text-5xl">Locations</h1>
   </div>
+  <div class="float-left align-middle m-2">
+    <div class="flex flex-col">
+      <a href="{% url 'all_areas' is_active=True %}">
+        <button type="button" class="btn-outer">
+          <span class="tk-objektiv btn-inner">
+            View Active
+          </span>
+        </button>
+      </a>
+      <a href="{% url 'all_areas' %}">
+        <button type="button" class="btn-outer">
+          <span class="tk-objektiv btn-inner">
+            View All
+          </span>
+        </button>
+      </a>
+    </div>
+  </div>
+  {% if all_areas %}
   <div class="flex flex-wrap justify-around">
-    {% if all_areas %}
     {% for area in all_areas %}
     <div class="flex-auto m-2 p-2 pb-5 rounded-lg shadow-lg shadow-violet-500/50 bg-white">
       <p class="text-gray-700 text-base tk-objektiv-mk2 font-light uppercase">
@@ -16,9 +34,9 @@
       </p>
       <h5 class="text-gray-900 text-2xl leading-tight font-extrabold mb-2 tk-rustica">{{ area.name }}</h5>
       <p class="text-gray-700 text-base mb-4 tk-objektiv-mk2 font-light flex-wrap">
-        {{ area.get_address }}
+        {{ area.get_address|title|linebreaksbr }}
       </p>
-      <div class="relative flex justify-center">
+      <div class="flex flex-col">
         <a href="{% url 'area' area.id %}">
           <button type="button" class="btn-outer">
             <span class="tk-objektiv btn-inner">

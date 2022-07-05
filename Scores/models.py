@@ -1,6 +1,6 @@
 import uuid
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -11,9 +11,13 @@ from Members.models import Team
 
 
 class BaseScore(models.Model):
+    '''
+    Base game score model for all games: cricket, 501, and 301. All games
+    include scores for stars, perfects, and game point.
+    '''
     FORMAT_CHOICES = [
-        ('SNGL', 'Singles'),
-        ('DBLS', 'Doubles')
+        ('SN', 'Singles'),
+        ('DB', 'Doubles')
     ]
 
     score_id = models.UUIDField(
@@ -21,8 +25,9 @@ class BaseScore(models.Model):
         primary_key=True, 
         editable=False
     )
-    scoreset = models.ForeignKey('Scoreset', models.CASCADE)
-    format = models.CharField(max_length=4, choices=FORMAT_CHOICES)
+ #   match = models.ForeignKey(Match, models.RESTRICT)
+ #   player = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)
+    format = models.CharField(max_length=2, choices=FORMAT_CHOICES)
     stars = models.PositiveIntegerField(blank=True, null=True)
     perfects = models.PositiveIntegerField(blank=True, null=True)
     game_point = models.PositiveIntegerField(
@@ -61,22 +66,49 @@ class Five01(BaseScore):
 class Scoreset(models.Model):
     match = models.ForeignKey(Match, models.CASCADE)
     team = models.ForeignKey(Team, models.CASCADE)
-    player = models.ForeignKey(User, models.CASCADE)
+    player = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)
     is_sub = models.BooleanField()
     created_at = CreationDateTimeField()
     modified_at = ModificationDateTimeField()
 
+
     @property
     def singles_wins(self):
-        return Scoreset.get(id=self.id).basescore_set.count(format='SNGL', game_point=1)
+        return Scoreset.objects.filter(
+                basescore__match=self.match
+            ).filter(
+                basescore__player=self.player
+            ).filter(
+                basescore__format='SN'
+            ).filter(
+                basescore__game_point=1
+            ).count()
 
     @property
     def doubles_wins(self):
-        return Scoreset.get(id=self.id).basescore_set.count(format='DBLS', game_point=1)
-    
+        return Scoreset.objects.filter(
+                basescore__match=self.match
+            ).filter(
+                basescore__player=self.player
+            ).filter(
+                basescore__format='DB'
+            ).filter(
+                basescore__game_point=1
+            ).count()
+
     @property
     def total_points(self):
-        return Scoreset.get(id=self.id).basescore_set.count(game_point=1)
+        return Scoreset.objects.filter(
+                basescore__match=self.match
+            ).filter(
+                basescore__player=self.player
+            ).filter(
+                basescore__game_point=1
+            ).count()
+
+    @property
+    def best_sngl_501(self):
+        pass
 
         
 # class PlayerStats(models.Model):
@@ -91,3 +123,38 @@ class Scoreset(models.Model):
 #             f'Total match points for {team} cannot be greater than 20. Please review and try again.'
 #         )]
 #     )
+
+class PlayerScore(models.Model):
+    match = models.ForeignKey(Match, models.PROTECT)
+    player = models.ForeignKey(settings.AUTH_USER_MODEL, models.PROTECT)
+    is_sub = models.BooleanField('Subs', 'Sub',)
+    team = models.ForeignKey(Team, models.PROTECT)
+    stars = models.PositiveIntegerField(blank=True, null=True)
+    perfects = models.PositiveIntegerField(blank=True, null=True)
+    singles_points = models.PositiveIntegerField(blank=True, null=True)
+    doubles_points = models.PositiveIntegerField(blank=True, null=True)
+    match_points = models.PositiveIntegerField(null=True)
+    high_in = models.PositiveIntegerField(blank=True, null=True)
+    high_out = models.PositiveIntegerField(blank=True, null=True)
+    best_501 = models.PositiveIntegerField(blank=True, null=True)
+    darts_thrown = models.PositiveIntegerField()
+    score_left = models.PositiveIntegerField(blank=True, null=True)
+    created_at = CreationDateTimeField()
+    modified_at = ModificationDateTimeField()
+
+    @property
+    def weeklyPPD(self):
+        return (1002 - self.score_left)/self.darts_thrown
+
+
+class TeamScore(models.Model):
+    team = models.ForeignKey(Team, models.PROTECT)
+    match = models.ForeignKey(Match, models.PROTECT)
+    match_points = models.PositiveIntegerField(null=True)
+    best_501 = models.PositiveIntegerField(blank=True, null=True)
+    darts_thrown = models.PositiveIntegerField()
+    score_left = models.PositiveIntegerField(blank=True, null=True)
+
+    @property
+    def weeklyPPD(self):
+        return (1002 - self.score_left)/self.darts_thrown

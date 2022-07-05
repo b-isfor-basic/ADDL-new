@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -99,19 +99,24 @@ class Establishment(models.Model):
     generalManager = models.CharField(max_length=100, blank=True, null=True)
     managerEmail = models.EmailField(blank=True, null=True)
     managerPhone = PhoneNumberField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['number']
 
     def get_address(self):
-        address = [self.streetLine1, self.streetLine2, self.city, self.state, self.zipCode]
-        visibleAddress = []
-        for i in address:
-            if i != None:
-                visibleAddress.append(str(i))
-            else:
-                continue
-        return ' '.join(visibleAddress)
+        address = ''
+        if self.streetLine1 != None:
+            address += f'{self.streetLine1}\n'
+        if self.streetLine2 != None:
+            address += f'{self.streetLine2}\n'
+        if self.city != None:
+            address += f'{self.city}, '
+        if self.state != None:
+            address += f'{self.state} '
+        if self.zipCode != None:
+            address += str(self.zipCode)
+        return ''.join(address)        
 
     def get_area_divisions(self):
         return Establishment.division_set.all(self)
@@ -121,6 +126,7 @@ class Establishment(models.Model):
 
     def get_absolute_url(self):
         return reverse("area", kwargs={"pk": self.id})
+
 
 
 class Division(models.Model):
@@ -158,7 +164,7 @@ class Division(models.Model):
         blank=True,
     )
     divisionManager = models.ForeignKey(
-        to=User,
+        to=settings.AUTH_USER_MODEL,
         verbose_name='Division Manager', 
         on_delete=models.SET_NULL,
         blank=True,

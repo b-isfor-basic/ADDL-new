@@ -1,6 +1,12 @@
 from django.contrib import admin
-from .models import Profile, Team
+from django.contrib.auth.admin import UserAdmin
+from .models import Player, Team
 
-admin.site.register(Profile)
+@admin.register(Player)
+class PlayerAdmin(UserAdmin):
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('phoneNumber',)}),
+    )
+
 admin.site.register(Team)
 

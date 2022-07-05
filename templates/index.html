@@ -3,31 +3,33 @@
 {% block content %}
 <div class="flex-1 lg:inline-flex my-8 space-x-4 align-middle max-w-full justify-center">
   <div class="text-center lg:text-right">
-    <h1 class="text-7xl tk-rustica font-black md:text-8xl lg:text-9xl" style="white-space: pre-line">ATLANTA
+    <h1 class="lg:mr-3 text-7xl tk-rustica font-black md:text-8xl lg:text-9xl" style="white-space: pre-line">ATLANTA
         DOUBLES
         DART
         LEAGUE
     </h1>
   </div>
-  <div class="flex-row flex-grow sm:max-w-lg lg:max-w-full max-h-96 bg-amber-500 overflow-x-scroll rounded-lg m-2 mt-4 pt-3 shadow-lg shadow-violet-500/40 lg:align-middle">
+  <div class="flex-row flex-grow sm:max-w-lg lg:max-w-full max-h-[500px] bg-amber-500 rounded-lg m-2 mt-4 pt-3 shadow-lg shadow-violet-500/40 lg:align-middle">
     <h2 class="text-2xl md:text-4xl text-black text-center tk-objektiv-mk2 font-extralight uppercase">Announcements</h2>
-    <div class="rounded-b-lg min-w-full min-h-full bg-white px-2 mt-3 md:mt-4 pt-1">
-    {% if announcement_list %}
-    {% for item in announcement_list %}
-      <div class="flex-wrap my-2 p-3 border-l-2 border-violet-500">
-        <p class="font-light text-left text-rose-500">{{ item.title|title }}</p>
-        <p class="text-xs text-slate-400">{{ item.date_created|date:"m d y" }}</p>
-        <p class="font-normal text-left text-sm text-black pl-3">{{ item.body }}</p>
-        <p class="text-xs text-right text-slate-400 italic">{{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }} </p>
+    <div class="place-content-stretch rounded-b-lg bg-white px-2 mt-4 pt-1">
+      <div class="overflow-x-scroll scroll-smooth">
+        {% if announcement_list %}
+        {% for item in announcement_list %}
+          <div class="flex-wrap my-2 p-3 border-l-2 border-violet-500">
+            <p class="font-light text-left text-rose-500">{{ item.title|title }}</p>
+            <p class="text-xs text-slate-400">{{ item.date_created|date:"m d y" }}</p>
+            <p class="font-normal text-left text-sm text-black pl-3">{{ item.body }}</p>
+            <p class="text-xs text-right text-slate-400 italic">{{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }} </p>
+          </div>
+        {% endfor %}
+        {% else %}
+          <div class="flex-wrap my-2 p-3 border-l-2 border-amber-500">
+            <p class="font-light text-left text-rose-500">
+              Currently No Announcements
+            </p>
+          </div>
+        {% endif %}
       </div>
-    {% endfor %}
-    {% else %}
-      <div class="flex-wrap my-2 p-3 border-l-2 border-amber-500">
-        <p class="font-light text-left text-rose-500">
-          Currently No Announcements
-        </p>
-      </div>
-    {% endif %}
     </div>
   </div>
 </div>

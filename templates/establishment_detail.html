@@ -15,9 +15,9 @@
   <div class="flex-col m-2 border-t-2 justify-around align-middle border-violet-500">
     <div class="row tk-rustica">
       <h3 class="text-lg">{{ division.matchNight }} Night</h3>
-      <div class="row pb-2">
+      <div class="flex-row pb-2">
         <div class="col">{{ division.divisionManager.first_name }} {{ division.divisionManager.last_name }}</div>
-        <div class="col text-end">{{ division.divisionManager.player.phoneNumber.as_national }}</div>
+        <div class="col text-end">{{ division.divisionManager.phoneNumber.as_national }}</div>
       </div>
       <div class="row">
         <div class="col">Player Fee: ${{ division.playerFee|floatformat:2 }}</div>

@@ -8,7 +8,7 @@ class DivisionInline(admin.StackedInline):
 class EstablishmentAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('number', 'name')
+            'fields': ('number', 'name', 'is_active')
         }),
         ('Address', {
             'fields': ('streetLine1', 'streetLine2', 'city', 'state', 'zipCode')

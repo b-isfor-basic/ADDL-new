@@ -3,7 +3,7 @@ import uuid
 
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
+from django.conf import settings
 from django_extensions.db.models import CreationDateTimeField, AutoSlugField
 
 from Locations.models import Division, Establishment
@@ -80,7 +80,7 @@ class Announcement(models.Model):
     active_date = models.DateTimeField()
     inactive_date = models.DateTimeField()
     season = models.ForeignKey(Season, models.CASCADE, blank=True, null=True)
-    created_by = models.ForeignKey(User, models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)
     date_created = CreationDateTimeField()
 
     def __str__(self):
