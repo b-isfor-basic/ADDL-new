@@ -55,15 +55,11 @@ class Match(models.Model):
 
     def __str__(self):
         return f"{self.awayTeam} vs. {self.homeTeam}"
-
+    
     def winner(self):
         if self.teamscore_set.all() != None:
-            homeTeamScore = self.teamscore_set.filter(
-                "team" == self.homeTeam
-            ).matchPoints
-            awayTeamScore = self.teamscore_set.filter(
-                "team" == self.awayTeam
-            ).matchPoints
+            homeTeamScore = self.teamscore_set.filter(team=self.homeTeam)
+            awayTeamScore = self.teamscore_set.filter(team=self.awayTeam)
             if homeTeamScore == awayTeamScore:
                 result = "Tie"
             elif homeTeamScore > awayTeamScore:
@@ -71,6 +67,8 @@ class Match(models.Model):
             else:
                 result = self.awayTeam
             return result
+        else:
+            return 'Not Scored'
 
 
 class Announcement(models.Model):

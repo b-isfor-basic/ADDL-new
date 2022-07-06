@@ -13,12 +13,12 @@ from .forms import AnnouncementForm, SeasonForm
 
 
 
-def SeasonDetailView(request, *division):
+def SeasonDetailView(request, **division):
     current_season = Season.objects.first().seasonNum
     season = Season.objects.get(seasonNum=current_season)
     if division:
         division = division.id
-        matches = Division.objects.get(id=division).match_set.all()
+        matches = Division.objects.get(division=division).match_set.all()
     else:
         divisions = season.division_set.all()
         matches = season.match_set.all()
