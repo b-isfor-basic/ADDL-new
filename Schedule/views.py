@@ -13,21 +13,26 @@ from .forms import AnnouncementForm, SeasonForm
 
 
 
-def SeasonDetailView(request, **division):
+def SeasonDetailView(request):
     current_season = Season.objects.first().seasonNum
     season = Season.objects.get(seasonNum=current_season)
-    if division:
-        division = division.id
-        matches = Division.objects.get(division=division).match_set.all()
+    active_div_list = season.division_set.all()
+    
+    if 'division' in request.GET.keys():
+        division = request.GET['division']
+        matches = season.match_set.filter(division__id=division).all()
+        divisions = season.division_set.get(id=division)
     else:
-        divisions = season.division_set.all()
         matches = season.match_set.all()
+        divisions = season.division_set.all()
     
     context = {
         'season': season,
         'matches': matches,
+        'active_divisions': active_div_list,
         'divisions': divisions
     }
+
     return render(request, 'season_detail.html', context)
 
 def SeasonCalendar(request, year, month):
