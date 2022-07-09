@@ -4,12 +4,13 @@ from django.views.generic import ListView
 from .models import Establishment, Division
 from .forms import EstablishmentForm, DivisionForm
 
-def establishment_list(request, **kwargs):
+def establishment_list(request):
     all_areas = Establishment.objects.all()
-    if kwargs:
-        is_active = Establishment.objects.filter(is_active=True)
+    if 'is_active' in request.GET.keys():
+        is_active = request.GET['is_active']
+        all_active = Establishment.objects.filter(is_active=is_active)
         context = {
-            'all_areas': is_active,
+            'all_areas': all_active,
         }
     else:
         context = {
