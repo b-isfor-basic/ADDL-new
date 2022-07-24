@@ -1,13 +1,13 @@
 import uuid
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.core.exceptions import ValidationError
-
-from django_extensions.db.models import CreationDateTimeField, ModificationDateTimeField
-from Schedule.models import Match
+from django_extensions.db.models import (CreationDateTimeField,
+                                         ModificationDateTimeField)
 from Members.models import Team
+from Schedule.models import Match
 
 
 class BaseScore(models.Model):
