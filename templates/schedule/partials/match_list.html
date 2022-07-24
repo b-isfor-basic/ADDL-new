@@ -1,0 +1,46 @@
+<div class="mb-9">
+    <h2 class="mb-2 text-center text-2xl tk-objektiv-mk2 uppercase font-extralight py-2">
+        {{ division }}
+    </h2>
+    <div class="relative overflow-x-auto shadow-lg shadow-violet-600/40">
+        <table class="w-full">
+            <thead class="text-sm text-white tk-objektiv-mk2 uppercase bg-gray-800">
+                <tr>
+                    <th scope="col" class="p-2 font-light">Week</th>
+                    <th scope="col" class="p-2 font-light">Match Date</th>
+                    <th scope="col" class="p-2 font-light">Away Team</th>
+                    <th scope="col" class="p-2 font-light">Home Team</th>
+                    <th scope="col" class="p-2 font-light">Boards</th>
+                    <th scope="col" class="p-2 font-light">Results</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% regroup division.match_set.all|dictsort:"weekNum" by weekNum as matches_list %}
+                {% for week in matches_list %}
+                <tr class="bg-white border-b border-amber-400 hover:bg-amber-300">
+                    <th rowspan={{ week.list|length }} scope="rowgroup" class="p-2 text-sm text-center">{{ week.grouper }}</th>      
+                        {% for match in week.list %}
+                            {% if not forloop.first %}
+                            <tr class="bg-white border-b border-amber-400 hover:bg-amber-300">
+                            {% endif %}
+                            <td class="p-2 text-sm text-center">{{ match.matchDate|date:"m.d.y" }}</td>
+                            <td class="p-2 text-sm text-center">{{ match.awayTeam }}</td>
+                            <td class="p-2 text-sm text-center">{{ match.homeTeam }}</td>
+                            <td class="p-2 text-sm text-center">{{ match.boards }}</td>
+                            <td class="p-2 text-sm text-center">
+                                {% if match.winner %}
+                                {{ match.winner }}
+                                {% else %}
+                                <a href="{% url 'add_scoresheet' match.id %}" class="font-medium text-violet-700 underline">
+                                    Enter Scores
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

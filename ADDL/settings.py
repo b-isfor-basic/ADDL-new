@@ -30,7 +30,6 @@ ALLOWED_HOSTS = []
 INTERNAL_IPS = ['127.0.0.1',]
 
 # Application definition
-
 INSTALLED_APPS = [
     # Django included packages
     'django.contrib.admin',
@@ -40,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django.contrib.postgres',
+    
     # Installed packages
     'django_extensions',
     'phonenumber_field',
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'compressor',
     'crispy_forms',
     'crispy_tailwind',
+    
     # Created packages
     'Scores.apps.ScoresConfig',
     'Locations.apps.LocationsConfig',
@@ -159,8 +161,9 @@ STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 # Django Extensions Graph Models
 # https://django-extensions.readthedocs.io/en/latest/graph_models.html
 
+# Graph Models ./manage.py graph_models -g -o my_project_visualized.png
 GRAPH_MODELS = {
-  'all_applications': True,
+  'app_labels': ['Locations', 'Schedule', 'Members', 'Scores'],
   'group_models': True,
 }
 

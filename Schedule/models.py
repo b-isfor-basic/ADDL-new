@@ -4,6 +4,8 @@ import uuid
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
+
 from django_extensions.db.models import CreationDateTimeField, AutoSlugField
 
 from Locations.models import Division, Establishment
@@ -38,7 +40,12 @@ class Match(models.Model):
     division = models.ForeignKey(Division, models.CASCADE)
     weekNum = models.IntegerField(blank=True, null=True)
     matchDate = models.DateField(blank=True, null=True)
-    boards = models.CharField(max_length=4, null=True, blank=True)
+    boards = ArrayField(
+        models.PositiveIntegerField(blank=True, null=True),
+        size=2,
+        null=True,
+        blank=True
+    )
     awayTeam = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
@@ -56,19 +63,20 @@ class Match(models.Model):
     def __str__(self):
         return f"{self.awayTeam} vs. {self.homeTeam}"
     
+    @property
     def winner(self):
         if self.teamscore_set.all() != None:
-            homeTeamScore = self.teamscore_set.filter(team=self.homeTeam)
-            awayTeamScore = self.teamscore_set.filter(team=self.awayTeam)
-            if homeTeamScore == awayTeamScore:
+            homeTeamScore = self.teamscore_set.get(team=self.homeTeam)
+            awayTeamScore = self.teamscore_set.get(team=self.awayTeam)
+            if homeTeamScore.match_points == awayTeamScore.match_points:
                 result = "Tie"
-            elif homeTeamScore > awayTeamScore:
+            elif homeTeamScore.match_points > awayTeamScore.match_points:
                 result = self.homeTeam
             else:
                 result = self.awayTeam
             return result
         else:
-            return 'Not Scored'
+            return None
 
 
 class Announcement(models.Model):

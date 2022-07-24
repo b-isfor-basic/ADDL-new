@@ -11,7 +11,7 @@ from .models import PlayerScore, TeamScore
 #from .forms import Scoresheet
 
 
-
+@login_required
 def PersonalStatsView(request, season_id):
     current_user = request.user.id
     scores = Season.objects.get(pk=season_id).match_set.playerscore_set.filter(player_id=current_user)
@@ -34,6 +34,8 @@ def PersonalStatsView(request, season_id):
 
     
 
+    
+
 @login_required
 def ScoresheetCreateView(request, id):
     match = Match.objects.get(id=id)
@@ -45,4 +47,4 @@ def ScoresheetCreateView(request, id):
 #    if request.method == "POST":
 #        if form.is_valid():
 #            pass
-    return render(request, 'add_scoresheet.html', context)
+    return render(request, 'scores/add_scoresheet.html', context)

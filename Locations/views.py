@@ -16,7 +16,7 @@ def establishment_list(request):
         context = {
             'all_areas': all_areas,
         }
-    return render(request, 'establishment_list.html', context)
+    return render(request, 'locations/establishment_list.html', context)
 
 
 def establishment_detail(request, pk):
@@ -32,7 +32,7 @@ def establishment_detail(request, pk):
             division.save()
             return HttpResponse('success')
         else:
-            return render(request, 'partials/division_form.html', context={
+            return render(request, 'locations/partials/division_form.html', context={
                 'form': form
             })
 
@@ -42,11 +42,11 @@ def establishment_detail(request, pk):
         'divisions': divisions
     }
 
-    return render(request, 'establishment_detail.html', context)
+    return render(request, 'locations/establishment_detail.html', context)
 
 def create_division_form(request):
     form = DivisionForm()
     context = {
         'form': form
     }
-    return render(request, 'partials/division_form.html', context)
+    return render(request, 'locations/partials/division_form.html', context)

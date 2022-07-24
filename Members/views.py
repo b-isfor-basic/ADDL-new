@@ -11,4 +11,4 @@ def StandingsView(request):
         'season': season,
     #    'matches': matches
     }
-    return render(request, 'standings.html', context)
+    return render(request, 'scores/standings.html', context)

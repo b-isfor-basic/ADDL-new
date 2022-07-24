@@ -107,25 +107,25 @@ class Establishment(models.Model):
     def get_address(self):
         address = ''
         if self.streetLine1 != None:
-            address += f'{self.streetLine1}\n'
+            address += f'{self.streetLine1}\n'.title()
         if self.streetLine2 != None:
-            address += f'{self.streetLine2}\n'
+            address += f'{self.streetLine2}\n'.title()
         if self.city != None:
-            address += f'{self.city}, '
+            address += f'{self.city}, '.title()
         if self.state != None:
-            address += f'{self.state} '
+            address += f'{self.state} '.upper()
         if self.zipCode != None:
             address += str(self.zipCode)
         return ''.join(address)        
-
-    def get_area_divisions(self):
-        return Establishment.division_set.all(self)
 
     def __str__(self):
         return f'{self.number} - {self.name}'
 
     def get_absolute_url(self):
         return reverse("area", kwargs={"pk": self.id})
+
+    def get_area_divisions(self):
+        return Establishment.division_set.all(self)
 
 
 
@@ -176,13 +176,23 @@ class Division(models.Model):
         blank=True,
         null=True,
     )
-    is_active = models.BooleanField('Active?')
+    is_active = models.BooleanField('Set Active?')
 
     def __str__(self):
         return f'Area {self.area.number} - {self.matchNight}'
 
     def get_absolute_url(self):
         return reverse("division_detail", kwargs={"pk": self.id})
+
+    def board_groups(self):
+        boards = self.capacity
+        if boards % 2 != 0:
+            boards -= 1
+        groups = []
+        for i in range(1, boards, 2):
+            groups.append([i, i + 1])
+        return groups
+
 
 
 

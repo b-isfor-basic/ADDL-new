@@ -33,7 +33,7 @@ def SeasonDetailView(request):
         'divisions': divisions
     }
 
-    return render(request, 'season_detail.html', context)
+    return render(request, 'schedule/season_detail.html', context)
 
 def SeasonCalendar(request, year, month):
     
@@ -43,11 +43,11 @@ def SeasonCalendar(request, year, month):
         'year': year,
         'month': calendar.month_name(month).index(),
     }
-    return render(request, 'season_calendar.html', context)
+    return render(request, 'schedule/season_calendar.html', context)
 
 
 def MatchDetail(request, seasonNum, matchID):
-    return render(request, 'match_details.html', {})
+    return render(request, 'schedule/match_details.html', {})
 
 
 def AnnouncementList(request):
@@ -61,7 +61,7 @@ def create_announcement_form(request):
     context = {
         "form": form
     }
-    return render(request, 'partials/announcement_form.html', context)
+    return render(request, 'schedule/partials/announcement_form.html', context)
 
 
 @login_required
