@@ -1,10 +1,8 @@
-from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import Sum, Max, Min
-
+from django.db.models import Max, Min, Sum
 from phonenumber_field.modelfields import PhoneNumberField
-
 
 
 class Player(AbstractUser):
