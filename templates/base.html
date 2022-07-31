@@ -28,63 +28,62 @@
     </svg>
   </head>
 
-  <body class="h-full">
-    <nav class="bg-gray-800 shadow-xl shadow-violet-600/40 sticky top-0 z-10">
-      <div class="max-w-7xl mx-auto pt-2">
-        <a class="tk-rig-solid-bold-halftone flex justify-center items-center" href="{% url 'home' %}">
-          <span class="text-6xl text-transparent bg-clip-text bg-gradient-to-tr from-violet-500 via-rose-500 to-amber-500">
+  <body class="relative flex flex-col justify-center">
+    <header class="bg-primary-900 sticky top-0 z-50 pt-2 pb-1 h-16 border-b border-slate-300 shadow-lg shadow-primary-400/30 ">
+      <div class="flex justify-between">
+        <a class="tk-rig-solid-bold-halftone mx-auto flex-shrink" href="{% url 'home' %}">
+          <span class="text-5xl text-primary-300">
             ADDL
           </span>
         </a>
-        <div class="tk-objektiv-mk2 uppercase text-sm font-extralight text-center text-gray-300 border-b border-slate-300 dark:text-slate-400 dark:border-slate-700">
-          <ul class="inline-flex -mb-px justify-around">
-            <li>
-                <a href="{% url 'home' %}" 
-                {% if request.resolver_match.url_name == 'home' %}
-                class="nav-link-active" aria-current="page"
-                {% else %}
-                class="nav-link-inactive"
-                {% endif %}
-                >Home</a>
-            </li>
-            <li>
-                <a href="{% url 'all_areas' %}" 
-                {% if request.resolver_match.url_name == 'all_areas' %}
-                class="nav-link-active" aria-current="page"
-                {% else %}
-                class="nav-link-inactive"
-                {% endif %}>Bars</a>
-            </li>
-            <li>
-              <a href="{% url 'schedule' %}" 
-              {% if request.resolver_match.url_name == 'schedule' %}
+      <div class="flex mx-auto items-end space-x-3 tk-objektiv-mk2 uppercase text-sm font-normal text-primary-300 -mb-px">
+          <div class="">
+              <a href="{% url 'home' %}" 
+              {% if request.resolver_match.url_name == 'home' %}
               class="nav-link-active" aria-current="page"
               {% else %}
               class="nav-link-inactive"
-              {% endif %}>Schedule</a>
-            </li>
-            <li>
-              <a href="{% url 'standings' %}" 
-              {% if request.resolver_match.url_name == 'standings' %}
+              {% endif %}
+              >Home</a>
+          </div>
+          <div class="">
+              <a href="{% url 'all_areas' %}" 
+              {% if request.resolver_match.url_name == 'all_areas' %}
               class="nav-link-active" aria-current="page"
               {% else %}
               class="nav-link-inactive"
-              {% endif %}>Stats</a>
-            </li>
-            <li>
-                <a href="#" class="nav-link-inactive">Login</a>
-            </li>
-          </ul>
-        </div>
+              {% endif %}>Bars</a>
+          </div>
+          <div class="">
+            <a href="{% url 'schedule' %}" 
+            {% if request.resolver_match.url_name == 'schedule' %}
+            class="nav-link-active" aria-current="page"
+            {% else %}
+            class="nav-link-inactive"
+            {% endif %}>Schedule</a>
+          </div>
+          <div class="">
+            <a href="{% url 'standings' %}" 
+            {% if request.resolver_match.url_name == 'standings' %}
+            class="nav-link-active" aria-current="page"
+            {% else %}
+            class="nav-link-inactive"
+            {% endif %}>Stats</a>
+          </div>
+          <div class="">
+              <a href="#" class="nav-link-inactive">Login</a>
+          </div>
       </div>
-    </nav>
+    </div>
+    {% block subheader %}{% endblock subheader %}
+    </header>
 
-    <main class="flex flex-auto min-h-full py-5 px-4 sm:px-6 max-w-6xl mx-auto justify-center overflow-x-hidden">
+    <main class="flex flex-col h-screen py-5 px-4 sm:px-6 max-w-6xl mx-auto align-middle justify-start">
       {% block content %} 
       {% endblock %}
     </main>
 
-    <div class="relative block bg-slate-800">
+    <div class="relative block bg-slate-900">
       <div class="text-center tk-rustica py-3">
         <p class="text-white">Website Design by Brittney Smith</p>
         <p class="text-white">

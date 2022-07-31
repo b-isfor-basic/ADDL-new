@@ -2,13 +2,19 @@
 
 {% block title %}Locations{% endblock %}
 
+{% block subheader %}
+{% include '../subheader.html' with title="Locations" %}
+{% endblock %}
+
 {% block content %}
-<div class="md:max-w-screen-lg">
+<div class="md:max-w-screen-lg mt-12">
+  <!--
   <div class="row-auto pb-4">
     <h1 class="tk-rustica font-black uppercase text-center text-5xl">Locations</h1>
   </div>
+  -->
   <div class="flex justify-evenly">
-    <div class="flex flex-row">
+    <div class="basis-25%">
       <a href="{% url 'all_areas' %}?is_active=True">
         <button type="button" class="btn-outer">
           <span class="tk-objektiv btn-inner">
@@ -28,7 +34,7 @@
   {% if all_areas %}
   <div class="flex flex-wrap justify-around">
     {% for area in all_areas %}
-    <div class="flex-auto m-2 p-2 pb-5 rounded-lg shadow-lg shadow-violet-500/50 bg-white">
+    <div class="flex-auto min-h-fit m-2 p-2 pb-5 rounded-lg shadow-lg shadow-violet-500/50 bg-white">
       <p class="text-gray-700 text-base tk-objektiv-mk2 font-light uppercase">
         Area {{ area.number }}
       </p>
@@ -36,13 +42,12 @@
       <p class="text-gray-700 text-base mb-4 tk-objektiv-mk2 font-light flex-wrap">
         {{ area.get_address|linebreaksbr }}
       </p>
-      <div class="flex flex-col">
+      <div class="flex my-auto justify-end align-bottom">
         <a href="{% url 'area' area.id %}">
-          <button type="button" class="btn-outer">
-            <span class="tk-objektiv btn-inner">
-              More Info
+            <span class="tk-objektiv-mk2 text-primary-500 inline-flex items-center">
+              Learn more 
+              <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
             </span>
-          </button>
         </a>
       </div>
     </div>

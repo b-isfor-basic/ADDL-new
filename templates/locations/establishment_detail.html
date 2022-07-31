@@ -3,11 +3,15 @@
 
 {% block title %}{{ area }}{% endblock %}
 
+{% block subheader %}
+{% include '../subheader.html' with title=area %}
+{% endblock %}
+
 {% block content %}
 
 <div id="divisionForm"></div>
 
-<div class="flex flex-col align-middle m-3">
+<div class="flex flex-col align-middle mt-12">
   <div class="block">
     <h1 class="font-black py-2 tk-rustica text-4xl leading-4">{{ area }}</h1>
   </div>

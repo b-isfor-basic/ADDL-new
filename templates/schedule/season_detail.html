@@ -2,9 +2,13 @@
 
 {% block title %}Schedule{% endblock title %}
 
+{% block subheader %}
+{% include '../subheader.html' with title=season %}
+{% endblock %}
+
 {% block content %}
 
-    <div class="w-full flex flex-col sm:flex-row flex-grow overflow-hidden">
+    <div class="w-full flex flex-col sm:flex-row flex-grow overflow-hidden mt-12">
         <div class="sm:w-1/3 md:1/4 w-full flex-shrink flex-grow-0 p-4">
             <div class="sticky p-4 w-full">
                 {% if season %}

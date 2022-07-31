@@ -4,7 +4,7 @@
     </h2>
     <div class="relative overflow-x-auto shadow-lg shadow-violet-600/40">
         <table class="w-full">
-            <thead class="text-sm text-white tk-objektiv-mk2 uppercase bg-gray-800">
+            <thead class="text-sm text-white tk-objektiv-mk2 uppercase bg-primary-800">
                 <tr>
                     <th scope="col" class="p-2 font-light">Week</th>
                     <th scope="col" class="p-2 font-light">Match Date</th>
@@ -17,11 +17,11 @@
             <tbody>
                 {% regroup division.match_set.all|dictsort:"weekNum" by weekNum as matches_list %}
                 {% for week in matches_list %}
-                <tr class="bg-white border-b border-amber-400 hover:bg-amber-300">
+                <tr class="bg-white border-b border-primary-400 hover:bg-primary-100">
                     <th rowspan={{ week.list|length }} scope="rowgroup" class="p-2 text-sm text-center">{{ week.grouper }}</th>      
                         {% for match in week.list %}
                             {% if not forloop.first %}
-                            <tr class="bg-white border-b border-amber-400 hover:bg-amber-300">
+                            <tr class="bg-white border-b border-primary-400 hover:bg-primary-100">
                             {% endif %}
                             <td class="p-2 text-sm text-center">{{ match.matchDate|date:"m.d.y" }}</td>
                             <td class="p-2 text-sm text-center">{{ match.awayTeam }}</td>
@@ -31,8 +31,9 @@
                                 {% if match.winner %}
                                 {{ match.winner }}
                                 {% else %}
-                                <a href="{% url 'add_scoresheet' match.id %}" class="font-medium text-violet-700 underline">
+                                <a href="{% url 'add_scoresheet' match.id %}" class="inline-flex items-center font-medium text-primary-500">
                                     Enter Scores
+                                    <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
                                 </a>
                                 {% endif %}
                             </td>
