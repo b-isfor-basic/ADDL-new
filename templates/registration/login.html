@@ -1,10 +1,20 @@
 {% extends 'base.html' %}
 
+{% load tailwind_filters %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login{% endblock title %}
+
 {% block content %}
-<div class="col-md-10 mx-auto col-lg-6">
-    <form class="p-4 rounded-3 border bg-light" id="login-form" method="post" action="{% url 'login' %}">
+<div class="flex flex-col mx-auto my-auto items-center justify-center">
+    <form class="max-w-lg rounded-lg p-3 bg-white shadow-lg shadow-violet-500/40" id="login-form" method="post">
       {% csrf_token %}
-      <p class="text-center h2 pb-4 tk-rustica">LOGIN</p>
+      <div class="flex-grow">
+      {{ form|crispy }}
+      </div>
+      <!-- add action="{% url 'login' %} to form element above if uncommenting and delete {{ form }}-->
+      <!--
+      <p class="text-center h2 pb-4 tk-objektiv-mk2">LOGIN</p>
       <div class="form-floating mb-3">
         <input type="text" class="form-control" id="id_username" placeholder="username">
       </div>
@@ -22,6 +32,14 @@
       {% if form.errors %}
       <small class="text-danger">Your username and password did not match. Please try again.</small>
       {% endif %}
+    -->
+    <div class="flex items-end justify-center">
+      <button class="btn-outer" type="submit">
+        <span class="btn-inner">
+          Submit
+        </span>
+      </button>
+    </div>
     </form>
   </div>
 {% endblock %}
