@@ -7,7 +7,7 @@ from django.db.models import Sum, Max, Min
 
 from Schedule.models import Match, Season
 from Locations.models import Division
-from .models import PlayerScore, TeamScore
+# from .models import PlayerScore, TeamScore
 #from .forms import Scoresheet
 
 

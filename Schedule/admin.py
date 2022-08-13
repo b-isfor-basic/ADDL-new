@@ -3,7 +3,7 @@ from .models import Season, Match, Announcement
 
 @admin.register(Season)
 class SeasonAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'startDate', 'endDate', 'is_active']
+    list_display = ['__str__', 'startDate', 'endDate']
 
 
 @admin.register(Match)

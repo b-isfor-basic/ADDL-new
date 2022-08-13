@@ -22,10 +22,10 @@ urlpatterns = [
     # TODO: Create view to handle header link active-page highlight logic.
     path('', AnnouncementList, name='home'),
     # TODO: Create login page.
-    # path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('django.contrib.auth.urls'), name='Accounts'),
     path('admin/', admin.site.urls),
-    path('locations/', include('Locations.urls')),
-    path('members/', include('Members.urls')),
-    path('schedule/', include('Schedule.urls')),
+    path('locations/', include('Locations.urls'), name='Locations'),
+    path('members/', include('Members.urls'), name='Members'),
+    path('schedule/', include('Schedule.urls'), name='Schedule'),
     path('scores/', include('Scores.urls'), name='Scores'),
 ]

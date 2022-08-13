@@ -1,6 +1,7 @@
 from django.urls import path, re_path
 from . import views
 
+
 urlpatterns = [
     path('', views.establishment_list, name='all_areas'),
     path('?Pis_active=<is_active>/', views.establishment_list, name='all_areas'),
