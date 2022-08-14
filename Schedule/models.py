@@ -81,22 +81,25 @@ class Match(models.Model):
 
     @property
     def winner(self):
-        home_scores = self.scoreset_set.filter(team=self.homeTeam)
-        homeTeamScore = home_scores.first().match_points() + home_scores.last().match_points()
-        away_scores = self.scoreset_set.filter(team=self.homeTeam)
-        awayTeamScore = away_scores.first().match_points() + away_scores.last().match_points()
-        total_score = self.scoreset_set.filter(cricket__game_point__gt=0).count()
-        if total_score > 0:
-            if homeTeamScore == awayTeamScore:
-                result = "Tie"
-            elif homeTeamScore > awayTeamScore:
-                result = self.homeTeam
-            else:
-                result = self.awayTeam
-            return result
-        else:
+        from Scores.models import Scoreset
+        scores = Scoreset.wins.with_points()
+        scores = scores.filter(match=self.id)
+        homeScore = scores.filter(team=self.homeTeam).aggregate(
+            Sum('match_points', default=0)
+        )
+        awayScore = scores.filter(team=self.awayTeam).aggregate(
+            Sum('match_points', default=0)
+        )
+        if homeScore['match_points__sum'] == 0 and awayScore['match_points__sum'] == 0:
             return None
-
+        else:
+            if homeScore['match_points__sum'] == awayScore['match_points__sum']:
+                return 'Tie'
+            elif homeScore['match_points__sum'] > awayScore['match_points__sum']:
+                return self.homeTeam
+            else:
+                return self.awayTeam
+        
 
 class Announcement(models.Model):
     """
@@ -116,3 +119,4 @@ class Announcement(models.Model):
 
     def __str__(self):
         return str(self.title).title()
+
