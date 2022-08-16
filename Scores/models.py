@@ -48,7 +48,7 @@ class GameScore(models.Model):
     ]
 
     id = models.UUIDField(default=uuid.uuid1, primary_key=True, editable=False)
-    scoreset = models.ForeignKey(to="Scoreset", on_delete=models.CASCADE)
+    scoreset = models.ForeignKey(to="Scoreset", on_delete=models.CASCADE, to_field='player')
     format = models.CharField(max_length=2, choices=FORMAT_CHOICES)
     game = models.CharField(max_length=3, choices=GAME_CHOICES)
     stars = models.PositiveIntegerField(blank=True, null=True)
@@ -82,6 +82,8 @@ class GameScore(models.Model):
 
 
 class ScoresetManager(models.Manager):
+    
+    # Return query with total wins
     def with_points(self):
         return self.annotate(
             match_points=models.Sum('gamescore__game_point')
@@ -90,7 +92,7 @@ class ScoresetManager(models.Manager):
 
 class Scoreset(models.Model):
     """
-    Links all of a players games to the corresponding match for game result and stat calculation.
+    Links all of a player's games to the corresponding match for game result and stat calculation.
     """
 
     match = models.ForeignKey(Match, models.CASCADE)
