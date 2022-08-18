@@ -30,7 +30,6 @@ class Three01GameScoreForm(forms.ModelForm):
         ]
 
 
-
 class Five01GameScoreForm(forms.ModelForm):
     
     class Meta:

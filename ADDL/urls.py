@@ -19,9 +19,8 @@ from Schedule.views import AnnouncementList
 
 
 urlpatterns = [
-    # TODO: Create view to handle header link active-page highlight logic.
+    path('__debug__/', include('debug_toolbar.urls')),
     path('', AnnouncementList, name='home'),
-    # TODO: Create login page.
     path('accounts/', include('django.contrib.auth.urls'), name='Accounts'),
     path('admin/', admin.site.urls),
     path('locations/', include('Locations.urls'), name='Locations'),

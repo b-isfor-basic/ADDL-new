@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@import url("https://use.typekit.net/ptc0kya.css");
+
+
+.btn-outer {
+    @apply flex-auto p-1 m-1 rounded-lg bg-gradient-to-br text-primary-200 from-primary-600 to-primary-800 hover:text-white;
+}
+.btn-inner {
+    @apply flex-auto p-1 uppercase text-base font-light rounded-lg bg-transparent;
+}
+.nav-link-active {
+    @apply p-1 font-bold text-lime-400 border-b-2 border-lime-500;
+}
+.nav-link-inactive {
+    @apply p-1 border-b-2 border-transparent hover:text-lime-200 hover:border-lime-200;
+}
+
+@tailwind utilities;
+@flowbite plugin;
+

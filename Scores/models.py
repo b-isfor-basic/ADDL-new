@@ -48,7 +48,7 @@ class GameScore(models.Model):
     ]
 
     id = models.UUIDField(default=uuid.uuid1, primary_key=True, editable=False)
-    scoreset = models.ForeignKey(to="Scoreset", on_delete=models.CASCADE, to_field='player')
+    scoreset = models.ForeignKey(to="Scoreset", on_delete=models.CASCADE)
     format = models.CharField(max_length=2, choices=FORMAT_CHOICES)
     game = models.CharField(max_length=3, choices=GAME_CHOICES)
     stars = models.PositiveIntegerField(blank=True, null=True)
