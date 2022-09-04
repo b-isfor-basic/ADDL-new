@@ -1,31 +1,61 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 
-{% block title %}Scoresheet{% endblock title %}
+{% load widget_tweaks %}
 
-{% block subheader %}
-{% include '../subheader.html' with title="Scoresheet" %}
-{% endblock %}
+{% block title %}Scoresheet{% endblock title %} 
+
+{% block subheader %} 
+  {%include '../subheader.html' with title="Scoresheet" %} 
+{% endblock %} 
 
 {% block content %}
-<div class="container text-center mt-12">
-    <div class="tk-objective-mk2 font-extrabold text-2xl">
-      <h1>Atlanta Doubles Dart League</h1>
-    </div>
-    <div class="tk-objective-mk2 font-normal text-lg">
-      <h2>Match Play Scoresheet</h2>
-    </div>
-    {% csrf_token %}
-    <div class="flex flex-row gap-2">
-      {% if match %}
-      <div class="">
-        <h3>{{ match.awayTeam }}</h3>
-      </div>
-      <div class="col-auto text-center">
-        <h3>{{ match.homeTeam }}</h3>
-      </div>
-      {% endif %}
-    </div>
-    <form action="{% url 'add_scoresheet' match.id %}" method="post">
-    </form>
+<div class="mt-12 bg-primary-100 border-primary-500 border-b text-primary-600">
+  <!-- Scoresheet Title -->
+  <div class="tk-objective-mk2 font-extrabold text-center text-3xl">
+    <h1>Atlanta Doubles Dart League</h1>
   </div>
+  <div class="tk-objective-mk2 text-center font-normal text-xl pb-2">
+    <h2>Match Play Scoresheet</h2>
+  </div>
+</div>
+
+<!-- Player Entry -->
+
+<form method="post">
+    {% csrf_token %}
+  <div class="container flex flex-col min-w-full">
+    <div class="inline-flex justify-around">
+      {% if match %}
+      <div class="basis-1/2 text-center m-4">
+        <h2 class="text-lg tk-objektiv-mk2 uppercase font-extralight p-2">Away</h2>
+        <h3>{{ match.awayTeam }}</h3>
+        {{ away_player_forms.management_form }}
+          {% for away_form in away_player_forms %}
+            <div>{% render_field away_form.player class+="rounded-lg m-2" %}</div>
+          {% endfor %}
+      </div>
+      <div class="basis-1/2 text-center m-4">
+        <h2 class="text-lg tk-objektiv-mk2 uppercase font-extralight p-2">Home</h2>
+        <h3>{{ match.homeTeam }}</h3>
+        {{ home_player_forms.management_form }}
+          {% for home_form in home_player_forms %}
+        <div>{% render_field home_form.player class+="rounded-lg m-2" %}</div>
+          {% endfor %}
+      </div>
+  {% endif %}
+    </div>
+
+  <div class="inline-flex justify-around">
+    <div class="flex-auto p-3 border-primary-500 bg-primary-100 border-y">
+      <h2 class="text-center text-xl text-primary-600 tk-objektiv-mk2 uppercase">Singles Cricket</h2>
+    </div>
+  </div>
+
+  <div class="min-w-full flex-auto justify-center">
+    <button type="submit" class="bg-white text-primary-500 font-semibold tk-rustica uppercase border-2 border-primary-500">
+      <span class="m-3">Submit</span>
+    </button>
+  </div>
+</form>
+
 {% endblock content %}

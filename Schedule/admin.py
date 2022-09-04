@@ -3,12 +3,13 @@ from .models import Season, Match, Announcement
 
 @admin.register(Season)
 class SeasonAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'startDate', 'endDate']
+    list_display = ['seasonNum', 'startDate', 'endDate']
 
 
 @admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):
-    list_display = ['weekNum', 'matchDate', 'division', 'awayTeam', 'homeTeam']
+    list_filter = ['season', 'division']
+    list_display = ['weekNum', 'matchDate', 'division', 'awayTeam', 'homeTeam', 'winner']
 
 
 @admin.register(Announcement)

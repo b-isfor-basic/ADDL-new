@@ -13,38 +13,29 @@
     <h1 class="tk-rustica font-black uppercase text-center text-5xl">Locations</h1>
   </div>
   -->
-  <div class="flex justify-evenly">
-    <div class="basis-25%">
-      <a href="{% url 'all_areas' %}?is_active=True">
-        <button type="button" class="btn-outer">
-          <span class="tk-objektiv btn-inner">
-            View Active
-          </span>
-        </button>
+  <div class="flex">
+    <div class="flex-col flex-shrink-0 inline-flex justify-start">
+      <a href="{% url 'all_areas' %}?is_active=True" class="tk-objektiv uppercase hover:underline hover:underline-offset-2">
+        View Active
       </a>
-      <a href="{% url 'all_areas' %}">
-        <button type="button" class="btn-outer">
-          <span class="tk-objektiv btn-inner">
-            View All
-          </span>
-        </button>
+      <a href="{% url 'all_areas' %}" class="tk-objektiv uppercase hover:underline hover:underline-offset-2">
+        View All
       </a>
     </div>
-  </div>
   {% if all_areas %}
-  <div class="flex flex-wrap justify-around">
+  <div class="flex flex-wrap justify-around align-top">
     {% for area in all_areas %}
     <div class="flex-auto min-h-fit m-2 p-2 pb-5 rounded-lg shadow-lg shadow-violet-500/50 bg-white">
       <p class="text-gray-700 text-base tk-objektiv-mk2 font-light uppercase">
         Area {{ area.number }}
       </p>
       <h5 class="text-gray-900 text-2xl leading-tight font-extrabold mb-2 tk-rustica">{{ area.name }}</h5>
-      <p class="text-gray-700 text-base mb-4 tk-objektiv-mk2 font-light flex-wrap">
+      <p class="text-gray-700 text-base mb-auto tk-objektiv-mk2 font-light flex-wrap">
         {{ area.get_address|linebreaksbr }}
       </p>
-      <div class="flex my-auto justify-end align-bottom">
+      <div class="mt-auto justify-start object-bottom">
         <a href="{% url 'area' area.id %}">
-            <span class="tk-objektiv-mk2 text-primary-500 inline-flex items-center">
+            <span class="inline-flex tk-objektiv-mk2 text-primary-500 items-center">
               Learn more 
               <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
             </span>

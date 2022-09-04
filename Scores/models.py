@@ -5,6 +5,7 @@ from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models.aggregates import Sum, Min, Max
 from django.db.models.functions import Coalesce
+from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from django_extensions.db.models import TimeStampedModel
@@ -15,22 +16,19 @@ from Schedule.models import Match
 
 class GameQuerySet(models.QuerySet):
     def doubles(self):
-        return self.filter(format='DB')
+        return super(GameQuerySet, self).filter(format='DB')
     
     def singles(self):
-        return self.filter(format='SN')
+        return super(GameQuerySet, self).filter(format='SN')
 
     def five01_singles(self):
-        return self.filter(
-            format='SN',
-            game='501'
-        )
+        return super(GameQuerySet, self).filter(format='SN', game='501')
     
     def five01_doubles(self):
-        return self.filter(
-            format='DB',
-            game='501'
-        )
+        return super(GameQuerySet, self).filter(format='DB', game='501')
+
+    def wins(self):
+        return super(GameQuerySet, self).filter(game_point=1)
 
 
 class GameScore(models.Model):
@@ -83,11 +81,25 @@ class GameScore(models.Model):
 
 class ScoresetManager(models.Manager):
     
-    # Return query with total wins
-    def with_points(self):
-        return self.annotate(
-            match_points=models.Sum('gamescore__game_point')
+    def get_queryset(self):
+        # Return queryset with total wins
+        return super(ScoresetManager,self).get_queryset().annotate(
+            match_points=Sum('gamescore__game_point')
         )
+
+    def create_new(self, match, team, player):
+        if player.team_set.first() == team:
+            sub = False
+        else: 
+            sub = True
+        scoreset = self.create(
+            match=match,
+            team=team,
+            player=player,
+            is_sub=sub
+        )
+        return scoreset
+
 
 
 class Scoreset(models.Model):
@@ -101,7 +113,10 @@ class Scoreset(models.Model):
     is_sub = models.BooleanField()
 
     objects = models.Manager()
-    wins = ScoresetManager()
+    details = ScoresetManager()
+
+    class Meta:
+        unique_together = ['match', 'player']
 
     def singles_points(self):
         points = GameScore.singles_games.filter(scoreset=self.id).aggregate(
