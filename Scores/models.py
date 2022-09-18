@@ -5,6 +5,7 @@ from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models.aggregates import Sum, Min, Max
 from django.db.models.functions import Coalesce
+from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from django_extensions.db.models import TimeStampedModel
@@ -15,22 +16,55 @@ from Schedule.models import Match
 
 class GameQuerySet(models.QuerySet):
     def doubles(self):
-        return self.filter(format='DB')
+        return super(GameQuerySet, self).filter(format='DB')
     
     def singles(self):
-        return self.filter(format='SN')
+        return super(GameQuerySet, self).filter(format='SN')
 
     def five01_singles(self):
-        return self.filter(
-            format='SN',
-            game='501'
-        )
+        return super(GameQuerySet, self).filter(format='SN', game='501')
     
     def five01_doubles(self):
-        return self.filter(
-            format='DB',
-            game='501'
-        )
+        return super(GameQuerySet, self).filter(format='DB', game='501')
+
+    def wins(self):
+        return super(GameQuerySet, self).filter(game_point=1)
+
+
+class SinglesCricketGameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'SN'
+        game = 'CKT'
+        return super().create(format=format, game=game, **kwargs)
+
+
+class DoublesCricketGameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'DB'
+        game = 'CKT'
+        return super().create(format=format, game=game, **kwargs)
+
+
+class Singles501GameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'SN'
+        game = '501'
+        return super().create(format=format, game=game, **kwargs)
+
+
+class Doubles501GameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'DB'
+        game = '501'
+        return super().create(format=format, game=game, **kwargs)
+
+
+class Doubles301GameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'DB'
+        game = '301'
+        return super().create(format=format, game=game, **kwargs)
+
 
 
 class GameScore(models.Model):
@@ -79,18 +113,43 @@ class GameScore(models.Model):
 
     objects = models.Manager()
     games = GameQuerySet.as_manager()
+    singles_cricket = SinglesCricketGameManager()
+    doubles_cricket = DoublesCricketGameManager()
+    singles_501 = Singles501GameManager()
+    doubles_501 = Doubles501GameManager()
+    doubles_301 = Doubles301GameManager()
+
+    @property
+    def player_display(self):
+        return '(' + str(self.scoreset.match.weekNum) + ') ' + self.scoreset.player.last_name
 
 
 class ScoresetManager(models.Manager):
-    def with_points(self):
-        return self.annotate(
-            match_points=models.Sum('gamescore__game_point')
+    
+    def get_queryset(self):
+        # Return queryset with total wins
+        return super(ScoresetManager,self).get_queryset().annotate(
+            match_points=Sum('gamescore__game_point')
         )
+
+    def create_new(self, match, team, player):
+        if player.team_set.first() == team:
+            sub = False
+        else: 
+            sub = True
+        scoreset = self.create(
+            match=match,
+            team=team,
+            player=player,
+            is_sub=sub
+        )
+        return scoreset
+
 
 
 class Scoreset(models.Model):
     """
-    Links all of a players games to the corresponding match for game result and stat calculation.
+    Links all of a player's games to the corresponding match for game result and stat calculation.
     """
 
     match = models.ForeignKey(Match, models.CASCADE)
@@ -99,7 +158,14 @@ class Scoreset(models.Model):
     is_sub = models.BooleanField()
 
     objects = models.Manager()
-    wins = ScoresetManager()
+    details = ScoresetManager()
+
+    class Meta:
+        unique_together = ['match', 'player']
+
+    @property
+    def player_display(self):
+        return '(' + str(self.match.weekNum) + ') ' + self.player.last_name
 
     def singles_points(self):
         points = GameScore.singles_games.filter(scoreset=self.id).aggregate(
