@@ -8,9 +8,16 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 
 from django_extensions.db.models import CreationDateTimeField, AutoSlugField
+from recurrence.fields import RecurrenceField
 
 from Locations.models import Division, Establishment
 from Members.models import Team
+
+
+class RecurringEvent(models.Model):
+    title = models.CharField(max_length=48)
+    description = models.TextField(null=True, blank=True)
+    recurrence = RecurrenceField()
 
 
 class Season(models.Model):

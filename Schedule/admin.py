@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Season, Match, Announcement
+from .models import Season, Match, Announcement, RecurringEvent
 
 @admin.register(Season)
 class SeasonAdmin(admin.ModelAdmin):
@@ -16,3 +16,7 @@ class MatchAdmin(admin.ModelAdmin):
 class AnnouncementAdmin(admin.ModelAdmin):
     list_filter = ('season', 'created_by')
     list_display = ['title', 'created_by', 'active_date', 'inactive_date']
+
+@admin.register(RecurringEvent)
+class RecurringEventAdmin(admin.ModelAdmin):
+    list_display = ['title', 'recurrence']

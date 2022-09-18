@@ -2,7 +2,7 @@ import calendar
 from calendar import HTMLCalendar
 
 from django.shortcuts import get_object_or_404, render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models.functions import Now
 
 from .models import Season, Match, Announcement
@@ -14,13 +14,12 @@ from .forms import AnnouncementForm, SeasonForm
 
 
 def SeasonDetailView(request):
-    current_season = Season.objects.first().seasonNum
-    season = Season.objects.get(seasonNum=current_season)
+    season = Season.objects.first()
     active_div_list = season.division_set.all()
     
     if 'division' in request.GET.keys():
         division = request.GET['division']
-        matches = season.match_set.filter(division__id=division).all()
+        matches = season.match_set.filter(division__id=division)
         divisions = season.division_set.get(id=division)
     else:
         matches = season.match_set.all()
@@ -64,9 +63,10 @@ def create_announcement_form(request):
     return render(request, 'schedule/partials/announcement_form.html', context)
 
 
-@login_required
+@login_required 
+@permission_required
 def MatchCreationView(request):
-    season = Season.objects.first()
+    season = Season.objects.latest()
     active_divisions = season.division_set.all()
-    for division in active_divisions:
-        division['num_teams']= division.team_set.count()
+#    for division in active_divisions:
+        

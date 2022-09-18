@@ -31,6 +31,42 @@ class GameQuerySet(models.QuerySet):
         return super(GameQuerySet, self).filter(game_point=1)
 
 
+class SinglesCricketGameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'SN'
+        game = 'CKT'
+        return super().create(format=format, game=game, **kwargs)
+
+
+class DoublesCricketGameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'DB'
+        game = 'CKT'
+        return super().create(format=format, game=game, **kwargs)
+
+
+class Singles501GameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'SN'
+        game = '501'
+        return super().create(format=format, game=game, **kwargs)
+
+
+class Doubles501GameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'DB'
+        game = '501'
+        return super().create(format=format, game=game, **kwargs)
+
+
+class Doubles301GameManager(models.Manager):
+    def create(self, **kwargs):
+        format = 'DB'
+        game = '301'
+        return super().create(format=format, game=game, **kwargs)
+
+
+
 class GameScore(models.Model):
     SINGLES = "SN"
     DOUBLES = "DB"
@@ -77,6 +113,15 @@ class GameScore(models.Model):
 
     objects = models.Manager()
     games = GameQuerySet.as_manager()
+    singles_cricket = SinglesCricketGameManager()
+    doubles_cricket = DoublesCricketGameManager()
+    singles_501 = Singles501GameManager()
+    doubles_501 = Doubles501GameManager()
+    doubles_301 = Doubles301GameManager()
+
+    @property
+    def player_display(self):
+        return '(' + str(self.scoreset.match.weekNum) + ') ' + self.scoreset.player.last_name
 
 
 class ScoresetManager(models.Manager):
@@ -117,6 +162,10 @@ class Scoreset(models.Model):
 
     class Meta:
         unique_together = ['match', 'player']
+
+    @property
+    def player_display(self):
+        return '(' + str(self.match.weekNum) + ') ' + self.player.last_name
 
     def singles_points(self):
         points = GameScore.singles_games.filter(scoreset=self.id).aggregate(

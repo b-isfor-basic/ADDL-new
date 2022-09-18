@@ -31,6 +31,10 @@ INTERNAL_IPS = ['127.0.0.1', '127.0.0.1:8000']
 
 # Application definition
 INSTALLED_APPS = [
+    # Autocomplete
+    'dal',
+    'dal_select2',
+
     # Django included packages
     'django.contrib.admin',
     'django.contrib.auth',
