@@ -27,14 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-INTERNAL_IPS = ['127.0.0.1', '127.0.0.1:8000']
+INTERNAL_IPS = ['127.0.0.1',]
 
 # Application definition
 INSTALLED_APPS = [
-    # Autocomplete
-    'dal',
-    'dal_select2',
-
     # Django included packages
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,15 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     
     # Installed packages
-    'debug_toolbar',
     'django_extensions',
     'phonenumber_field',
     'recurrence',
     'compressor',
-    'widget_tweaks',
-#   No longer in use - may re-add in future
-#    'crispy_forms',
-#    'crispy_tailwind',
+    'crispy_forms',
+    'crispy_tailwind',
     
     # Created packages
     'Scores.apps.ScoresConfig',
@@ -64,7 +57,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -87,7 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # 'Locations.custom_context_processor.area_renderer'
+                'Locations.custom_context_processor.area_renderer'
             ],
         },
     },
@@ -146,7 +138,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'src/']
+# STATICFILES_DIRS = [BASE_DIR / 'templates/static/']
 STATIC_ROOT = './static/'
 
 # Default primary key field type
@@ -175,15 +167,10 @@ GRAPH_MODELS = {
   'group_models': True,
 }
 
-# Crispy Froms - No longer in use. May re-add in future.
+# Crispy Froms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
-# CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
-# CRISPY_TEMPLATE_PACK = "tailwind"
+CRISPY_TEMPLATE_PACK = "tailwind"
 
 # Custom User Model
 AUTH_USER_MODEL = 'Members.Player'
-
-# Debug Toolbar Config
-DEBUG_TOOLBAR_CONFIG = {
-    'INSERT_BEFORE': '</main>'
-}

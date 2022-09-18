@@ -4,11 +4,12 @@
 __pycache__
 
 # Env
+.env
+myvenv/
 .venv/
 
 # Static folder at project root
-static/admin/
-static/CACHE/
+static/
 
 # macOS
 ._*
@@ -20,9 +21,3 @@ static/CACHE/
 .vscode/
 .history/
 *.code-workspace
-
-# node_modules
-node_modules/
-
-# Model visualization
-my_project_visualized.png

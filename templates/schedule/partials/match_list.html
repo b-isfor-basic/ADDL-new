@@ -15,7 +15,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% regroup matches|dictsort:"weekNum" by weekNum as matches_list %}
+                {% regroup division.match_set.all|dictsort:"weekNum" by weekNum as matches_list %}
                 {% for week in matches_list %}
                 <tr class="bg-white border-b border-primary-400 hover:bg-primary-100">
                     <th rowspan={{ week.list|length }} scope="rowgroup" class="p-2 text-sm text-center">{{ week.grouper }}</th>      

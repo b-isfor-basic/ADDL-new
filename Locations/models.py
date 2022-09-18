@@ -129,6 +129,7 @@ class DivisionManager(models.Manager):
     def num_active_divisions(self, season_number):
         return self.filter(season__seasonNum=season_number).count()
 
+    @property
     def num_active_teams(self):
         return self.annotate(
             num_teams=Coalesce(models.Count('team_set'))
@@ -169,8 +170,11 @@ class Division(models.Model):
         blank=True,
         null=True,
     )
-    season = models.ManyToManyField(
+    season = models.ForeignKey(
         "Schedule.Season",
+        models.CASCADE,
+        blank=True,
+        null=True,
     )
     
     objects = models.Manager()

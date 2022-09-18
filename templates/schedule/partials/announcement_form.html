@@ -1,3 +1,4 @@
+{% load tailwind_filters %}
 <div class="flex flex-row flex-grow">
   <button type="button" class="btn-outer" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">
     <span class="tk-objektiv btn-inner">
@@ -18,7 +19,7 @@
             data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body relative p-4">
-          <p>{{ form }}</p>
+          <p>{{ form|crispy }}</p>
         </div>
         <div
           class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">

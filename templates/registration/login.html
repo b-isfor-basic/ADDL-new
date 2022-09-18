@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 
+{% load tailwind_filters %}
+{% load crispy_forms_tags %}
+
 {% block title %}Login{% endblock title %}
 
 {% block content %}
 <div class="flex flex-col mx-auto my-auto items-center justify-center">
     <form class="max-w-lg rounded-lg p-3 bg-white shadow-lg shadow-violet-500/40" id="login-form" method="post">
       {% csrf_token %}
-      <div class="flex-auto">
-      {{ form }}
+      <div class="flex-grow">
+      {{ form|crispy }}
       </div>
       <!-- add action="{% url 'login' %} to form element above if uncommenting and delete {{ form }}-->
       <!--
