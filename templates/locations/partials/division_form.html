@@ -1,8 +1,5 @@
-{% load crispy_forms_tags %}
-{% load tailwind_filters %}
-
 <div hx-target="this" hx-swap="outerHTML">
-  <div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="relative z-30" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <!--
       Background backdrop, show/hide based on modal state.
         Entering: "ease-out duration-300"
@@ -14,7 +11,7 @@
       -->
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
       
-    <div class="fixed z-10 inset-0 overflow-y-auto">
+    <div class="fixed z-40 inset-0 overflow-y-auto">
       <div class="flex items-center sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
         <!--
           Modal panel, show/hide based on modal state.          
@@ -27,17 +24,19 @@
         -->
         <div class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-2/3">
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
+            <div class="flex-auto">
               <div class="mt-3 text-center">
                 <h3 class="text-lg font-extralight tk-objektiv-mk2 uppercase text-gray-900" id="modal-title">Register Division</h3>
               </div>
               <div class="mt-2">
-                <form class="justify-items-stretch" method="POST">
+                <form class="" method="POST">
                   {% csrf_token %}
-                  {{ form|crispy }}
+                  <div class="flex flex-col">
+                  {{ form }}
+                  </div>
                   <div class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-slate-200 rounded-b-md">
                     <button type="button" class="btn-outer" id="closeButton" _="on click take .uk-open from #modal wait 200ms then remove #modal">
-                      <span class="btn-inner hover:bg-transparent">
+                      <span class="btn-inner">
                         Close
                       </span>
                     </button>

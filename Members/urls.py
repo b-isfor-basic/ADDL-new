@@ -1,6 +1,7 @@
-from django.urls import path
-from . import views
+from django.urls import path, re_path
+from .views import *
 
 urlpatterns = [
-    path('', views.StandingsView, name='standings')
+    path('', StandingsView, name='standings'),
+    re_path(r'^player-autocomplete/$', PlayerAutocomplete.as_view(), name='player-autocomplete')
 ]

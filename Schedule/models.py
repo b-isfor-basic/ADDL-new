@@ -8,16 +8,23 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 
 from django_extensions.db.models import CreationDateTimeField, AutoSlugField
+from recurrence.fields import RecurrenceField
 
 from Locations.models import Division, Establishment
 from Members.models import Team
 
 
+class RecurringEvent(models.Model):
+    title = models.CharField(max_length=48)
+    description = models.TextField(null=True, blank=True)
+    recurrence = RecurrenceField()
+
+
 class Season(models.Model):
     """
-    Season match play lasts for 9 to 11 weeks based on the number of 
-    teams registered in each area and can accommodate 4, 5, 6, 8, 9, 
-    10, 11, or 12 teams in each division. 
+    Season match play lasts for 9 to 11 weeks based on the number of
+    teams registered in each area and can accommodate 4, 5, 6, 8, 9,
+    10, 11, or 12 teams in each division.
 
     There is 1 week at the end of the season for make-up matches and
     1 week for in-house seeded playoff preliminary matches. The final
@@ -47,9 +54,15 @@ class Season(models.Model):
         return before_today.days > 0 and after_today.days > 0
 
 
+class MatchManager(models.Manager):
+    
+    def get_queryset(self):
+        return super(MatchManager, self).get_queryset().annotate(points=F('scoreset_set__gamescore__game_point'))
+
+
 class Match(models.Model):
     """
-    
+    Scheduled matches.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     season = models.ForeignKey(Season, models.CASCADE)
@@ -73,37 +86,34 @@ class Match(models.Model):
         related_name="homeMatches",
     )
 
+    objects = models.Manager()
+    details = MatchManager()
+
     class Meta:
         verbose_name_plural = "Matches"
 
     def __str__(self):
         return f"{self.awayTeam} vs. {self.homeTeam}"
-
+    
     @property
     def winner(self):
-        from Scores.models import Scoreset
-        scores = Scoreset.wins.with_points()
-        scores = scores.filter(match=self.id)
-        homeScore = scores.filter(team=self.homeTeam).aggregate(
-            Sum('match_points', default=0)
-        )
-        awayScore = scores.filter(team=self.awayTeam).aggregate(
-            Sum('match_points', default=0)
-        )
-        if homeScore['match_points__sum'] == 0 and awayScore['match_points__sum'] == 0:
+        homeScore = self.scoreset_set.filter(team=self.homeTeam).aggregate(wins=Sum('gamescore__game_point', default=0))
+        awayScore = self.scoreset_set.filter(team=self.awayTeam).aggregate(wins=Sum('gamescore__game_point', default=0))
+
+        if homeScore['wins'] == 0 and awayScore['wins'] == 0:
             return None
         else:
-            if homeScore['match_points__sum'] == awayScore['match_points__sum']:
-                return 'Tie'
-            elif homeScore['match_points__sum'] > awayScore['match_points__sum']:
-                return self.homeTeam
+            if homeScore['wins'] == awayScore['wins']:
+                return "Tie"
+            elif homeScore['wins'] > awayScore['wins']:
+                return 'Home'
             else:
-                return self.awayTeam
-        
+                return 'Away'
+
 
 class Announcement(models.Model):
     """
-    Holds front page announcements such as season creation dates, 
+    Holds front page announcements such as season creation dates,
     team registration deadlines, etc. Requires an active date and
     expiration date to remove messages that are no longer relevant.
     """
@@ -119,4 +129,3 @@ class Announcement(models.Model):
 
     def __str__(self):
         return str(self.title).title()
-
