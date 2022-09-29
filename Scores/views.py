@@ -4,10 +4,11 @@ from django.forms import all_valid, formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from Schedule.models import Match
+from Schedule.models import Match, Season
 
 from .forms import (GameScoreForm, ScoresetForm)
 from .models import (GameScore, Scoreset)
+
 
 ScoresetFormSet = formset_factory(ScoresetForm, extra=2, min_num=2, max_num=2)
 GameScoreFormSet = formset_factory(GameScoreForm, extra=10, min_num=10, max_num=10)
@@ -56,12 +57,11 @@ def ScoresheetCreateView(request, id):
                 home_score.save()
                 player_scores.append(home_score.id)
 
-            # Loop through all games
-            for i in range(10):
-
-                # Create singles cricket scores
-                while i < 2:
-                    for form_set in game_score_forms:
+            for form_set in game_score_forms: # Loop through each player
+                for i in range(10): # Loop through each game
+                    
+                    # Create singles cricket scores
+                    while i < 2:
                         form = form_set.forms[i]
                         scoreset = Scoreset.objects.get(id=player_scores[form_set.index])
                         stars = form.cleaned_data['stars']
@@ -75,9 +75,8 @@ def ScoresheetCreateView(request, id):
                         )
                         new_score.save()
                
-               # Create doubles cricket scores
-                while i >= 2 and i < 4:
-                    for form_set in game_score_forms:
+                    # Create doubles cricket scores
+                    while i >= 2 and i < 4:
                         form = form_set.forms[i]
                         scoreset = Scoreset.objects.get(id=player_scores[form_set.index])
                         stars = form.cleaned_data['stars']
@@ -91,9 +90,8 @@ def ScoresheetCreateView(request, id):
                         )
                         new_score.save()
                 
-                # Create singles 501 scores
-                while i >= 4 and i < 6:
-                    for form_set in game_score_forms:
+                    # Create singles 501 scores
+                    while i >= 4 and i < 6:
                         form = form_set.forms[i]
                         scoreset = Scoreset.objects.get(id=player_scores[form_set.index])
                         stars = form.cleaned_data['stars']
@@ -113,9 +111,8 @@ def ScoresheetCreateView(request, id):
                         )
                         new_score.save()
                 
-                # Create doubles 301 scores
-                while i >= 6 and i < 8:
-                    for form_set in game_score_forms:
+                    # Create doubles 301 scores
+                    while i >= 6 and i < 8:
                         form = form_set.forms[i]
                         scoreset = Scoreset.objects.get(id=player_scores[form_set.index])
                         stars = form.cleaned_data['stars']
@@ -133,27 +130,26 @@ def ScoresheetCreateView(request, id):
                         )
                         new_score.save()
 
-                # Create doubles 501 scores
-                while i >= 8:
-                  for form_set in game_score_forms:
-                    form = form_set.forms[i]
-                    scoreset = Scoreset.objects.get(id=player_scores[form_set.index])
-                    stars = form.cleaned_data['stars']
-                    perfects = form.cleaned_data['perfects']
-                    game_point = form.cleaned_data['game_point']
-                    out_thrown = form.cleaned_data['out_thrown']
-                    darts_thrown = form.cleaned_data['darts_thrown']
-                    score_left = form.cleaned_data['score_left']
-                    new_score = GameScore.doubles_501.create(
-                        scoreset=scoreset,
-                        stars=stars,
-                        perfects=perfects,
-                        game_point=game_point,
-                        out_thrown=out_thrown,
-                        darts_thrown=darts_thrown,
-                        score_left=score_left
-                    )
-                    new_score.save()
+                    # Create doubles 501 scores
+                    while i >= 8:
+                        form = form_set.forms[i]
+                        scoreset = Scoreset.objects.get(id=player_scores[form_set.index])
+                        stars = form.cleaned_data['stars']
+                        perfects = form.cleaned_data['perfects']
+                        game_point = form.cleaned_data['game_point']
+                        out_thrown = form.cleaned_data['out_thrown']
+                        darts_thrown = form.cleaned_data['darts_thrown']
+                        score_left = form.cleaned_data['score_left']
+                        new_score = GameScore.doubles_501.create(
+                            scoreset=scoreset,
+                            stars=stars,
+                            perfects=perfects,
+                            game_point=game_point,
+                            out_thrown=out_thrown,
+                            darts_thrown=darts_thrown,
+                            score_left=score_left
+                        )
+                        new_score.save()
 
             return HttpResponseRedirect('/schedule/')
         
@@ -178,3 +174,12 @@ def ScoresheetCreateView(request, id):
     return render(request, 'scores/add_scoresheet.html', context)
 
  
+def StandingsView(request, season=Season.objects.first(), *args, **kwargs):
+    season = season
+    
+    # matches = season.match_set.all()
+    context = {
+        'season': season,
+    #    'matches': matches
+    }
+    return render(request, 'scores/standings.html', context)
