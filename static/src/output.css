@@ -900,10 +900,6 @@ select {
   left: 0px;
 }
 
-.right-0 {
-  right: 0px;
-}
-
 .z-50 {
   z-index: 50;
 }
@@ -940,13 +936,30 @@ select {
   margin: 0.5rem;
 }
 
+.m-28 {
+  margin: 7rem;
+}
+
 .m-3 {
   margin: 0.75rem;
+}
+
+.m-8 {
+  margin: 2rem;
+}
+
+.m-6 {
+  margin: 1.5rem;
 }
 
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .my-auto {
@@ -1047,10 +1060,6 @@ select {
   display: inline-block;
 }
 
-.inline {
-  display: inline;
-}
-
 .flex {
   display: flex;
 }
@@ -1083,14 +1092,6 @@ select {
   height: 1rem;
 }
 
-.h-1 {
-  height: 0.25rem;
-}
-
-.h-5 {
-  height: 1.25rem;
-}
-
 .max-h-\[500px\] {
   max-height: 500px;
 }
@@ -1117,10 +1118,6 @@ select {
   width: 1rem;
 }
 
-.w-1 {
-  width: 0.25rem;
-}
-
 .w-2\/3 {
   width: 66.666667%;
 }
@@ -1129,8 +1126,8 @@ select {
   width: auto;
 }
 
-.w-5 {
-  width: 1.25rem;
+.min-w-full {
+  min-width: 100%;
 }
 
 .max-w-6xl {
@@ -1151,6 +1148,10 @@ select {
 
 .flex-auto {
   flex: 1 1 auto;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
 }
 
 .flex-shrink {
@@ -1221,14 +1222,6 @@ select {
 
 .content-center {
   align-content: center;
-}
-
-.content-end {
-  align-content: flex-end;
-}
-
-.items-start {
-  align-items: flex-start;
 }
 
 .items-end {
@@ -1343,6 +1336,10 @@ select {
 
 .border-2 {
   border-width: 2px;
+}
+
+.border {
+  border-width: 1px;
 }
 
 .border-b {
@@ -1496,11 +1493,6 @@ select {
      object-position: bottom;
 }
 
-.object-right {
-  -o-object-position: right;
-     object-position: right;
-}
-
 .p-4 {
   padding: 1rem;
 }
@@ -1519,6 +1511,14 @@ select {
 
 .p-\[2px\] {
   padding: 2px;
+}
+
+.p-8 {
+  padding: 2rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
 }
 
 .px-4 {
@@ -1709,11 +1709,6 @@ select {
   color: rgb(181 179 249 / var(--tw-text-opacity));
 }
 
-.text-primary-300 {
-  --tw-text-opacity: 1;
-  color: rgb(136 126 247 / var(--tw-text-opacity));
-}
-
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
@@ -1868,6 +1863,16 @@ select {
 
 @flowbite plugin;
 
+.placeholder\:text-primary-200::-moz-placeholder {
+  --tw-text-opacity: 1;
+  color: rgb(181 179 249 / var(--tw-text-opacity));
+}
+
+.placeholder\:text-primary-200::placeholder {
+  --tw-text-opacity: 1;
+  color: rgb(181 179 249 / var(--tw-text-opacity));
+}
+
 .placeholder\:text-slate-200::-moz-placeholder {
   --tw-text-opacity: 1;
   color: rgb(226 232 240 / var(--tw-text-opacity));
@@ -1898,14 +1903,24 @@ select {
   color: rgb(148 163 184 / var(--tw-text-opacity));
 }
 
-.placeholder\:text-primary-200::-moz-placeholder {
+.placeholder\:text-gray-300::-moz-placeholder {
   --tw-text-opacity: 1;
-  color: rgb(181 179 249 / var(--tw-text-opacity));
+  color: rgb(209 213 219 / var(--tw-text-opacity));
 }
 
-.placeholder\:text-primary-200::placeholder {
+.placeholder\:text-gray-300::placeholder {
   --tw-text-opacity: 1;
-  color: rgb(181 179 249 / var(--tw-text-opacity));
+  color: rgb(209 213 219 / var(--tw-text-opacity));
+}
+
+.placeholder\:text-gray-400::-moz-placeholder {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
+}
+
+.placeholder\:text-gray-400::placeholder {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
 }
 
 .hover\:bg-transparent:hover {

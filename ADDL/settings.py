@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # Autocomplete
     'dal',
     'dal_select2',
+    'djhacker',
 
     # Django included packages
     'django.contrib.admin',

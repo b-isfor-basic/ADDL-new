@@ -9,15 +9,14 @@ class ScoresetForm(forms.ModelForm):
     class Meta:
         model = Scoreset
         fields = ['player']
-        widgets = {
-            'player': autocomplete.ModelSelect2(
-                url='members/player-autocomplete',
-                attrs={
-                    'data-placeholder': 'Select Player...',
-                    'data-minimum-input-length': 3,
-                }
-            )
-        }
+        # widgets = {
+        #     'player': autocomplete.ModelSelect2(
+        #         url='player-autocomplete',
+        #         attrs={
+        #             'data-minimum-input-length': 1,
+        #         }
+        #     )
+        # }
         
 
 class GameScoreForm(forms.ModelForm):

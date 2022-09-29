@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from .views import *
 
 urlpatterns = [
-    path('add/<uuid:id>', views.ScoresheetCreateView, name='add_scoresheet'),
+    path('add/<uuid:id>', ScoresheetCreateView, name='add_scoresheet'),
+    path('', StandingsView, name='standings'),
 #    path('mystats/<int:season_id>/', views.PersonalStatsView, name='my_stats'),
 ]

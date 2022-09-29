@@ -3,9 +3,7 @@ import uuid
 from django.conf import settings
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models.aggregates import Sum, Min, Max
-from django.db.models.functions import Coalesce
-from django.forms import ValidationError
+from django.db.models.aggregates import Max, Min, Sum
 from django.utils.translation import gettext_lazy as _
 
 from django_extensions.db.models import TimeStampedModel

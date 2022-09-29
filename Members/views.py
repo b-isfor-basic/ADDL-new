@@ -1,32 +1,29 @@
-from multiprocessing import context
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 
 from dal import autocomplete
 
-from Schedule.models import Season, Match
-from Scores.models import Scoreset
 
-from .models import Player, Team
-
-def StandingsView(request):
-    season = Season.objects.first()
-    # matches = season.match_set.all()
+@login_required
+def PlayerProfileView(request):
     context = {
-        'season': season,
-    #    'matches': matches
+        'message': 'This is the profile page view.'
     }
-    return render(request, 'scores/standings.html', context)
+    return render(request,'members/playerprofile.html', context)
 
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated:
-            return Player.objects.none()
+            return None
 
-        qs = Player.objects.all()
+        users = get_user_model()
+        qs = users.objects.all()
 
         if self.q:
-            qs = qs.filter(name__istartswith=self.q)
+            qs = qs.filter(first_name__istartswith=self.q)
 
         return qs
+
