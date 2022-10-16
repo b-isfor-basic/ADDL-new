@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
+from django.views.generic import ListView
+from django.db.models import Q
 
-from dal import autocomplete
+from .models import Player
 
 
 @login_required
@@ -13,17 +14,17 @@ def PlayerProfileView(request):
     return render(request,'members/playerprofile.html', context)
 
 
-class PlayerAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated:
-            return None
-
-        users = get_user_model()
-        qs = users.objects.all()
-
-        if self.q:
-            qs = qs.filter(first_name__istartswith=self.q)
-
-        return qs
+# class PlayerSearchView(ListView):
+#     model = Player
+#     template_name = 'partials/player_search.html'
+# 
+#     def get_queryset(self):
+#         q = self.request.GET.get('q')
+#         object_list = Player.objects.filter(
+#             Q(first_name__istartswith=q) | 
+#             Q(last_name__istartswith=q) |
+#             Q(username__istartswith=q) |
+#             Q(email__istartswith=q)
+#         )
+#         return object_list
 

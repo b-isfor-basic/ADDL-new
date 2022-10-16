@@ -7,6 +7,9 @@
   },
   "scripts": {
     "dev": "webpack --mode development --watch",
-    "watch": "tailwindcss -i ./static/src/input.css -o ./static/src/output.css --watch"
+    "watch": "tailwindcss -i ./static/src/input.css -o ./static/src/output.css --mode development --watch"
+  },
+  "dependencies": {
+    "select2": "^4.1.0-rc.0"
   }
 }

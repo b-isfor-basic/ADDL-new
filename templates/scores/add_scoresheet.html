@@ -1,12 +1,13 @@
 {% extends 'base.html' %} 
 
 {% load widget_tweaks %}
+
 {% load static %}
 
 {% block title %}Scoresheet{% endblock title %} 
 
 {% block subheader %} 
-  {%include '../subheader.html' with title="Scoresheet" %} 
+  {% include '../subheader.html' with title="Scoresheet" %} 
 {% endblock %} 
 
 {% block content %}
@@ -31,10 +32,14 @@
           <h2 class="block text-lg tk-objektiv-mk2 uppercase font-extralight p-2">Away</h2>
           <h3 class="block">{{ match.awayTeam }}</h3>
           {{ away_player_forms.management_form }}
-
           {% for away_form in away_player_forms %}
-            {% render_field away_form.player class+="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+          <div class="inline-flex">
+            <img id="loadIcon" src="{% static 'images/rings.svg' %}" class="items-start inline htmx-indicator"/>
+            <input type="search" name="{{ away_form.player.name }}" class="mt-1 inline-flex flex-grow rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 htmx-search" placeholder="Search for player..." id="{{ away_form.player.id }}" hx-get="{% url 'player_search' player=away_form.player.values %}" hx-target="#searchResultAway" hx-trigger="keyup changed delay:200ms" hx-indicator="#loadIcon">
+            </input>
+          </div>
           {% endfor %}
+          <div id="searchResultAway"></div>
         </div>
       </div>
       <div class="block text-center m-4">
@@ -43,8 +48,14 @@
         <h3>{{ match.homeTeam }}</h3>
         {{ home_player_forms.management_form }}
           {% for home_form in home_player_forms %}
-            {% render_field home_form.player class+="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+          <div class="inline-flex">
+            <img id="loadIcon" src="{% static 'images/rings.svg' %}" class="items-start inline htmx-indicator"/>
+            <input type="search" name="{{ home_form.player.name }}" class="mt-1 inline-flex flex-grow rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 htmx-search" placeholder="Search for player..." id="{{ home_form.player.id }}" hx-get="{% url 'player_search' player=home_form.player.values %}" hx-target="#searchResultHome" hx-trigger="keyup changed delay:200ms" hx-indicator="#loadIcon">
+            </input>
+          </div>
           {% endfor %}
+          <div id="searchResultHome"></div>
+        </div>
       </div>
   {% endif %}
     </div>
@@ -78,8 +89,8 @@
       {% for a0 in away_0_game|slice:":1" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
         <span name="away_0_player" class="inline-block col-span-1 text-sm">Away Player 1</span>
-        {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-        {% render_field a0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+        {{ a0.stars }}
+        {{ a0.perfects }}
         {% render_field a0.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
       </div>
       {% endfor %}
@@ -87,8 +98,8 @@
       {% for a1 in away_1_game|slice:":1" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
         <span name="away_1_player" class="inline-block col-span-1 text-sm">Away Player 2</span>
-        {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-        {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+        {{ a1.stars }}
+        {{ a1.perfects }}
         {% render_field a1.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
       </div>
       {% endfor %}
@@ -96,8 +107,8 @@
       {% for a0 in away_0_game|slice:"1:2" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
         <span name="away_0_player" class="inline-block col-span-1 text-sm">Away Player 1</span>
-        {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-        {% render_field a0.perfects placeholder+="perfects" class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+        {{ a0.stars }}
+        {{ a0.perfects }}
         {% render_field a0.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
       </div>
       {% endfor %}
@@ -105,8 +116,8 @@
       {% for a1 in away_1_game|slice:"1:2" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
         <span name="away_1_player" class="inline-block col-span-1 text-sm">Away Player 2</span>
-        {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-        {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+        {{ a1.stars }}
+        {{ a1.perfects }}
         {% render_field a1.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
       </div>
       {% endfor %}
@@ -126,8 +137,8 @@
       {% for h0 in home_0_game|slice:":1" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
         <span name="home_0_player" class="inline-block col-span-1 text-sm">Home Player 1</span>
-        {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-        {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+        {{ h0.stars }}
+        {{ h0.perfects }}
         {% render_field h0.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
       </div>
       {% endfor %}
@@ -135,8 +146,8 @@
       {% for h1 in home_1_game|slice:":1" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
         <span name="home_1_player" class="inline-block col-span-1 text-sm">Home Player 2</span>
-        {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-        {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+        {{ h1.stars }}
+        {{ h1.perfects }}
         {% render_field h1.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
       </div>
       {% endfor %}
@@ -144,8 +155,8 @@
       {% for h1 in home_1_game|slice:"1:2" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
         <span name="home_1_player" class="inline-block col-span-1 text-sm">Home Player 2</span>
-        {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-        {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+        {{ h1.stars }}
+        {{ h1.perfects }}
         {% render_field h1.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
       </div>
       {% endfor %}
@@ -153,8 +164,8 @@
       {% for h0 in home_0_game|slice:"1:2" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
         <span name="home_0_player" class="inline-block col-span-1 text-sm">Home Player 1</span>
-        {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-        {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+        {{ h0.stars }}
+        {{ h0.perfects }}
         {% render_field h0.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
       </div>
       {% endfor %}
@@ -184,8 +195,8 @@
     {% for a0 in away_0_game|slice:"2:3" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
       <span name="away_0_player" class="inline-block col-span-1 text-sm">Away Player 1</span>
-      {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.stars }}
+      {{ a0.perfects }}
       {% render_field a0.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -193,8 +204,8 @@
     {% for a1 in away_1_game|slice:"2:3" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center mb-4">
       <span name="away_1_player" class="inline-block col-span-1 text-sm">Away Player 2</span>
-      {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.stars }}
+      {{ a1.perfects }}
       {% render_field a1.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -202,8 +213,8 @@
     {% for a1 in away_1_game|slice:"3:4" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
       <span name="away_1_player" class="inline-block col-span-1 text-sm">Away Player 2</span>
-      {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.stars }}
+      {{ a1.perfects }}
       {% render_field a1.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -211,8 +222,8 @@
     {% for a0 in away_0_game|slice:"3:4" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
       <span name="away_0_player" class="inline-block col-span-1 text-sm">Away Player 1</span>
-      {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.stars }}
+      {{ a0.perfects }}
       {% render_field a0.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -229,8 +240,8 @@
     {% for h0 in home_0_game|slice:"2:3" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
       <span name="home_0_player" class="inline-block col-span-1 text-sm">Home Player 1</span>
-      {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.stars }}
+      {{ h0.perfects }}
       {% render_field h0.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -238,8 +249,8 @@
     {% for h1 in home_1_game|slice:"2:3" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center mb-4">
       <span name="home_1_player" class="inline-block col-span-1 text-sm">Home Player 2</span>
-      {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.stars }}
+      {{ h1.perfects }}
       {% render_field h1.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -247,8 +258,8 @@
     {% for h1 in home_1_game|slice:"3:4" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
       <span name="home_1_player" class="inline-block col-span-1 text-sm">Home Player 2</span>
-      {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.stars }}
+      {{ h1.perfects }}
       {% render_field h1.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -256,8 +267,8 @@
     {% for h0 in home_0_game|slice:"3:4" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
       <span name="home_0_player" class="inline-block col-span-1 text-sm">Home Player 1</span>
-      {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.stars }}
+      {{ h0.perfects }}
       {% render_field h0.game_point class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -288,45 +299,45 @@
     {% for a0 in away_0_game|slice:"4:5" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
-      {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.stars }}
+      {{ a0.perfects }}
       {% render_field a0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.darts_thrown }}
+      {{ a0.score_left }}
+      {{ a0.out_thrown }}
     </div>
     {% endfor %}
     {% for a1 in away_1_game|slice:"4:5" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
-      {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.stars }}
+      {{ a1.perfects }}
       {% render_field a1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.darts_thrown }}
+      {{ a1.score_left }}
+      {{ a1.out_thrown }}
     </div>
     {% endfor %}
     {% for a0 in away_0_game|slice:"5:6" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
-      {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.stars }}
+      {{ a0.perfects }}
       {% render_field a0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.darts_thrown }}
+      {{ a0.score_left }}
+      {{ a0.out_thrown }}
     </div>
     {% endfor %}
     {% for a1 in away_1_game|slice:"5:6" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
-      {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.stars }}
+      {{ a1.perfects }}
       {% render_field a1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.darts_thrown }}
+      {{ a1.score_left }}
+      {{ a1.out_thrown }}
     </div>
     {% endfor %}
   </div>
@@ -345,45 +356,45 @@
     {% for h0 in home_0_game|slice:"4:5" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
-      {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.stars }}
+      {{ h0.perfects }}
       {% render_field h0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.darts_thrown }}
+      {{ h0.score_left }}
+      {{ h0.out_thrown }}
     </div>
     {% endfor %}
     {% for h1 in home_1_game|slice:"4:5" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
-      {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.stars }}
+      {{ h1.perfects }}
       {% render_field h1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.darts_thrown }}
+      {{ h1.score_left }}
+      {{ h1.out_thrown }}
     </div>
     {% endfor %}
     {% for h1 in home_1_game|slice:"5:6" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
-      {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.stars }}
+      {{ h1.perfects }}
       {% render_field h1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.darts_thrown }}
+      {{ h1.score_left }}
+      {{ h1.out_thrown }}
     </div>
     {% endfor %}
     {% for h0 in home_0_game|slice:"5:6" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
-      {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.stars }}
+      {{ h0.perfects }}
       {% render_field h0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.darts_thrown }}
+      {{ h0.score_left }}
+      {{ h0.out_thrown }}
     </div>
     {% endfor %}
   </div>
@@ -414,40 +425,40 @@
     {% for a0 in away_0_game|slice:"6:7" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
       <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
-      {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.stars }}
+      {{ a0.perfects }}
       {% render_field a0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.in_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.in_thrown }}
       {% render_field a0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
     {% for a1 in away_1_game|slice:"6:7" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center mb-4">
       <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
-      {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.stars }}
+      {{ a1.perfects }}
       {% render_field a1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.in_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.in_thrown }}
       {% render_field a1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
     {% for a1 in away_1_game|slice:"7:8" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
       <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
-      {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.stars }}
+      {{ a1.perfects }}
       {% render_field a1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.in_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.in_thrown }}
       {% render_field a1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
     {% for a0 in away_0_game|slice:"7:8" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
       <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
-      {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.stars }}
+      {{ a0.perfects }}
       {% render_field a0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.in_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.in_thrown }}
       {% render_field a0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -467,40 +478,40 @@
     {% for h1 in home_1_game|slice:"6:7" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
       <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
-      {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.stars }}
+      {{ h1.perfects }}
       {% render_field h1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.in_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.in_thrown }}
       {% render_field h1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
     {% for h0 in home_0_game|slice:"6:7" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center mb-4">
       <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
-      {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.stars }}
+      {{ h0.perfects }}
       {% render_field h0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.in_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.in_thrown }}
       {% render_field h0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
     {% for h0 in home_0_game|slice:"7:8" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
       <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
-      {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.stars }}
+      {{ h0.perfects }}
       {% render_field h0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.in_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.in_thrown }}
       {% render_field h0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
     {% for h1 in home_1_game|slice:"7:8" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
       <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
-      {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.stars }}
+      {{ h1.perfects }}
       {% render_field h1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.in_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.in_thrown }}
       {% render_field h1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
     </div>
     {% endfor %}
@@ -523,53 +534,53 @@
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
       <div class="col-span-1">Point</div>
+      <div class="col-span-1">Out</div>
       <div class="col-span-1">Darts Thrown</div>
       <div class="col-span-1">Score Left</div>
-      <div class="col-span-1">Out</div>
     </div>
 
     {% for a0 in away_0_game|slice:"8:9" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
-      {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.stars }}
+      {{ a0.perfects }}
       {% render_field a0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.out_thrown }}
+      {{ a0.darts_thrown }}
+      {{ a0.score_left }}
     </div>
     {% endfor %}
     {% for a1 in away_1_game|slice:"8:9" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center mb-4">
       <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
-      {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.stars }}
+      {{ a1.perfects }}
       {% render_field a1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.out_thrown }}
+      {{ a1.darts_thrown }}
+      {{ a1.score_left }}
     </div>
     {% endfor %}
     {% for a1 in away_1_game|slice:"9:" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
-      {% render_field a1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.stars }}
+      {{ a1.perfects }}
       {% render_field a1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a1.out_thrown }}
+      {{ a1.darts_thrown }}
+      {{ a1.score_left }}
     </div>
     {% endfor %}
     {% for a0 in away_0_game|slice:"9:" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
-      {% render_field a0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.stars }}
+      {{ a0.perfects }}
       {% render_field a0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field a0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ a0.out_thrown }}
+      {{ a0.darts_thrown }}
+      {{ a0.score_left }}
     </div>
     {% endfor %}
   </div>
@@ -581,61 +592,115 @@
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
       <div class="col-span-1">Point</div>
+      <div class="col-span-1">Out</div>
       <div class="col-span-1">Darts Thrown</div>
       <div class="col-span-1">Score Left</div>
-      <div class="col-span-1">Out</div>
     </div>
 
     {% for h0 in home_0_game|slice:"8:9" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
-      {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.stars }}
+      {{ h0.perfects }}
       {% render_field h0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.out_thrown }}
+      {{ h0.darts_thrown }}
+      {{ h0.score_left }}
     </div>
     {% endfor %}
     {% for h1 in home_1_game|slice:"8:9" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center mb-4">
       <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
-      {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.stars }}
+      {{ h1.perfects }}
       {% render_field h1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.out_thrown }}
+      {{ h1.darts_thrown }}
+      {{ h1.score_left }}
     </div>
     {% endfor %}
     {% for h1 in home_1_game|slice:"9:" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
-      {% render_field h1.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.stars }}
+      {{ h1.perfects }}
       {% render_field h1.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h1.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h1.out_thrown }}
+      {% render_field h1.darts_thrown class+="row-span-2"%}
+      {% render_field h1.score_left  class+="row-span-2"%}
     </div>
     {% endfor %}
     {% for h0 in home_0_game|slice:"9:" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
       <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
-      {% render_field h0.stars placeholder+="stars"  class+="form-input inline-block rounded-l-md mt-1 block border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.perfects class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.stars }}
+      {{ h0.perfects }}
       {% render_field h0.game_point class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.darts_thrown class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.score_left class+="form-input inline-block mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
-      {% render_field h0.out_thrown class+="form-input inline-block rounded-r-md mt-1 border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" %}
+      {{ h0.out_thrown }}
     </div>
     {% endfor %}
   </div>
 </div>
 </div>
 
+<div class="justify-around mt-8 mb-4">
+  <div class="flex-auto p-3 border-primary-500 border-t">
+    <h2 class="text-left text-2xl text-primary-600 tk-objektiv-mk2 font-black uppercase">Match Summary</h2>
+  </div>
+</div>
 
+<div class="grid grid-cols-2 gap-4 p-2">
+   
+  <div class="block grid-rows-3">
+    
+    <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+      <div class="col-span-1"></div>
+      <div class="col-span-1">Stars</div>
+      <div class="col-span-1">Perfects</div>
+      <div class="col-span-1">Point</div>
+    </div>
+    
+    <div class="grid grid-cols-4 grid-flow-dense items-center">
+      <span name="away_0_player" class="inline-block col-span-1 text-md text-right">Away Player 1</span>
+      <span id="#a0TotalStars" class="inline-block col-span-1 text-md text-center">0</span>
+      <span id="#a0TotalPerfects" class="inline-block col-span-1 text-md text-center">0</span>
+      <span id="#a0TotalPoints" class="inline-block col-span-1 text-md text-center">0</span>
+    </div>
 
+    <div class="grid grid-cols-4 grid-flow-dense items-center">
+      <span name="away_1_player" class="inline-block col-span-1 text-md text-right">Away Player 2</span>
+      <span id="#a1TotalStars" class="inline-block col-span-1 text-md text-center">0</span>
+      <span id="#a1TotalPerfects" class="inline-block col-span-1 text-md text-center">0</span>
+      <span id="#a1TotalPoints" class="inline-block col-span-1 text-md text-center">0</span>
+    </div>
+
+  </div>
+
+  <div class="block grid-rows-3">
+    
+    <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+      <div class="col-span-1"></div>
+      <div class="col-span-1">Stars</div>
+      <div class="col-span-1">Perfects</div>
+      <div class="col-span-1">Point</div>
+    </div>
+    
+    <div class="grid grid-cols-4 grid-flow-dense items-center">
+      <span name="home_0_player" class="inline-block col-span-1 text-md text-right">Home Player 1</span>
+      <span id="#h0TotalStars" class="inline-block col-span-1 text-md text-center">0</span>
+      <span id="#h0TotalPerfects" class="inline-block col-span-1 text-md text-center">0</span>
+      <span id="#h0TotalPoints" class="inline-block col-span-1 text-md text-center">0</span>
+    </div>
+
+    <div class="grid grid-cols-4 grid-flow-dense items-center">
+      <span name="home_1_player" class="inline-block col-span-1 text-md text-right">Home Player 2</span>
+      <span id="#h1TotalStars" class="inline-block col-span-1 text-md text-center">0</span>
+      <span id="#h1TotalPerfects" class="inline-block col-span-1 text-md text-center">0</span>
+      <span id="#h1TotalPoints" class="inline-block col-span-1 text-md text-center">0</span>
+    </div>
+
+  </div>
+</div>
 
   <div class="flex min-w-full justify-center p-8">
     <button type="submit" class="bg-white rounded-md text-primary-500 font-semibold tk-rustica uppercase border-2 border-primary-500">
@@ -644,8 +709,13 @@
   </div>
 </form>
 
+
+<script src="https://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+<script src="{% static 'js/scoresheet.js' %}"></script>
 {% endblock content %}
 
-{% block footer_scripts %}
-<script type="text/javascript" src="{% static 'js/scoresheet.js' %}"></script>
-{% endblock footer_scripts %}
+
+

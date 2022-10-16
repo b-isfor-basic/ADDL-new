@@ -1,21 +1,23 @@
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
+from django.contrib.postgres.search import SearchVector
+from django.db.models import Q
 from django.forms import all_valid, formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.views.generic import ListView
 
+from Members.models import Player
 from Schedule.models import Match, Season
 
-from .forms import (GameScoreForm, ScoresetForm)
-from .models import (GameScore, Scoreset)
-
+from .forms import GameScoreForm, ScoresetForm
+from .models import GameScore, Scoreset
 
 ScoresetFormSet = formset_factory(ScoresetForm, extra=2, min_num=2, max_num=2)
 GameScoreFormSet = formset_factory(GameScoreForm, extra=10, min_num=10, max_num=10)
 
 
 @login_required
-def ScoresheetCreateView(request, id):
+def ScoresheetCreateView(request, id, **kwargs):
     match = Match.objects.get(id=id)
     home_player_forms = ScoresetFormSet(prefix='home', initial=[{'match': match}])
     away_player_forms = ScoresetFormSet(prefix='away', initial=[{'match': match}])
@@ -36,7 +38,8 @@ def ScoresheetCreateView(request, id):
 
         if all_valid(formsets=[home_player_forms, away_player_forms, away_0_game, away_1_game, home_0_game, home_1_game]):
             game_score_forms = [away_0_game, away_1_game, home_0_game, home_1_game]
-            # Create list to hold new scoreset ids to apply GameScores to
+            
+            # Create list to hold new scoreset ids to apply GameScores under
             player_scores = []
                         
             for form in away_player_forms.forms:
@@ -177,9 +180,28 @@ def ScoresheetCreateView(request, id):
 def StandingsView(request, season=Season.objects.first(), *args, **kwargs):
     season = season
     
-    # matches = season.match_set.all()
+    matches = season.match_set.all()
     context = {
         'season': season,
-    #    'matches': matches
+        #'matches': matches
     }
     return render(request, 'scores/standings.html', context)
+
+
+def PlayerSearchView(request, **kwargs):
+    template = 'scores/partials/player_search.html'
+
+    if 'player' in request.GET.keys():  
+        qs = request.GET.get('player')    
+        object_list = Player.objects.filter(
+            Q(first_name__icontains=qs)| 
+            Q(last_name__icontains=qs)|
+            Q(username__icontains=qs)|
+            Q(email__icontains=qs)
+        )
+        context = {
+            'object_list': object_list
+        }
+        return render(request, template, context)
+    else:
+        return None

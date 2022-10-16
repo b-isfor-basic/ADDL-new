@@ -3,9 +3,8 @@ import uuid
 from django.conf import settings
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models.aggregates import Max, Min, Sum
+from django.db.models.aggregates import Count, Max, Min, Sum
 from django.utils.translation import gettext_lazy as _
-
 from django_extensions.db.models import TimeStampedModel
 
 from Members.models import Team
@@ -13,20 +12,20 @@ from Schedule.models import Match
 
 
 class GameQuerySet(models.QuerySet):
-    def doubles(self):
-        return super(GameQuerySet, self).filter(format='DB')
+    def doubles(self, **kwargs):
+        return super(GameQuerySet, self).filter(format='DB', **kwargs)
     
-    def singles(self):
-        return super(GameQuerySet, self).filter(format='SN')
+    def singles(self, **kwargs):
+        return super(GameQuerySet, self).filter(format='SN', **kwargs)
 
-    def five01_singles(self):
-        return super(GameQuerySet, self).filter(format='SN', game='501')
+    def five01_singles(self, **kwargs):
+        return super(GameQuerySet, self).filter(format='SN', game='501', **kwargs)
     
-    def five01_doubles(self):
-        return super(GameQuerySet, self).filter(format='DB', game='501')
+    def five01_doubles(self, **kwargs):
+        return super(GameQuerySet, self).filter(format='DB', game='501', **kwargs)
 
-    def wins(self):
-        return super(GameQuerySet, self).filter(game_point=1)
+    def wins(self, **kwargs):
+        return super(GameQuerySet, self).filter(game_point=1, **kwargs)
 
 
 class SinglesCricketGameManager(models.Manager):
@@ -125,9 +124,8 @@ class GameScore(models.Model):
 class ScoresetManager(models.Manager):
     
     def get_queryset(self):
-        # Return queryset with total wins
         return super(ScoresetManager,self).get_queryset().annotate(
-            match_points=Sum('gamescore__game_point')
+            Sum('gamescore__game_point')
         )
 
     def create_new(self, match, team, player):
@@ -165,52 +163,62 @@ class Scoreset(models.Model):
     def player_display(self):
         return '(' + str(self.match.weekNum) + ') ' + self.player.last_name
 
+    @property
     def singles_points(self):
-        points = GameScore.singles_games.filter(scoreset=self.id).aggregate(
+        points = GameScore.games.singles(scoreset=self.id).aggregate(
             Sum("game_point", default=0)
         )
         return points["game_point__sum"]
 
+    @property
     def doubles_points(self):
-        points = GameScore.doubles_games.filter(scoreset=self.id).aggregate(
+        points = GameScore.games.doubles(scoreset=self.id).aggregate(
             Sum("game_point", default=0)
         )
         return points["game_point__sum"]
 
+    @property
     def match_points(self):
         return self.singles_points() + self.doubles_points()
 
+    @property
     def singles_ppd(self):
-        total_thrown = GameScore.singles_games.filter(scoreset=self.id).aggregate(
-            Sum("darts_thrown")
+        total_thrown = GameScore.games.five01_singles(scoreset=self.id).aggregate(
+            Sum("darts_thrown"), Count("id")
         )
-        total_scored = GameScore.singles_games.filter(scoreset=self.id).aggregate(
-            Sum("score_left")
-        )
-        return (1002 - total_scored["score_left__sum"]) / total_thrown[
-            "darts_thrown__sum"
-        ]
+        total_scored = (501 * total_thrown["id__count"]) - (GameScore.games.five01_singles(scoreset=self.id).aggregate(
+            Sum("score_left", default=0)
+        ))
+        return total_scored["score_left__sum"] / total_thrown["darts_thrown__sum"]
 
+    @property
     def best_singles_501(self):
-        low_thrown = GameScore.singles_games.filter(
-            scoreset=self.id, game_point=1
-        ).aggregate(Min("darts_thrown"))
+        low_thrown = GameScore.games.five01_singles(
+            scoreset=self.id, 
+            game_point=1
+        ).aggregate(
+            Min("darts_thrown")
+        )
         return low_thrown["darts_thrown__min"]
 
+    @property
     def best_doubles_501(self):
-        low_thrown = GameScore.doubles_games.filter(
+        low_thrown = GameScore.games.five01_doubles(
             scoreset=self.id, game_point=1
         ).aggregate(Min("darts_thrown"))
         return low_thrown["darts_thrown__min"]
 
+    @property
     def high_in(self):
-        high_in = GameScore.doubles_games.filter(scoreset=self.id).aggregate(
+        high_in = GameScore.objects.filter(scoreset=self.id).aggregate(
             Max("in_thrown", default=0)
         )
         return high_in["in_thrown__max"]
 
+    @property
     def high_out(self):
         high_out = GameScore.objects.filter(scoreset=self.id).aggregate(
             Max("out_thrown", default=0)
         )
         return high_out["out_thrown__max"]
+
