@@ -8,10 +8,6 @@ class ScoresetForm(forms.ModelForm):
     class Meta:
         model = Scoreset
         fields = ['player']
-        widgets = {
-            'player': forms.widgets.TextInput(
-            )
-        }
         
         
 

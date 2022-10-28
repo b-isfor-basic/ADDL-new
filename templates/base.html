@@ -6,25 +6,30 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />        
+    
+    <title>ADDL | {% block title %}Portal{% endblock title %}</title>
+    
     <script>
       try {
         Typekit.load({ async: true });
       } catch (e) {}
     </script>
-    <title>ADDL | {% block title %}Portal{% endblock title %}</title>
+    <link rel="stylesheet" href="https://use.typekit.net/ptc0kya.css"></link>
+    <link rel="icon" href="{% static 'images/icon.svg'%}" type="image/svg+xml">
     {% compress css %}
     <link rel="stylesheet" href="{% static 'src/output.css' %}"></link>
     {% endcompress %}
-    <script src="{% static 'htmx/htmx.js' %}"></script>
-    <link rel="stylesheet" href="https://use.typekit.net/ptc0kya.css"></link>
-    <link rel="icon" href="{% static 'images/icon.svg'%}" type="image/svg+xml">
+    
+    {% block headerScripts %}
+    {% endblock headerScripts %}
+ 
   </head>
 
   <body class="w-full h-full">
     <header class="bg-primary-900 sticky top-0 z-50 pt-2 pb-1 h-16 border-b border-slate-300 shadow-lg shadow-primary-400/30 ">
       <div class="flex justify-between">
         <a class="tk-rig-solid-bold-halftone mx-auto flex-shrink" href="{% url 'home' %}">
-          <span class="text-5xl text-primary-200">
+          <span class="text-5xl text-amber-500">
             ADDL
           </span>
         </a>
@@ -103,11 +108,7 @@
         </p>
       </div>
     </div>
-    <script>
-      document.body.addEventListener('htmx:configRequest', (event) => {
-        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-      })
-    </script>
-    {% block footer_scripts %}{% endblock footer_scripts %}
+  {% block footerScripts %}
+  {% endblock footerScripts %}
   </body>
 </html>

@@ -65,76 +65,77 @@ const h1TotalPoints = "span[id='#h1TotalPoints']";
 const statList = [a0StarsID, a1StarsID, h0StarsID, h1StarsID, a0PerfectsID, a1PerfectsID, h0PerfectsID, h1PerfectsID, a0PointsID, a1PointsID, h0PointsID, h1PointsID];
 const totalList = [a0TotalStars, a1TotalStars, h0TotalStars, h1TotalStars, a0TotalPerfects, a1TotalPerfects, h0TotalPerfects, h1TotalPerfects, a0TotalPoints, a1TotalPoints, h0TotalPoints, h1TotalPoints];
 
-$(document).ready(function() {
+$(function () {
 
     LoadRunningTotals();
-    
+
     for (let i = 0; i < statList.length; i++) {
         var sel = statList[i];
         var tar = totalList[i];
-        
+
         LoadRunningTotals(sel, tar);
-       }
+    };
+
 });
 
-$(a0StarsID).blur(function () {
+$(a0StarsID).on("focusout", function () {
     $(a0TotalStars).html(function () {
         LoadRunningTotals($(a0StarsID), $(a0TotalStars));
     });
 })
-$(a1StarsID).blur(function () {
+$(a1StarsID).on("focusout", function () {
     $(a1TotalStars).html(function () {
         LoadRunningTotals($(a1StarsID), $(a1TotalStars));
     });
 })
-$(h0StarsID).blur(function () {
+$(h0StarsID).on("focusout", function () {
     $(h0TotalStars).html(function () {
         LoadRunningTotals($(h0StarsID), $(h0TotalStars));
     });
 })
-$(h1StarsID).blur(function () {
+$(h1StarsID).on("focusout", function () {
     $(h1TotalStars).html(function () {
         LoadRunningTotals($(h1StarsID), $(h1TotalStars));
     });
 })
 
-$(a0PerfectsID).blur(function () {
+$(a0PerfectsID).on("focusout", function () {
     $(a0TotalPerfects).html(function () {
         LoadRunningTotals($(a0PerfectsID), $(a0TotalPerfects));
     });
 })
-$(a1PerfectsID).blur(function () {
+$(a1PerfectsID).on("focusout", function () {
     $(a1TotalPerfects).html(function () {
         LoadRunningTotals($(a1PerfectsID), $(a1TotalPerfects));
     });
 })
-$(h0PerfectsID).blur(function () {
+$(h0PerfectsID).on("focusout", function () {
     $(h0TotalPerfects).html(function () {
         LoadRunningTotals($(h0PerfectsID), $(h0TotalPerfects));
     });
 })
-$(h1PerfectsID).blur(function () {
+$(h1PerfectsID).on("focusout", function () {
     $(h1TotalPerfects).html(function () {
         LoadRunningTotals($(h1PerfectsID), $(h1TotalPerfects));
     });
 })
 
-$(a0PointsID).blur(function () {
+$(a0PointsID).on("focusout", function () {
     $(a0TotalPoints).html(function () {
         LoadRunningTotals($(a0PointsID), $(a0TotalPoints));
     });
 })
-$(a1PointsID).blur(function () {
+$(a1PointsID).on("focusout", function () {
     $(a1TotalPoints).html(function () {
         LoadRunningTotals($(a1PointsID), $(a1TotalPoints));
     });
 })
-$(h0PointsID).blur(function () {
+$(h0PointsID).on("focusout", function () {
     $(h0TotalPoints).html(function () {
         LoadRunningTotals($(h0PointsID), $(h0TotalPoints));
     });
 })
-$(h1PointsID).blur(function () {
+$(h1PointsID).on("focusout", function () {
     $(h1TotalPoints).html(function () {
         LoadRunningTotals($(h1PointsID), $(h1TotalPoints));
     });
@@ -143,12 +144,53 @@ $(h1PointsID).blur(function () {
 
 function LoadRunningTotals(sel, tar) {
     var tmp = 0;
-    var total = 0;   
-    $(sel).each( function(){
-        tmp=parseInt($(this).val());
-        if (isNaN(tmp)){tmp=0;};
+    var total = 0;
+    $(sel).each(function () {
+        tmp = parseInt($(this).val());
+        if (isNaN(tmp)) { tmp = 0; };
         total = total + tmp;
     })
-    $(tar).html(total);  
-   }
+    $(tar).html(total);
+}
 
+function selectConfigs() {
+    return {
+        show: false,
+        filter: '',
+        selected: null,
+        focusedOptionIndex: null,
+        options: null,
+        open() {
+            this.show = true;
+            this.filter = '';
+        },
+        close() {
+            this.show = false;
+        },
+        toggle() {
+            if (this.show) {
+                this.close();
+            }
+            else {
+                this.open();
+            }
+        },
+        isOpen() {
+            return this.show === true;
+        },
+        // fetchOptions() {
+        //     fetch('http://127.0.0.1/scores/add/?results=5')
+        //         .then(response => response.json())
+        //         .then(data => this.options = data);
+        // },
+        // filteredOptions() {
+        //     return this.options
+        //     ? this.options.results.filter(option => {
+        //             return (option.first_name.toLowerCase().indexOf(this.filter) > -1)
+        //                 || (option.last_name.toLowerCase().indexOf(this.filter) > -1)
+        //                 || (option.email.toLowerCase().indexOf(this.filter) > -1)
+        //         })
+        //         :{}
+        // },
+    }
+}

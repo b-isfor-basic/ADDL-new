@@ -1,5 +1,14 @@
-<ul>
-    {% for object in object_list %}
-    <li>{{ object }}</li>
-    {% endfor %}
-</ul>
+<table id="player_table" class="absolute h-28 rounded-b-lg z-30 bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-50 bg-opacity-20 border-primary-100">
+    <thead>
+        <tr>
+            <th><input type="search" name="q" id="playerSearch" placeholder="Search for player..."></input></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for val, name in form.player.field.choices %}
+        <tr class="table-row text- w-full m-1 p-2 border-primary-200 hover:bg-primary-200 hover:bg-opacity-20">
+            <td class="table-cell"><button type="select"><option class="uppercase tk-rustica text-left text-slate-800" value="{{ val }}">{{ name }}</option></button></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
