@@ -7,8 +7,7 @@ __pycache__
 .venv/
 
 # Static folder at project root
-static/admin/
-static/CACHE/
+
 
 # macOS
 ._*
