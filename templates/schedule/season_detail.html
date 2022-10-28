@@ -8,12 +8,12 @@
 
 {% block content %}
 
-    <div class="w-full flex flex-col sm:flex-row flex-grow overflow-hidden mt-12">
+    <div class="flex flex-col sm:flex-row flex-grow mt-12">
         <div class="flex flex-shrink-0 p-4">
-            <div class="sticky flex-shrink p-4 w-full">
+            <div class="sticky flex-shrink p-4 min-w-fit w-full">
                 {% if season %}
                 <h1 class="text-center font-black text-3xl mb-2">
-                    Season {{ season.seasonNum }}
+                    Active Divisions
                 </h1>
                 <ul class="flex sm:flex-col overflow-hidden content-center justify-between">
                     {% for division in active_divisions %}
