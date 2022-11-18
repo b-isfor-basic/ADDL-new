@@ -27,4 +27,5 @@ urlpatterns = [
     path('members/', include('Members.urls'), name='Members'),
     path('schedule/', include('Schedule.urls'), name='Schedule'),
     path('scores/', include('Scores.urls'), name='Scores'),
+    path('api/v1/', include('API.urls'))
 ]

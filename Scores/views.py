@@ -1,10 +1,8 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.postgres.search import SearchVector
 from django.db.models import Q
 from django.forms import all_valid, formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic import ListView
 
 from Members.models import Player
 from Schedule.models import Match, Season
@@ -13,7 +11,7 @@ from .forms import GameScoreForm, ScoresetForm
 from .models import GameScore, Scoreset
 
 ScoresetFormSet = formset_factory(ScoresetForm, extra=2, min_num=2, max_num=2)
-GameScoreFormSet = formset_factory(GameScoreForm, extra=10, min_num=10, max_num=10)
+GameScoreFormSet = formset_factory(GameScoreForm, extra=10, min_num=0, max_num=10)
 
 
 @login_required
