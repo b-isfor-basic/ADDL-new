@@ -1,5 +1,4 @@
 const listPlayerID = ['away_0', 'away_1', 'home_0', 'home_1'];
-const listPlayerHyphen = ['away-0', 'away-1', 'home-0', 'home-1'];
 const listStats = ['stars', 'perfects', 'point'];
 const listAbbrPlayer = ['a0', 'a1', 'h0', 'h1'];
 const listTotalStats = ['TotalStars', 'TotalPerfects', 'TotalPoints'];
@@ -7,6 +6,14 @@ const listTotalStats = ['TotalStars', 'TotalPerfects', 'TotalPoints'];
 $(function () {
     const statList = [];
     const totalList = [];
+
+    LoadRunningTotals();
+
+    for (let i = 0; i < statList.length; i++) {
+        const sel = statList[i];
+        const tar = totalList[i];
+        LoadRunningTotals(sel, tar);
+    };
 
     listAbbrPlayer.forEach(function (player) {
         listTotalStats.forEach(function (stat) {
@@ -27,18 +34,6 @@ $(function () {
             LoadRunningTotals(stat, totalList[statList.indexOf(stat)]);
         });
     });
-    
-    listPlayerHyphen.forEach(function (player) {
-        setNames(player);
-    });
-
-    LoadRunningTotals();
-
-    for (let i = 0; i < statList.length; i++) {
-        const sel = statList[i];
-        const tar = totalList[i];
-        LoadRunningTotals(sel, tar);
-    };
 });
 
 function LoadRunningTotals(sel, tar) {
@@ -52,8 +47,15 @@ function LoadRunningTotals(sel, tar) {
     $(tar).html(total);
 }
 
+const playerData = fetch('/api/v1/players')
+    .then(response => {
+        return response.json()
+    });
+
+
 function selectConfigs() {
     return {
+        id: '',
         filter: '',
         show: false,
         options: null,
@@ -85,9 +87,10 @@ function selectConfigs() {
         selectedID() { 
             return this.selectedOptionID ? this.selected.id : this.filter; },
         fetchOptions() {
-            fetch('/api/v1/players')
-                .then(response => response.json())
-                .then(data => this.options = data);
+            playerData.then(data => {
+                this.options = data;
+            });
+            this.id = this.$id('team');
         },
         filteredOptions() {
             return this.options
@@ -112,6 +115,7 @@ function selectConfigs() {
 
             this.selected = selected;
             this.filter = this.selectedName();
+            setNames(this.id, this.selectedName());
             this.close();
         },
         focusPrevOption() {
@@ -138,16 +142,13 @@ function selectConfigs() {
             else if (this.focusedOptionIndex >= 0 && this.focusedOptionIndex < optionsNum) {
                 this.focusedOptionIndex++;
             }
-        }
+        },
     }
 }
 
 
-function setNames(player)  {
-        $(`input[id='id_${player}-player']`).on('focusout', (e) => {
-            console.log(this.value);
-            console.log(e);
-            const text = e.target.value;
-            $(`span[name='${listPlayerID[listPlayerHyphen.indexOf(player)]}_player']`).val(text);
-        });
-    }
+function setNames(id, name) {
+    id = Number.parseInt(id.slice(-1), 10) - 1;
+    $(`span[name=${listAbbrPlayer[id]}Player]`).text(name);
+}
+        

@@ -61,7 +61,8 @@
           <div x-show="isOpen()" class="relative w-full rounded-lg z-50 overflow-y-auto shadow-indigo-200 shadow-sm bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-200">
             <div class="flex flex-col w-full">
               <template x-for="(option, index) in filteredOptions()" :key="index">
-                  <div @click="onOptionClick(index)" class="mx-2 my-2 rounded-lg hover:bg-primary-200 hover:bg-opacity-40">
+                  <div 
+                    @click="onOptionClick(index)" @d class="mx-2 my-2 rounded-lg hover:bg-primary-100 hover:bg-opacity-90">
                     <div class="p-2 tk-rustica text-left">
                       <span x-text="option.first_name + ' ' + option.last_name"></span>
                     </div>
@@ -81,7 +82,7 @@
       {{ home_player_forms.management_form }}
         {% for home_form in home_player_forms %}
         <div class="flex flex-col w-full">
-          <div x-data="selectConfigs()" x-init="fetchOptions()" class="w-full rounded-lg items-center m-2 bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-100 shadow-indigo-300 shadow-sm">
+          <div x-data="selectConfigs()" :id="$id('home')" x-init="fetchOptions()" class="w-full rounded-lg items-center m-2 bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-100 shadow-indigo-300 shadow-sm">
             <div @click.away="close()" class="inline-flex items-center w-full">
               <input 
                 id="{{ home_form.player.id_for_label }}"
@@ -92,7 +93,6 @@
                 x-transition:leave-end="opacity-0"
                 x-cloak 
                 @click.inside="open()"
-                list="filteredOptions()"
                 class="appearance-none inline-flex bg-transparent m-2 pl-2 w-full text-gray-800"></input>
               <div class="text-gray-300 w-8 m-2 pl-2 pr-1 items-center">
                 <button @click="toggle()" class="w-6 h-6 text-gray-600 outline-none focus:outline-none" type="button">
@@ -108,10 +108,10 @@
             <template x-for="(option, index) in filteredOptions()" :key="index">
                 <div @click="onOptionClick(index)" class="mx-2 my-2 rounded-lg hover:bg-primary-200 hover:bg-opacity-40">
                   <div class="p-2 tk-rustica text-left">
-                    <option x-text="option.first_name + ' ' + option.last_name"></option>
+                    <span x-text="option.first_name + ' ' + option.last_name"></span>
                   </div>
                 </div>
-              </template>
+            </template>
           </div>
         </div>
       </div>
@@ -148,7 +148,7 @@
       
       {% for a0 in away_0_game|slice:":1" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
-        <span name="away_0_player" class="inline-block col-span-1 text-sm">Away Player 1</span>
+        <span name="a0Player" class="inline-block col-span-1 text-sm">Away Player 1</span>
         {{ a0.stars }}
         {{ a0.perfects }}
         {% render_field a0.game_point class+="ss-right" %}
@@ -157,7 +157,7 @@
 
       {% for a1 in away_1_game|slice:":1" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
-        <span name="away_1_player" class="inline-block col-span-1 text-sm">Away Player 2</span>
+        <span name="a1Player" class="inline-block col-span-1 text-sm">Away Player 2</span>
         {{ a1.stars }}
         {{ a1.perfects }}
         {% render_field a1.game_point class+="ss-right" %}
@@ -166,7 +166,7 @@
       
       {% for a0 in away_0_game|slice:"1:2" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
-        <span name="away_0_player" class="inline-block col-span-1 text-sm">Away Player 1</span>
+        <span name="a0Player" class="inline-block col-span-1 text-sm">Away Player 1</span>
         {{ a0.stars }}
         {{ a0.perfects }}
         {% render_field a0.game_point class+="ss-right" %}
@@ -175,7 +175,7 @@
      
       {% for a1 in away_1_game|slice:"1:2" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
-        <span name="away_1_player" class="inline-block col-span-1 text-sm">Away Player 2</span>
+        <span name="a1Player" class="inline-block col-span-1 text-sm">Away Player 2</span>
         {{ a1.stars }}
         {{ a1.perfects }}
         {% render_field a1.game_point class+="ss-right" %}
@@ -196,7 +196,7 @@
       
       {% for h0 in home_0_game|slice:":1" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
-        <span name="home_0_player" class="inline-block col-span-1 text-sm">Home Player 1</span>
+        <span name="h0Player" class="inline-block col-span-1 text-sm">Home Player 1</span>
         {{ h0.stars }}
         {{ h0.perfects }}
         {% render_field h0.game_point class+="ss-right" %}
@@ -205,7 +205,7 @@
       
       {% for h1 in home_1_game|slice:":1" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
-        <span name="home_1_player" class="inline-block col-span-1 text-sm">Home Player 2</span>
+        <span name="h1Player" class="inline-block col-span-1 text-sm">Home Player 2</span>
         {{ h1.stars }}
         {{ h1.perfects }}
         {% render_field h1.game_point class+="ss-right" %}
@@ -214,7 +214,7 @@
       
       {% for h1 in home_1_game|slice:"1:2" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
-        <span name="home_1_player" class="inline-block col-span-1 text-sm">Home Player 2</span>
+        <span name="h1Player" class="inline-block col-span-1 text-sm">Home Player 2</span>
         {{ h1.stars }}
         {{ h1.perfects }}
         {% render_field h1.game_point class+="ss-right" %}
@@ -223,7 +223,7 @@
       
       {% for h0 in home_0_game|slice:"1:2" %}
       <div class="grid grid-cols-4 grid-flow-dense items-center">
-        <span name="home_0_player" class="inline-block col-span-1 text-sm">Home Player 1</span>
+        <span name="h0Player" class="inline-block col-span-1 text-sm">Home Player 1</span>
         {{ h0.stars }}
         {{ h0.perfects }}
         {% render_field h0.game_point class+="ss-right" %}
@@ -254,7 +254,7 @@
 
     {% for a0 in away_0_game|slice:"2:3" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
-      <span name="away_0_player" class="inline-block col-span-1 text-sm">Away Player 1</span>
+      <span name="a0Player" class="inline-block col-span-1 text-sm">Away Player 1</span>
       {{ a0.stars }}
       {{ a0.perfects }}
       {% render_field a0.game_point class+="ss-right" %}
@@ -263,7 +263,7 @@
     
     {% for a1 in away_1_game|slice:"2:3" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center mb-4">
-      <span name="away_1_player" class="inline-block col-span-1 text-sm">Away Player 2</span>
+      <span name="a1Player" class="inline-block col-span-1 text-sm">Away Player 2</span>
       {{ a1.stars }}
       {{ a1.perfects }}
       {% render_field a1.game_point class+="ss-right" %}
@@ -272,7 +272,7 @@
     
     {% for a1 in away_1_game|slice:"3:4" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
-      <span name="away_1_player" class="inline-block col-span-1 text-sm">Away Player 2</span>
+      <span name="a1Player" class="inline-block col-span-1 text-sm">Away Player 2</span>
       {{ a1.stars }}
       {{ a1.perfects }}
       {% render_field a1.game_point class+="ss-right" %}
@@ -281,7 +281,7 @@
     
     {% for a0 in away_0_game|slice:"3:4" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
-      <span name="away_0_player" class="inline-block col-span-1 text-sm">Away Player 1</span>
+      <span name="a0Player" class="inline-block col-span-1 text-sm">Away Player 1</span>
       {{ a0.stars }}
       {{ a0.perfects }}
       {% render_field a0.game_point class+="ss-right" %}
@@ -299,7 +299,7 @@
 
     {% for h0 in home_0_game|slice:"2:3" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
-      <span name="home_0_player" class="inline-block col-span-1 text-sm">Home Player 1</span>
+      <span name="h0Player" class="inline-block col-span-1 text-sm">Home Player 1</span>
       {{ h0.stars }}
       {{ h0.perfects }}
       {% render_field h0.game_point class+="ss-right" %}
@@ -308,7 +308,7 @@
     
     {% for h1 in home_1_game|slice:"2:3" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center mb-4">
-      <span name="home_1_player" class="inline-block col-span-1 text-sm">Home Player 2</span>
+      <span name="h1Player" class="inline-block col-span-1 text-sm">Home Player 2</span>
       {{ h1.stars }}
       {{ h1.perfects }}
       {% render_field h1.game_point class+="ss-right" %}
@@ -317,7 +317,7 @@
     
     {% for h1 in home_1_game|slice:"3:4" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
-      <span name="home_1_player" class="inline-block col-span-1 text-sm">Home Player 2</span>
+      <span name="h1Player" class="inline-block col-span-1 text-sm">Home Player 2</span>
       {{ h1.stars }}
       {{ h1.perfects }}
       {% render_field h1.game_point class+="ss-right" %}
@@ -326,7 +326,7 @@
     
     {% for h0 in home_0_game|slice:"3:4" %}
     <div class="grid grid-cols-4 grid-flow-dense items-center">
-      <span name="home_0_player" class="inline-block col-span-1 text-sm">Home Player 1</span>
+      <span name="h0Player" class="inline-block col-span-1 text-sm">Home Player 1</span>
       {{ h0.stars }}
       {{ h0.perfects }}
       {% render_field h0.game_point class+="ss-right" %}
@@ -358,7 +358,7 @@
 
     {% for a0 in away_0_game|slice:"4:5" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
+      <span name="a0Player" class="inline-block col-span-2 text-sm">Away Player 1</span>
       {{ a0.stars }}
       {{ a0.perfects }}
       {% render_field a0.game_point class+="ss-center" %}
@@ -369,7 +369,7 @@
     {% endfor %}
     {% for a1 in away_1_game|slice:"4:5" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
+      <span name="a1Player" class="inline-block col-span-2 text-sm">Away Player 2</span>
       {{ a1.stars }}
       {{ a1.perfects }}
       {% render_field a1.game_point class+="ss-center" %}
@@ -380,7 +380,7 @@
     {% endfor %}
     {% for a0 in away_0_game|slice:"5:6" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
+      <span name="a0Player" class="inline-block col-span-2 text-sm">Away Player 1</span>
       {{ a0.stars }}
       {{ a0.perfects }}
       {% render_field a0.game_point class+="ss-center" %}
@@ -391,7 +391,7 @@
     {% endfor %}
     {% for a1 in away_1_game|slice:"5:6" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
+      <span name="a1Player" class="inline-block col-span-2 text-sm">Away Player 2</span>
       {{ a1.stars }}
       {{ a1.perfects }}
       {% render_field a1.game_point class+="ss-center" %}
@@ -415,7 +415,7 @@
     </div>
     {% for h0 in home_0_game|slice:"4:5" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
+      <span name="h0Player" class="inline-block col-span-2 text-sm">Home Player 1</span>
       {{ h0.stars }}
       {{ h0.perfects }}
       {% render_field h0.game_point class+="ss-center" %}
@@ -426,7 +426,7 @@
     {% endfor %}
     {% for h1 in home_1_game|slice:"4:5" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
+      <span name="h1Player" class="inline-block col-span-2 text-sm">Home Player 2</span>
       {{ h1.stars }}
       {{ h1.perfects }}
       {% render_field h1.game_point class+="ss-center" %}
@@ -437,7 +437,7 @@
     {% endfor %}
     {% for h1 in home_1_game|slice:"5:6" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
+      <span name="h1Player" class="inline-block col-span-2 text-sm">Home Player 2</span>
       {{ h1.stars }}
       {{ h1.perfects }}
       {% render_field h1.game_point class+="ss-center" %}
@@ -448,7 +448,7 @@
     {% endfor %}
     {% for h0 in home_0_game|slice:"5:6" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
+      <span name="h0Player" class="inline-block col-span-2 text-sm">Home Player 1</span>
       {{ h0.stars }}
       {{ h0.perfects }}
       {% render_field h0.game_point class+="ss-center" %}
@@ -484,7 +484,7 @@
 
     {% for a0 in away_0_game|slice:"6:7" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
-      <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
+      <span name="a0Player" class="inline-block col-span-2 text-sm">Away Player 1</span>
       {{ a0.stars }}
       {{ a0.perfects }}
       {% render_field a0.game_point class+="ss-center" %}
@@ -494,7 +494,7 @@
     {% endfor %}
     {% for a1 in away_1_game|slice:"6:7" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center mb-4">
-      <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
+      <span name="a1Player" class="inline-block col-span-2 text-sm">Away Player 2</span>
       {{ a1.stars }}
       {{ a1.perfects }}
       {% render_field a1.game_point class+="ss-center" %}
@@ -504,7 +504,7 @@
     {% endfor %}
     {% for a1 in away_1_game|slice:"7:8" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
-      <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
+      <span name="a1Player" class="inline-block col-span-2 text-sm">Away Player 2</span>
       {{ a1.stars }}
       {{ a1.perfects }}
       {% render_field a1.game_point class+="ss-center" %}
@@ -514,7 +514,7 @@
     {% endfor %}
     {% for a0 in away_0_game|slice:"7:8" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
-      <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
+      <span name="a0Player" class="inline-block col-span-2 text-sm">Away Player 1</span>
       {{ a0.stars }}
       {{ a0.perfects }}
       {% render_field a0.game_point class+="ss-center" %}
@@ -537,7 +537,7 @@
 
     {% for h1 in home_1_game|slice:"6:7" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
-      <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
+      <span name="h1Player" class="inline-block col-span-2 text-sm">Home Player 2</span>
       {{ h1.stars }}
       {{ h1.perfects }}
       {% render_field h1.game_point class+="ss-center" %}
@@ -547,7 +547,7 @@
     {% endfor %}
     {% for h0 in home_0_game|slice:"6:7" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center mb-4">
-      <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
+      <span name="h0Player" class="inline-block col-span-2 text-sm">Home Player 1</span>
       {{ h0.stars }}
       {{ h0.perfects }}
       {% render_field h0.game_point class+="ss-center" %}
@@ -557,7 +557,7 @@
     {% endfor %}
     {% for h0 in home_0_game|slice:"7:8" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
-      <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
+      <span name="h0Player" class="inline-block col-span-2 text-sm">Home Player 1</span>
       {{ h0.stars }}
       {{ h0.perfects }}
       {% render_field h0.game_point class+="ss-center" %}
@@ -567,7 +567,7 @@
     {% endfor %}
     {% for h1 in home_1_game|slice:"7:8" %}
     <div class="grid grid-cols-7 grid-flow-dense items-center">
-      <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
+      <span name="h1Player" class="inline-block col-span-2 text-sm">Home Player 2</span>
       {{ h1.stars }}
       {{ h1.perfects }}
       {% render_field h1.game_point class+="ss-center" %}
@@ -601,7 +601,7 @@
 
     {% for a0 in away_0_game|slice:"8:9" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
+      <span name="a0Player" class="inline-block col-span-2 text-sm">Away Player 1</span>
       {{ a0.stars }}
       {{ a0.perfects }}
       {% render_field a0.game_point class+="ss-center" %}
@@ -612,7 +612,7 @@
     {% endfor %}
     {% for a1 in away_1_game|slice:"8:9" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center mb-4">
-      <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
+      <span name="a1Player" class="inline-block col-span-2 text-sm">Away Player 2</span>
       {{ a1.stars }}
       {{ a1.perfects }}
       {% render_field a1.game_point class+="ss-center" %}
@@ -623,7 +623,7 @@
     {% endfor %}
     {% for a1 in away_1_game|slice:"9:" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="away_1_player" class="inline-block col-span-2 text-sm">Away Player 2</span>
+      <span name="a1Player" class="inline-block col-span-2 text-sm">Away Player 2</span>
       {{ a1.stars }}
       {{ a1.perfects }}
       {% render_field a1.game_point class+="ss-center" %}
@@ -634,7 +634,7 @@
     {% endfor %}
     {% for a0 in away_0_game|slice:"9:" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="away_0_player" class="inline-block col-span-2 text-sm">Away Player 1</span>
+      <span name="a0Player" class="inline-block col-span-2 text-sm">Away Player 1</span>
       {{ a0.stars }}
       {{ a0.perfects }}
       {% render_field a0.game_point class+="ss-center" %}
@@ -659,7 +659,7 @@
 
     {% for h0 in home_0_game|slice:"8:9" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
+      <span name="h0Player" class="inline-block col-span-2 text-sm">Home Player 1</span>
       {{ h0.stars }}
       {{ h0.perfects }}
       {% render_field h0.game_point class+="ss-center" %}
@@ -670,7 +670,7 @@
     {% endfor %}
     {% for h1 in home_1_game|slice:"8:9" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center mb-4">
-      <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
+      <span name="h1Player" class="inline-block col-span-2 text-sm">Home Player 2</span>
       {{ h1.stars }}
       {{ h1.perfects }}
       {% render_field h1.game_point class+="ss-center" %}
@@ -681,7 +681,7 @@
     {% endfor %}
     {% for h1 in home_1_game|slice:"9:" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="home_1_player" class="inline-block col-span-2 text-sm">Home Player 2</span>
+      <span name="h1Player" class="inline-block col-span-2 text-sm">Home Player 2</span>
       {{ h1.stars }}
       {{ h1.perfects }}
       {% render_field h1.game_point class+="ss-center" %}
@@ -692,7 +692,7 @@
     {% endfor %}
     {% for h0 in home_0_game|slice:"9:" %}
     <div class="grid grid-cols-8 grid-flow-dense items-center">
-      <span name="home_0_player" class="inline-block col-span-2 text-sm">Home Player 1</span>
+      <span name="h0Player" class="inline-block col-span-2 text-sm">Home Player 1</span>
       {{ h0.stars }}
       {{ h0.perfects }}
       {% render_field h0.game_point class+="ss-center" %}
@@ -723,14 +723,14 @@
     </div>
     
     <div class="grid grid-cols-4 grid-flow-dense items-center">
-      <span name="away_0_player" class="inline-block col-span-1 text-md text-right">Away Player 1</span>
+      <span name="a0Player" class="inline-block col-span-1 text-md text-right">Away Player 1</span>
       <span id="#a0TotalStars" class="inline-block col-span-1 text-md text-center">0</span>
       <span id="#a0TotalPerfects" class="inline-block col-span-1 text-md text-center">0</span>
       <span id="#a0TotalPoints" class="inline-block col-span-1 text-md text-center">0</span>
     </div>
 
     <div class="grid grid-cols-4 grid-flow-dense items-center">
-      <span name="away_1_player" class="inline-block col-span-1 text-md text-right">Away Player 2</span>
+      <span name="a1Player" class="inline-block col-span-1 text-md text-right">Away Player 2</span>
       <span id="#a1TotalStars" class="inline-block col-span-1 text-md text-center">0</span>
       <span id="#a1TotalPerfects" class="inline-block col-span-1 text-md text-center">0</span>
       <span id="#a1TotalPoints" class="inline-block col-span-1 text-md text-center">0</span>
@@ -748,14 +748,14 @@
     </div>
     
     <div class="my-2 grid grid-cols-4 grid-flow-dense items-center">
-      <span name="home_0_player" class="inline-block col-span-1 text-md text-right">Home Player 1</span>
+      <span name="h0Player" class="inline-block col-span-1 text-md text-right">Home Player 1</span>
       <span id="#h0TotalStars" class="inline-block col-span-1 text-md text-center">0</span>
       <span id="#h0TotalPerfects" class="inline-block col-span-1 text-md text-center">0</span>
       <span id="#h0TotalPoints" class="inline-block col-span-1 text-md text-center">0</span>
     </div>
 
     <div class="my-2 grid grid-cols-4 grid-flow-dense items-center">
-      <span name="home_1_player" class="inline-block col-span-1 text-md text-right">Home Player 2</span>
+      <span name="h1Player" class="inline-block col-span-1 text-md text-right">Home Player 2</span>
       <span id="#h1TotalStars" class="inline-block col-span-1 text-md text-center">0</span>
       <span id="#h1TotalPerfects" class="inline-block col-span-1 text-md text-center">0</span>
       <span id="#h1TotalPoints" class="inline-block col-span-1 text-md text-center">0</span>
