@@ -19,10 +19,10 @@ class SeasonForm(forms.ModelForm):
     class Meta:
         model = Season
         fields = (
-            'seasonNum',
-            'startDate',
-            'endDate',
-            'playoffFinalsDate',
+            'season_number',
+            'match_play_start_dt',
+            'match_play_end_dt',
+            'playoff_finals_dt',
             'playoffFinalsLocation'
         )
 

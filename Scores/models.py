@@ -3,7 +3,8 @@ import uuid
 from django.conf import settings
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models.aggregates import Count, Max, Min, Sum
+from django.db.models import F
+from django.db.models.aggregates import Count, Max, Min, Sum, Avg
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from django.db.models.signals import post_save
@@ -84,7 +85,7 @@ class GameScore(models.Model):
             Only one player per team can have a non-zero value.
         darts_thrown: The number of darts thrown by the player/team.
         score_left: The score left on the board when the game ended.
-            If score_left is 0, the player/team won the game.
+            If score left is 0, the player/team won the game.
     """
 
     SINGLES = "SN"
@@ -150,11 +151,80 @@ class GameScore(models.Model):
 
 
 class ScoresetManager(models.Manager):
-    def get_queryset(self):
+    """
+    Provides methods for calculating scoreset stats.
+    ::
+    get_wins
+        Returns a queryset with total win points annotated.
+    get_stars
+        Returns a queryset with total stars annotated.
+    get_perfects
+        Returns a queryset with total perfects annotated.
+    get_in_thrown
+        Returns a queryset with high in thrown annotated.
+    get_out_thrown
+        Returns a queryset with high out thrown annotated.
+    get_best_week_501
+        Returns a queryset with low darts thrown annotated.
+    get_ppd
+        Returns a queryset with average PPD annotated.
+    """
+
+    def get_wins(self):
         return (
             super(ScoresetManager, self)
             .get_queryset()
             .annotate(Sum("gamescore__game_point"))
+        )
+
+    def get_stars(self):
+        return (
+            super(ScoresetManager, self)
+            .get_queryset()
+            .annotate(Sum("gamescore__stars"))
+        )
+
+    def get_perfects(self):
+        return (
+            super(ScoresetManager, self)
+            .get_queryset()
+            .annotate(Sum("gamescore__perfects"))
+        )
+
+    def get_ppd(self):
+        return (
+            super(ScoresetManager, self)
+            .get_queryset()
+            .annotate(
+                Avg(
+                    F((501 * Count("gamescore__id")) - Sum("gamescore__score_left"))
+                    / F(Sum("gamescore__darts_thrown"))
+                )
+            )
+        )
+
+    def get_best_week_501(self):
+        return (
+            super(ScoresetManager, self)
+            .get_queryset()
+            .filter(gamescore__score_left=0)
+            .annotate(Min("gamescore__darts_thrown"))
+        )
+
+    def get_high_in(self):
+        return (
+            super(ScoresetManager, self)
+            .get_queryset()
+            .filter(gamescore__in_thrown__isnull=False)
+            .annotate(Max("gamescore__in_thrown"))
+        )
+
+    def get_high_out(self):
+        return (
+            super(ScoresetManager, self)
+            .get_queryset()
+            .filter(gamescore__out_thrown__isnull=False)
+            .annotate(Max("gamescore__out_thrown"))
         )
 
     def create_new(self, match, team, player):
@@ -186,6 +256,7 @@ class Scoreset(TimeStampedModel, models.Model):
     def player_display(self):
         return "(" + str(self.match.weekNum) + ") " + self.player.last_name
 
+    """
     @property
     def singles_points(self):
         points = GameScore.games.singles(scoreset=self.id).aggregate(
@@ -243,6 +314,7 @@ class Scoreset(TimeStampedModel, models.Model):
             Max("out_thrown", default=0)
         )
         return high_out["out_thrown__max"]
+    """
 
 
 class Approval(TimeStampedModel, models.Model):
@@ -252,7 +324,7 @@ class Approval(TimeStampedModel, models.Model):
 
     class Meta:
         unique_together = ["match", "approved_by"]
-    
+
     @receiver(post_save, sender=Scoreset)
     def create_approval(sender, instance, created, **kwargs):
         if created:

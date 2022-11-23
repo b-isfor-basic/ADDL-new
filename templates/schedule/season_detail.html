@@ -27,7 +27,7 @@
             <div id="matchtable" class="col-auto p-3">
                 {% if divisions|length > 1 %}
                     {% for division in divisions %}
-                        {% include 'schedule/partials/match_list.html' %}
+                        {% include 'schedule/partials/match_list.html' with division=division %}
                     {% endfor %}
                 {% else %}
                     {% with divisions as division %}

@@ -126,13 +126,16 @@ class Establishment(models.Model):
 
 
 class DivisionManager(models.Manager):
-    def num_active_divisions(self, season_number):
-        return self.filter(season__seasonNum=season_number).count()
-
     def num_active_teams(self):
-        return self.annotate(
+        return self.get_queryset().annotate(
             num_teams=Coalesce(models.Count('team_set'))
         )
+
+    def matches(self):
+        from Schedule.models import Season
+
+        season = Season.details.get_active()
+        return self.get_queryset().filter(match_set__season=season)
 
 
 class Division(models.Model):
@@ -150,7 +153,11 @@ class Division(models.Model):
         to=Establishment, on_delete=models.SET_NULL, null=True, blank=True
     )
     matchNight = models.CharField(
-        "Match Night", choices=WEEKDAY_CHOICES, max_length=9, null=True, blank=True
+        "Match Night",
+        choices=WEEKDAY_CHOICES,
+        max_length=9,
+        null=True, 
+        blank=True
     )
     playerFee = models.IntegerField(
         "Player Fee",
@@ -176,7 +183,6 @@ class Division(models.Model):
     objects = models.Manager()
     active = DivisionManager()
 
-
     def __str__(self):
         return f"Area {self.area.number} - {self.matchNight}"
 
@@ -191,3 +197,9 @@ class Division(models.Model):
         for i in range(1, boards, 2):
             groups.append([i, i + 1])
         return groups
+
+    def get_matches(self):
+        from Schedule.models import Season
+
+        season = Season.details.get_active()
+        return self.match_set.filter(season=season)

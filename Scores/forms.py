@@ -13,9 +13,9 @@ class ScoresetForm(forms.ModelForm):
 
 
 class SinglesCricketScoreForm(forms.Form):
-    '''
+    """
     Form for singles cricket matches.
-    '''
+    """
     away_stars = forms.IntegerField(required=False, min_value=0)
     away_perfects = forms.IntegerField(required=False, min_value=0)
     away_point = forms.IntegerField(min_value=0, max_value=1)
@@ -46,43 +46,43 @@ class SinglesCricketScoreForm(forms.Form):
     
 
 class DoublesCricketScoreForm(forms.Form):
-    '''
+    """
     Form for doubles cricket matches. 
-    '''
+    """
     # Away Player 1
-    away1_stars = forms.IntegerField(required=False, min_value=0)
-    away1_perfects = forms.IntegerField(required=False, min_value=0)
-    away1_point = forms.IntegerField(min_value=0, max_value=1)
+    a0_stars = forms.IntegerField(required=False, min_value=0)
+    a0_perfects = forms.IntegerField(required=False, min_value=0)
+    a0_point = forms.IntegerField(min_value=0, max_value=1)
     # Away Player 2
-    away2_stars = forms.IntegerField(required=False, min_value=0)
-    away2_perfects = forms.IntegerField(required=False, min_value=0)
-    away2_point = forms.IntegerField(min_value=0, max_value=1)
+    a1_stars = forms.IntegerField(required=False, min_value=0)
+    a1_perfects = forms.IntegerField(required=False, min_value=0)
+    a1_point = forms.IntegerField(min_value=0, max_value=1)
     # Home Player 1
-    home1_stars = forms.IntegerField(required=False, min_value=0)
-    home1_perfects = forms.IntegerField(required=False, min_value=0)
-    home1_point = forms.IntegerField(min_value=0, max_value=1)
+    h0_stars = forms.IntegerField(required=False, min_value=0)
+    h0_perfects = forms.IntegerField(required=False, min_value=0)
+    h0_point = forms.IntegerField(min_value=0, max_value=1)
     # Home Player 2
-    home2_stars = forms.IntegerField(required=False, min_value=0)
-    home2_perfects = forms.IntegerField(required=False, min_value=0)
-    home2_point = forms.IntegerField(min_value=0, max_value=1)
+    h1_stars = forms.IntegerField(required=False, min_value=0)
+    h1_perfects = forms.IntegerField(required=False, min_value=0)
+    h1_point = forms.IntegerField(min_value=0, max_value=1)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
-        away1_point = cleaned_data.get('away1_point')
-        away2_point = cleaned_data.get('away2_point')
-        home1_point = cleaned_data.get('home1_point')
-        home2_point = cleaned_data.get('home2_point')
+        a0_point = cleaned_data.get('a0_point')
+        a1_point = cleaned_data.get('a1_point')
+        h0_point = cleaned_data.get('h0_point')
+        h1_point = cleaned_data.get('h1_point')
 
         # Verify that only one team has win points, or that both players on a team have points for winning games
-        if away1_point + away2_point == home1_point + home2_point:
-            raise forms.ValidationError('Invalid score. Only one team can have the game point.')
-        elif away1_point != away2_point | home1_point != home2_point:
-            raise forms.ValidationError('Invalid score. Both players on a team must have the same value for game point.')
+        if a0_point + a1_point == h0_point + h1_point:
+            raise forms.ValidationError('Invalid score. Only one team can have a game point.')
+        elif a0_point != a1_point | h0_point != h1_point:
+            raise forms.ValidationError('Invalid score. Both players on a team must have the same score.')
         
-        for player in ['away1', 'away2', 'home1', 'home2']:
+        for player in ['a0', 'a1', 'h0', 'h1']:
             stars = cleaned_data.get(f'{player}_stars')
             perfects = cleaned_data.get(f'{player}_perfects')
             if stars / 3 < perfects:

@@ -175,13 +175,13 @@ def ScoresheetCreateView(request, id, **kwargs):
     return render(request, 'scores/add_scoresheet.html', context)
 
  
-def StandingsView(request, season=Season.objects.first(), *args, **kwargs):
+def StandingsView(request, season=Season.details.get_active(), *args, **kwargs):
     season = season
     
     matches = season.match_set.all()
     context = {
         'season': season,
-        #'matches': matches
+        'matches': matches
     }
     return render(request, 'scores/standings.html', context)
 

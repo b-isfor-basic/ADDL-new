@@ -9,15 +9,26 @@ from django.contrib.postgres.fields import ArrayField
 
 from django_extensions.db.models import CreationDateTimeField, AutoSlugField
 from recurrence.fields import RecurrenceField
+from recurrence.models import Rule
 
 from Locations.models import Division, Establishment
 from Members.models import Team
 
 
-class RecurringEvent(models.Model):
+class Scheduler(models.Model):
     title = models.CharField(max_length=48)
     description = models.TextField(null=True, blank=True)
-    recurrence = RecurrenceField()
+    frequency = RecurrenceField()
+
+
+class SeasonManager(models.Manager):
+    def get_active(self):
+        season_start_before_today = Q(match_play_start_dt__lte=timezone.now())
+        season_end_after_today = Q(match_play_end_dt__gte=timezone.now())
+
+        if self.get_queryset().filter(season_start_before_today & season_end_after_today).exists():
+            return self.get_queryset().filter(season_start_before_today & season_end_after_today).first()
+        return self.get_queryset().filter(Q(match_play_start_dt__gte=timezone.now())).earliest('match_play_start_dt')
 
 
 class Season(models.Model):
@@ -28,36 +39,37 @@ class Season(models.Model):
 
     There is 1 week at the end of the season for make-up matches and
     1 week for in-house seeded playoff preliminary matches. The final
-    league-wide playoff tournament is on the second Saturday following the
-    in-house playoffs.
+    league-wide playoff tournament is traditionally held on the second 
+    Saturday following the in-house playoffs.
     """
 
-    seasonNum = models.PositiveIntegerField("Season Number")
-    startDate = models.DateField()
-    endDate = models.DateField()
-    # TODO: Move playoff info to a new model with 1 to 1 relationship.
-    playoffFinalsDate = models.DateTimeField("Playoff Finals")
+    season_number = models.PositiveIntegerField("Season Number")
+    match_play_start_dt = models.DateField()
+    match_play_end_dt = models.DateField()
+    playoff_finals_dt = models.DateTimeField("Playoff Finals")
     playoffFinalsLocation = models.ForeignKey(
         to=Establishment, blank=True, null=True, on_delete=models.SET_NULL
     )
 
+    objects = models.Manager()
+    details = SeasonManager()
+
+
     class Meta:
-        ordering = ["-seasonNum"]
-        get_latest_by = ["startDate"]
+        ordering = ["-season_number"]
+        get_latest_by = ["match_play_start_dt"]
 
     def __str__(self):
-        return f"Season {self.seasonNum}"
-
-    def active(self):
-        before_today = datetime.date.today() - self.startDate
-        after_today = self.playoffFinalsDate - timezone.now()
-        return before_today.days > 0 and after_today.days > 0
+        return f"Season {self.season_number}"
 
 
 class MatchManager(models.Manager):
     
-    def get_queryset(self):
-        return super(MatchManager, self).get_queryset().annotate(points=F('scoreset_set__gamescore__game_point'))
+    def by_season(self, season):
+        return self.get_queryset().filter(season=season)
+
+    def by_division(self, area):
+        return self.get_queryset().filter(division=area)
 
 
 class Match(models.Model):

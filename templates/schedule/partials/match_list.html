@@ -15,7 +15,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% regroup matches|dictsort:"weekNum" by weekNum as matches_list %}
+                {% regroup division.get_matches|dictsort:"weekNum" by weekNum as matches_list %}
                 {% for week in matches_list %}
                 <tr class="bg-white border-b border-primary-400 hover:bg-primary-100">
                     <th rowspan={{ week.list|length }} scope="rowgroup" class="p-2 text-sm text-center">{{ week.grouper }}</th>      
@@ -26,7 +26,7 @@
                             <td class="p-2 text-sm text-center">{{ match.matchDate|date:"m.d.y" }}</td>
                             <td class="p-2 text-sm text-center">{{ match.awayTeam }}</td>
                             <td class="p-2 text-sm text-center">{{ match.homeTeam }}</td>
-                            <td class="p-2 text-sm text-center">{{ match.boards }}</td>
+                            <td class="p-2 text-sm text-center">{% if match.boards %}{{ match.boards|join:" & " }}{% else %}{% endif %}</td>
                             <td class="p-2 text-sm text-center">
                                 {% if match.winner %}
                                 {{ match.winner }}

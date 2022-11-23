@@ -8,8 +8,8 @@ from .models import *
 class SeasonTestCase(TestCase):
     def setUp(self):
         Season.objects.create(
-            seasonNum = 39,
-            startDate = timezone.now(),
-            endDate = self.startDate + timedelta(days=84),
-            playoffFinalsDate = self.endDate + timedelta(days=7),
+            season_number = 39,
+            match_play_start_dt = timezone.now(),
+            match_play_end_dt = self.match_play_start_dt + timedelta(days=84),
+            playoff_finals_dt = self.match_play_end_dt + timedelta(days=7),
         )
