@@ -30,13 +30,11 @@ if 'SECRET_KEY' in os.environ:
 if IS_HEROKU:
     ALLOWED_HOSTS = ["*"]
 else:
-    ALLOWED_HOSTS = ["localhost", ""]
+    ALLOWED_HOSTS = [""]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if not IS_HEROKU:
     DEBUG = True
-
-INTERNAL_IPS = ["127.0.0.1", "127.0.0.1:8000"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -159,7 +157,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "src/"]
 # STATIC_ROOT = BASE_DIR / "staticfiles"
-STATIC_ROOT = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "static/"
 
 
 # Default primary key field type
