@@ -23,11 +23,8 @@
     "type": "git",
     "url": "git+https://github.com/b-isfor-basic/ADDL-new.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Brittney Smith",
   "bugs": {
     "url": "https://github.com/b-isfor-basic/ADDL-new/issues"
-  },
-  "homepage": "https://github.com/b-isfor-basic/ADDL-new#readme",
-  "description": ""
+  }
   }
