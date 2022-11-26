@@ -18,7 +18,7 @@
             <p class="font-semibold text-left text-amber-400">{{ item.title|title }}</p>
             <p class="text-xs text-primary-200">{{ item.date_created|date:"m d y" }}</p>
             <p class="font-normal text-left text-sm text-primary-100 pl-3">{{ item.body }}</p>
-            <p class="text-xs text-right text-primary-200 italic">{{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }} </p>
+            <p class="text-xs text-right text-primary-200 italic">{{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }}</p>
           </div>
         {% endfor %}
         {% else %}

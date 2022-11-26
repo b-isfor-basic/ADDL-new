@@ -40,6 +40,7 @@ INTERNAL_IPS = ["127.0.0.1", "127.0.0.1:8000"]
 
 # Application definition
 INSTALLED_APPS = [
+    'scout_apm.django',
     # Django included packages
     "django.contrib.admin",
     "django.contrib.auth",
@@ -51,7 +52,6 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     # Installed packages
     "rest_framework",
-  #  "debug_toolbar",
     "django_extensions",
     "phonenumber_field",
     "recurrence",
@@ -157,9 +157,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "static/"
-# STATICFILES_DIRS = ["src/"]
+STATICFILES_DIRS = [BASE_DIR / "src/"]
 # STATIC_ROOT = BASE_DIR / "staticfiles"
-STATIC_ROOT = BASE_DIR / "src"
+STATIC_ROOT = [BASE_DIR / "static"]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -179,7 +180,7 @@ PHONENUMBER_DEFAULT_REGION = "US"
 # STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
 
 # Enable WhiteNoise's GZip compression of static assets.
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Django Extensions Graph Models
 # https://django-extensions.readthedocs.io/en/latest/graph_models.html
@@ -200,6 +201,3 @@ if "CI" in os.environ:
 
 # Custom User Model
 AUTH_USER_MODEL = "Members.Player"
-
-
-
