@@ -51,11 +51,11 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     # Installed packages
     "rest_framework",
-    "debug_toolbar",
+  #  "debug_toolbar",
     "django_extensions",
     "phonenumber_field",
     "recurrence",
-    "compressor",
+ #   "compressor",
     "widget_tweaks",
     # Created packages
     "Scores.apps.ScoresConfig",
@@ -65,8 +65,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    #"debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -172,10 +173,13 @@ PHONENUMBER_DEFAULT_REGION = "US"
 
 # Compressor for Flowbite Integration
 # https://flowbite.com/docs/getting-started/django/
+# 
+# COMPRESS_ROOT = BASE_DIR / "static"
+# COMPRESS_ENABLED = True
+# STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
 
-COMPRESS_ROOT = BASE_DIR / "static"
-COMPRESS_ENABLED = True
-STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
+# Enable WhiteNoise's GZip compression of static assets.
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Django Extensions Graph Models
 # https://django-extensions.readthedocs.io/en/latest/graph_models.html
