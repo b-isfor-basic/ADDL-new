@@ -24,3 +24,5 @@ static/
 node_modules/
 
 
+addl.app.csr
+addl.app.key

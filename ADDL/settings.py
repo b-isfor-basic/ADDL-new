@@ -11,23 +11,32 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
+from django.test.runner import DiscoverRunner
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+IS_HEROKU = "DYNO" in os.environ
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-@mq2cn^nh+kak)r-_jeb_$-&x+=5^^q2k!y++l3125mb5)!p7#"
+if 'SECRET_KEY' in os.environ:
+    SECRET_KEY = os.environ['SECRET_KEY']
+
+# Generally avoid wildcards(*). However since Heroku router provides hostname validation it is ok
+if IS_HEROKU:
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = []
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if not IS_HEROKU:
+    DEBUG = True
 
-ALLOWED_HOSTS = []
-
-INTERNAL_IPS = ["127.0.0.1", "127.0.0.1:8000"]
+#INTERNAL_IPS = ["127.0.0.1", "127.0.0.1:8000"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -86,11 +95,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ADDL.wsgi.application"
 
+MAX_CONN_AGE = 600
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-DATABASES = {
+DATABASES = {}
+'''
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "ADDL",
@@ -100,6 +110,16 @@ DATABASES = {
         "PORT": "5432",
     }
 }
+'''
+
+if "DATABASE_URL" in os.environ:
+    # Configure Django for DATABASE_URL environment variable.
+    DATABASES["default"] = dj_database_url.config(
+        conn_max_age=MAX_CONN_AGE, ssl_require=True)
+
+    # Enable test database if found in CI environment.
+    if "CI" in os.environ:
+        DATABASES["default"]["TEST"] = DATABASES["default"]
 
 
 # Password validation
@@ -138,7 +158,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = ["src/"]
-STATIC_ROOT = "./static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -160,14 +180,24 @@ STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
 # Django Extensions Graph Models
 # https://django-extensions.readthedocs.io/en/latest/graph_models.html
 
-# Graph Models ./manage.py graph_models -g -o my_project_visualized.png
-GRAPH_MODELS = {
-    "app_labels": ["Locations", "Schedule", "Members", "Scores"],
-    "group_models": True,
-}
+# Test Runner Config
+class HerokuDiscoverRunner(DiscoverRunner):
+    """Test Runner for Heroku CI, which provides a database for you.
+    This requires you to set the TEST database (done for you by settings().)"""
+
+    def setup_databases(self, **kwargs):
+        self.keepdb = True
+        return super(HerokuDiscoverRunner, self).setup_databases(**kwargs)
+
+
+# Use HerokuDiscoverRunner on Heroku CI
+if "CI" in os.environ:
+    TEST_RUNNER = "gettingstarted.settings.HerokuDiscoverRunner"
 
 # Custom User Model
 AUTH_USER_MODEL = "Members.Player"
 
 # Debug Toolbar Config
 DEBUG_TOOLBAR_CONFIG = {"INSERT_BEFORE": "</main>"}
+
+
