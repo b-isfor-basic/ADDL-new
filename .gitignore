@@ -7,7 +7,7 @@ __pycache__
 .venv/
 
 # Static folder at project root
-static/
+./static/
 
 # macOS
 ._*
@@ -23,5 +23,4 @@ static/
 # node_modules
 node_modules/
 
-# Model visualization
-my_project_visualized.png
+
