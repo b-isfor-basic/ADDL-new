@@ -18,7 +18,7 @@ from django.test.runner import DiscoverRunner
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-IS_HEROKU = "DYNO" in os.environ
+IS_HEROKU = "web.1" in os.environ
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -36,7 +36,7 @@ else:
 if not IS_HEROKU:
     DEBUG = True
 
-#INTERNAL_IPS = ["127.0.0.1", "127.0.0.1:8000"]
+INTERNAL_IPS = ["127.0.0.1", "127.0.0.1:8000"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -100,8 +100,7 @@ MAX_CONN_AGE = 600
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-DATABASES = {}
-'''
+DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "ADDL",
@@ -111,7 +110,7 @@ DATABASES = {}
         "PORT": "5432",
     }
 }
-'''
+
 
 if "DATABASE_URL" in os.environ:
     # Configure Django for DATABASE_URL environment variable.
@@ -158,8 +157,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = ["src/"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATICFILES_DIRS = ["src/"]
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "src"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -196,12 +196,10 @@ class HerokuDiscoverRunner(DiscoverRunner):
 
 # Use HerokuDiscoverRunner on Heroku CI
 if "CI" in os.environ:
-    TEST_RUNNER = "gettingstarted.settings.HerokuDiscoverRunner"
+    TEST_RUNNER = "ADDL.settings.HerokuDiscoverRunner"
 
 # Custom User Model
 AUTH_USER_MODEL = "Members.Player"
 
-# Debug Toolbar Config
-DEBUG_TOOLBAR_CONFIG = {"INSERT_BEFORE": "</main>"}
 
 
