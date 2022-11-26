@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Members', '0006_remove_playerseasoninstance_partner_and_more'),
+        ("Members", "0006_remove_playerseasoninstance_partner_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='playerseasoninstance',
-            name='doubles_wins',
+            model_name="playerseasoninstance",
+            name="doubles_wins",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='playerseasoninstance',
-            name='singles_wins',
+            model_name="playerseasoninstance",
+            name="singles_wins",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

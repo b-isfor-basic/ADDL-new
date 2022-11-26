@@ -6,20 +6,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Scores', '0004_gamescore_remove_five01_scoreset_and_more'),
+        ("Scores", "0004_gamescore_remove_five01_scoreset_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='scoreset',
+            name="scoreset",
             options={},
         ),
         migrations.RemoveField(
-            model_name='scoreset',
-            name='created',
+            model_name="scoreset",
+            name="created",
         ),
         migrations.RemoveField(
-            model_name='scoreset',
-            name='modified',
+            model_name="scoreset",
+            name="modified",
         ),
     ]

@@ -26,10 +26,27 @@ class SeasonManager(models.Manager):
         season_start_before_today = Q(match_play_start_dt__lte=timezone.now())
         season_end_after_today = Q(match_play_end_dt__gte=timezone.now())
 
-        if self.get_queryset().filter(season_start_before_today & season_end_after_today).exists():
-            return self.get_queryset().filter(season_start_before_today & season_end_after_today).first()
-        return self.get_queryset().filter(Q(match_play_start_dt__gte=timezone.now())).earliest('match_play_start_dt')
+        if (
+            self.get_queryset()
+            .filter(season_start_before_today & season_end_after_today)
+            .exists()
+        ):
+            return (
+                self.get_queryset()
+                .filter(season_start_before_today & season_end_after_today)
+                .first()
+            )
+        return (
+            self.get_queryset()
+            .filter(Q(match_play_start_dt__gte=timezone.now()))
+            .earliest("match_play_start_dt")
+        )
 
+    def get_team_stats(self, season):
+        return self.get_queryset().filter(season=season).team_set.annotate(
+            wins=Sum("scoreset__gamescore__game_point"),
+            losses=Count("player1__scoreset"),
+        )
 
 class Season(models.Model):
     """
@@ -39,7 +56,7 @@ class Season(models.Model):
 
     There is 1 week at the end of the season for make-up matches and
     1 week for in-house seeded playoff preliminary matches. The final
-    league-wide playoff tournament is traditionally held on the second 
+    league-wide playoff tournament is traditionally held on the second
     Saturday following the in-house playoffs.
     """
 
@@ -54,7 +71,6 @@ class Season(models.Model):
     objects = models.Manager()
     details = SeasonManager()
 
-
     class Meta:
         ordering = ["-season_number"]
         get_latest_by = ["match_play_start_dt"]
@@ -64,9 +80,8 @@ class Season(models.Model):
 
 
 class MatchManager(models.Manager):
-    
     def by_season(self, season):
-        return self.get_queryset().filter(season=season)
+        return self.get_queryset().filter(season__season_number=season)
 
     def by_division(self, area):
         return self.get_queryset().filter(division=area)
@@ -76,6 +91,7 @@ class Match(models.Model):
     """
     Scheduled matches.
     """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     season = models.ForeignKey(Season, models.CASCADE)
     division = models.ForeignKey(Division, models.CASCADE)
@@ -106,21 +122,30 @@ class Match(models.Model):
 
     def __str__(self):
         return f"{self.awayTeam} vs. {self.homeTeam}"
-    
+
+    @classmethod
+    def homeScore(self):
+        homeScore = self.scoreset_set.filter(team=self.homeTeam).aggregate(
+            wins=Sum("gamescore__game_point", default=0)
+        )
+
+    @classmethod
+    def awayScore(self):
+        awayScore = self.scoreset_set.filter(team=self.awayTeam).aggregate(
+            wins=Sum("gamescore__game_point", default=0)
+        )
+
     @property
     def winner(self):
-        homeScore = self.scoreset_set.filter(team=self.homeTeam).aggregate(wins=Sum('gamescore__game_point', default=0))
-        awayScore = self.scoreset_set.filter(team=self.awayTeam).aggregate(wins=Sum('gamescore__game_point', default=0))
-
-        if homeScore['wins'] == 0 and awayScore['wins'] == 0:
+        if homeScore["wins"] == 0 and awayScore["wins"] == 0:
             return None
         else:
-            if homeScore['wins'] == awayScore['wins']:
+            if homeScore["wins"] == awayScore["wins"]:
                 return "Tie"
-            elif homeScore['wins'] > awayScore['wins']:
-                return 'Home'
+            elif homeScore["wins"] > awayScore["wins"]:
+                return "Home"
             else:
-                return 'Away'
+                return "Away"
 
 
 class Announcement(models.Model):

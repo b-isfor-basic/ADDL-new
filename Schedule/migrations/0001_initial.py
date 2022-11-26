@@ -12,55 +12,143 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('Members', '0001_initial'),
+        ("Members", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Locations', '0001_initial'),
+        ("Locations", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Season',
+            name="Season",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('seasonNum', models.PositiveIntegerField(verbose_name='Season Number')),
-                ('startDate', models.DateField()),
-                ('endDate', models.DateField()),
-                ('playoffFinalsDate', models.DateTimeField(verbose_name='Playoff Finals')),
-                ('playoffFinalsLocation', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='Locations.establishment')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "seasonNum",
+                    models.PositiveIntegerField(verbose_name="Season Number"),
+                ),
+                ("startDate", models.DateField()),
+                ("endDate", models.DateField()),
+                (
+                    "playoffFinalsDate",
+                    models.DateTimeField(verbose_name="Playoff Finals"),
+                ),
+                (
+                    "playoffFinalsLocation",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="Locations.establishment",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-seasonNum'],
-                'get_latest_by': ['startDate'],
+                "ordering": ["-seasonNum"],
+                "get_latest_by": ["startDate"],
             },
         ),
         migrations.CreateModel(
-            name='Match',
+            name="Match",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('weekNum', models.IntegerField(blank=True, null=True)),
-                ('matchDate', models.DateField(blank=True, null=True)),
-                ('boards', models.CharField(blank=True, max_length=4, null=True)),
-                ('awayTeam', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='awayMatches', to='Members.team')),
-                ('division', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Locations.division')),
-                ('homeTeam', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='homeMatches', to='Members.team')),
-                ('season', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Schedule.season')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("weekNum", models.IntegerField(blank=True, null=True)),
+                ("matchDate", models.DateField(blank=True, null=True)),
+                ("boards", models.CharField(blank=True, max_length=4, null=True)),
+                (
+                    "awayTeam",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="awayMatches",
+                        to="Members.team",
+                    ),
+                ),
+                (
+                    "division",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Locations.division",
+                    ),
+                ),
+                (
+                    "homeTeam",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="homeMatches",
+                        to="Members.team",
+                    ),
+                ),
+                (
+                    "season",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Schedule.season",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Matches',
+                "verbose_name_plural": "Matches",
             },
         ),
         migrations.CreateModel(
-            name='Announcement',
+            name="Announcement",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=100)),
-                ('title_slug', django_extensions.db.fields.AutoSlugField(blank=True, editable=False, populate_from='title')),
-                ('body', models.TextField()),
-                ('active_date', models.DateTimeField()),
-                ('inactive_date', models.DateTimeField()),
-                ('date_created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('season', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='Schedule.season')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=100)),
+                (
+                    "title_slug",
+                    django_extensions.db.fields.AutoSlugField(
+                        blank=True, editable=False, populate_from="title"
+                    ),
+                ),
+                ("body", models.TextField()),
+                ("active_date", models.DateTimeField()),
+                ("inactive_date", models.DateTimeField()),
+                (
+                    "date_created",
+                    django_extensions.db.fields.CreationDateTimeField(
+                        auto_now_add=True
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "season",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Schedule.season",
+                    ),
+                ),
             ],
         ),
     ]

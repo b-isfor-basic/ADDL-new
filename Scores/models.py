@@ -3,67 +3,15 @@ import uuid
 from django.conf import settings
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models import F
-from django.db.models.aggregates import Count, Max, Min, Sum, Avg
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from .managers import *
+
 from Members.models import Team
 from Schedule.models import Match
-
-
-class GameQuerySet(models.QuerySet):
-    def doubles(self, **kwargs):
-        return super(GameQuerySet, self).filter(format="DB", **kwargs)
-
-    def singles(self, **kwargs):
-        return super(GameQuerySet, self).filter(format="SN", **kwargs)
-
-    def five01_singles(self, **kwargs):
-        return super(GameQuerySet, self).filter(format="SN", game="501", **kwargs)
-
-    def five01_doubles(self, **kwargs):
-        return super(GameQuerySet, self).filter(format="DB", game="501", **kwargs)
-
-    def wins(self, **kwargs):
-        return super(GameQuerySet, self).filter(game_point=1, **kwargs)
-
-
-class SinglesCricketGameManager(models.Manager):
-    def create(self, **kwargs):
-        format = "SN"
-        game = "CKT"
-        return super().create(format=format, game=game, **kwargs)
-
-
-class DoublesCricketGameManager(models.Manager):
-    def create(self, **kwargs):
-        format = "DB"
-        game = "CKT"
-        return super().create(format=format, game=game, **kwargs)
-
-
-class Singles501GameManager(models.Manager):
-    def create(self, **kwargs):
-        format = "SN"
-        game = "501"
-        return super().create(format=format, game=game, **kwargs)
-
-
-class Doubles501GameManager(models.Manager):
-    def create(self, **kwargs):
-        format = "DB"
-        game = "501"
-        return super().create(format=format, game=game, **kwargs)
-
-
-class Doubles301GameManager(models.Manager):
-    def create(self, **kwargs):
-        format = "DB"
-        game = "301"
-        return super().create(format=format, game=game, **kwargs)
 
 
 class GameScore(models.Model):
@@ -133,12 +81,8 @@ class GameScore(models.Model):
     )
 
     objects = models.Manager()
-    games = GameQuerySet.as_manager()
-    singles_cricket = SinglesCricketGameManager()
-    doubles_cricket = DoublesCricketGameManager()
-    singles_501 = Singles501GameManager()
-    doubles_501 = Doubles501GameManager()
-    doubles_301 = Doubles301GameManager()
+    games = GamesManager()
+    query = GameQuerySet.as_manager()
 
     @property
     def player_display(self):
@@ -148,92 +92,6 @@ class GameScore(models.Model):
             + ") "
             + self.scoreset.player.last_name
         )
-
-
-class ScoresetManager(models.Manager):
-    """
-    Provides methods for calculating scoreset stats.
-    ::
-    get_wins
-        Returns a queryset with total win points annotated.
-    get_stars
-        Returns a queryset with total stars annotated.
-    get_perfects
-        Returns a queryset with total perfects annotated.
-    get_in_thrown
-        Returns a queryset with high in thrown annotated.
-    get_out_thrown
-        Returns a queryset with high out thrown annotated.
-    get_best_week_501
-        Returns a queryset with low darts thrown annotated.
-    get_ppd
-        Returns a queryset with average PPD annotated.
-    """
-
-    def get_wins(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .annotate(Sum("gamescore__game_point"))
-        )
-
-    def get_stars(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .annotate(Sum("gamescore__stars"))
-        )
-
-    def get_perfects(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .annotate(Sum("gamescore__perfects"))
-        )
-
-    def get_ppd(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .annotate(
-                Avg(
-                    F((501 * Count("gamescore__id")) - Sum("gamescore__score_left"))
-                    / F(Sum("gamescore__darts_thrown"))
-                )
-            )
-        )
-
-    def get_best_week_501(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .filter(gamescore__score_left=0)
-            .annotate(Min("gamescore__darts_thrown"))
-        )
-
-    def get_high_in(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .filter(gamescore__in_thrown__isnull=False)
-            .annotate(Max("gamescore__in_thrown"))
-        )
-
-    def get_high_out(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .filter(gamescore__out_thrown__isnull=False)
-            .annotate(Max("gamescore__out_thrown"))
-        )
-
-    def create_new(self, match, team, player):
-        if player in match.season.team_set.filter(id=team.id).players.all():
-            sub = False
-        else:
-            sub = True
-        scoreset = self.create(match=match, team=team, player=player, is_sub=sub)
-        return scoreset
 
 
 class Scoreset(TimeStampedModel, models.Model):
@@ -255,66 +113,6 @@ class Scoreset(TimeStampedModel, models.Model):
     @property
     def player_display(self):
         return "(" + str(self.match.weekNum) + ") " + self.player.last_name
-
-    """
-    @property
-    def singles_points(self):
-        points = GameScore.games.singles(scoreset=self.id).aggregate(
-            Sum("game_point", default=0)
-        )
-        return points["game_point__sum"]
-
-    @property
-    def doubles_points(self):
-        points = GameScore.games.doubles(scoreset=self.id).aggregate(
-            Sum("game_point", default=0)
-        )
-        return points["game_point__sum"]
-
-    @property
-    def match_points(self):
-        return self.singles_points() + self.doubles_points()
-
-    @property
-    def singles_ppd(self):
-        total_thrown = GameScore.games.five01_singles(scoreset=self.id).aggregate(
-            Sum("darts_thrown"), Count("id")
-        )
-        total_scored = (501 * total_thrown["id__count"]) - (
-            GameScore.games.five01_singles(scoreset=self.id).aggregate(
-                Sum("score_left", default=0)
-            )
-        )
-        return total_scored["score_left__sum"] / total_thrown["darts_thrown__sum"]
-
-    @property
-    def best_singles_501(self):
-        low_thrown = GameScore.games.five01_singles(
-            scoreset=self.id, game_point=1
-        ).aggregate(Min("darts_thrown"))
-        return low_thrown["darts_thrown__min"]
-
-    @property
-    def best_doubles_501(self):
-        low_thrown = GameScore.games.five01_doubles(
-            scoreset=self.id, game_point=1
-        ).aggregate(Min("darts_thrown"))
-        return low_thrown["darts_thrown__min"]
-
-    @property
-    def high_in(self):
-        high_in = GameScore.objects.filter(scoreset=self.id).aggregate(
-            Max("in_thrown", default=0)
-        )
-        return high_in["in_thrown__max"]
-
-    @property
-    def high_out(self):
-        high_out = GameScore.objects.filter(scoreset=self.id).aggregate(
-            Max("out_thrown", default=0)
-        )
-        return high_out["out_thrown__max"]
-    """
 
 
 class Approval(TimeStampedModel, models.Model):

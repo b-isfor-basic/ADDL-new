@@ -13,77 +13,240 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('Schedule', '0003_match_boards'),
-        ('Members', '0006_remove_playerseasoninstance_partner_and_more'),
+        ("Schedule", "0003_match_boards"),
+        ("Members", "0006_remove_playerseasoninstance_partner_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Scoreset',
+            name="Scoreset",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
-                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
-                ('is_sub', models.BooleanField()),
-                ('match', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Schedule.match')),
-                ('player', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Members.team')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    django_extensions.db.fields.CreationDateTimeField(
+                        auto_now_add=True, verbose_name="created"
+                    ),
+                ),
+                (
+                    "modified",
+                    django_extensions.db.fields.ModificationDateTimeField(
+                        auto_now=True, verbose_name="modified"
+                    ),
+                ),
+                ("is_sub", models.BooleanField()),
+                (
+                    "match",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="Schedule.match"
+                    ),
+                ),
+                (
+                    "player",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "team",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="Members.team"
+                    ),
+                ),
             ],
             options={
-                'get_latest_by': 'modified',
-                'abstract': False,
+                "get_latest_by": "modified",
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Three01',
+            name="Three01",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('stars', models.PositiveIntegerField(blank=True, null=True)),
-                ('perfects', models.PositiveIntegerField(blank=True, null=True)),
-                ('game_point', models.PositiveIntegerField(default=0, validators=[django.core.validators.MaxValueValidator(1, 'Game point cannot exceed 1.')])),
-                ('in_thrown', models.PositiveIntegerField(blank=True, null=True, validators=[django.core.validators.MaxValueValidator(170, 'In cannot exceed 170.')])),
-                ('out_thrown', models.PositiveIntegerField(blank=True, null=True, validators=[django.core.validators.MaxValueValidator(170, 'Out cannot exceed 170.')])),
-                ('scoreset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Scores.scoreset')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("stars", models.PositiveIntegerField(blank=True, null=True)),
+                ("perfects", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "game_point",
+                    models.PositiveIntegerField(
+                        default=0,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                1, "Game point cannot exceed 1."
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "in_thrown",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                170, "In cannot exceed 170."
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "out_thrown",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                170, "Out cannot exceed 170."
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "scoreset",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Scores.scoreset",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='TeamScoreset',
+            name="TeamScoreset",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('match', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Schedule.match')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "match",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="Schedule.match"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Five01',
+            name="Five01",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('stars', models.PositiveIntegerField(blank=True, null=True)),
-                ('perfects', models.PositiveIntegerField(blank=True, null=True)),
-                ('game_point', models.PositiveIntegerField(default=0, validators=[django.core.validators.MaxValueValidator(1, 'Game point cannot exceed 1.')])),
-                ('darts_thrown', models.PositiveIntegerField(blank=True, null=True)),
-                ('score_left', models.PositiveIntegerField(blank=True, null=True, validators=[django.core.validators.MaxValueValidator(501, 'Score left cannot exceed 501.')])),
-                ('out_thrown', models.PositiveIntegerField(blank=True, null=True, validators=[django.core.validators.MaxValueValidator(170, 'Out cannot exceed 170.')])),
-                ('scoreset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Scores.scoreset')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("stars", models.PositiveIntegerField(blank=True, null=True)),
+                ("perfects", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "game_point",
+                    models.PositiveIntegerField(
+                        default=0,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                1, "Game point cannot exceed 1."
+                            )
+                        ],
+                    ),
+                ),
+                ("darts_thrown", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "score_left",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                501, "Score left cannot exceed 501."
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "out_thrown",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                170, "Out cannot exceed 170."
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "scoreset",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Scores.scoreset",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Cricket',
+            name="Cricket",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('stars', models.PositiveIntegerField(blank=True, null=True)),
-                ('perfects', models.PositiveIntegerField(blank=True, null=True)),
-                ('game_point', models.PositiveIntegerField(default=0, validators=[django.core.validators.MaxValueValidator(1, 'Game point cannot exceed 1.')])),
-                ('scoreset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Scores.scoreset')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("stars", models.PositiveIntegerField(blank=True, null=True)),
+                ("perfects", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "game_point",
+                    models.PositiveIntegerField(
+                        default=0,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                1, "Game point cannot exceed 1."
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "scoreset",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Scores.scoreset",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Schedule', '0002_remove_match_boards'),
+        ("Schedule", "0002_remove_match_boards"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='match',
-            name='boards',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.PositiveIntegerField(blank=True, null=True), blank=True, null=True, size=2),
+            model_name="match",
+            name="boards",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.PositiveIntegerField(blank=True, null=True),
+                blank=True,
+                null=True,
+                size=2,
+            ),
         ),
     ]

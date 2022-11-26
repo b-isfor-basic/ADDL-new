@@ -9,9 +9,9 @@ from Members.models import Player
 from .serializers import PlayerSerializer
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def player_list(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         objects = Player.objects.all()
         serializer = PlayerSerializer(objects, many=True)
         return Response(serializer.data)

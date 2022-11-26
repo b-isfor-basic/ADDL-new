@@ -8,20 +8,55 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Schedule', '0002_remove_match_boards'),
-        ('Locations', '0004_alter_division_is_active'),
-        ('Members', '0004_alter_player_options'),
+        ("Schedule", "0002_remove_match_boards"),
+        ("Locations", "0004_alter_division_is_active"),
+        ("Members", "0004_alter_player_options"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PlayerSeasonInstance',
+            name="PlayerSeasonInstance",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('division', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='Locations.division')),
-                ('partner', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='Members.playerseasoninstance')),
-                ('player', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('season', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Schedule.season')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "division",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="Locations.division",
+                    ),
+                ),
+                (
+                    "partner",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="Members.playerseasoninstance",
+                    ),
+                ),
+                (
+                    "player",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "season",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Schedule.season",
+                    ),
+                ),
             ],
         ),
     ]

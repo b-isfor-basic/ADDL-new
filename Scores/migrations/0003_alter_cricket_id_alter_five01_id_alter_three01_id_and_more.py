@@ -7,26 +7,32 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Scores', '0002_cricket_format_five01_format_three01_format'),
+        ("Scores", "0002_cricket_format_five01_format_three01_format"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cricket',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid1, editable=False, primary_key=True, serialize=False),
+            model_name="cricket",
+            name="id",
+            field=models.UUIDField(
+                default=uuid.uuid1, editable=False, primary_key=True, serialize=False
+            ),
         ),
         migrations.AlterField(
-            model_name='five01',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid1, editable=False, primary_key=True, serialize=False),
+            model_name="five01",
+            name="id",
+            field=models.UUIDField(
+                default=uuid.uuid1, editable=False, primary_key=True, serialize=False
+            ),
         ),
         migrations.AlterField(
-            model_name='three01',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid1, editable=False, primary_key=True, serialize=False),
+            model_name="three01",
+            name="id",
+            field=models.UUIDField(
+                default=uuid.uuid1, editable=False, primary_key=True, serialize=False
+            ),
         ),
         migrations.DeleteModel(
-            name='TeamScoreset',
+            name="TeamScoreset",
         ),
     ]

@@ -6,26 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Scores', '0001_initial'),
+        ("Scores", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='cricket',
-            name='format',
-            field=models.CharField(choices=[('SN', 'Singles'), ('DB', 'Doubles')], default='SN', max_length=2),
+            model_name="cricket",
+            name="format",
+            field=models.CharField(
+                choices=[("SN", "Singles"), ("DB", "Doubles")],
+                default="SN",
+                max_length=2,
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='five01',
-            name='format',
-            field=models.CharField(choices=[('SN', 'Singles'), ('DB', 'Doubles')], default='SN', max_length=2),
+            model_name="five01",
+            name="format",
+            field=models.CharField(
+                choices=[("SN", "Singles"), ("DB", "Doubles")],
+                default="SN",
+                max_length=2,
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='three01',
-            name='format',
-            field=models.CharField(choices=[('SN', 'Singles'), ('DB', 'Doubles')], default='SN', max_length=2),
+            model_name="three01",
+            name="format",
+            field=models.CharField(
+                choices=[("SN", "Singles"), ("DB", "Doubles")],
+                default="SN",
+                max_length=2,
+            ),
             preserve_default=False,
         ),
     ]

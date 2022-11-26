@@ -5,23 +5,21 @@ from django.test import TestCase
 from .models import *
 from Schedule.models import Match
 
-class ScoresetModelTest(TestCase):
 
+class ScoresetModelTest(TestCase):
     def setUp(self):
-        #Get a Match
+        # Get a Match
         self.match = Match.objects.first()
-        #Get a Player
+        # Get a Player
         self.player = self.match.homeTeam.player1
-        #Get a Team
+        # Get a Team
         self.team = self.match.homeTeam
 
     def test_scoreset_creation(self):
 
         # Create a Scoreset
         scoreset = Scoreset.details.create_new(
-            player=self.player,
-            team=self.team,
-            match=self.match
+            player=self.player, team=self.team, match=self.match
         )
 
         # Verify that the scoreset was created
@@ -34,9 +32,7 @@ class ScoresetModelTest(TestCase):
 
         # Create a Scoreset
         scoreset = Scoreset.details.create_new(
-            player=self.player,
-            team=self.team,
-            match=self.match
+            player=self.player, team=self.team, match=self.match
         )
 
         # Verify that the scoreset was not created

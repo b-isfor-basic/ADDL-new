@@ -11,7 +11,7 @@
 {% endblock %} 
 
 {% block content %}
-<div class="mt-12 w-full bg-primary-100 border-primary-500 border-b text-primary-600">
+<div class="w-full bg-primary-100 border-primary-500 border-b text-primary-600">
   <div class="tk-objective-mk2 font-extrabold text-center text-3xl">
     <h1>Atlanta Doubles Dart League</h1>
   </div>
@@ -103,7 +103,7 @@
                 </button>
               </div>
             </div>
-        <div x-show="isOpen()" class="relative w-full rounded-lg z-50 overflow-y-auto shadow-indigo-200 shadow-sm bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-200">
+        <div x-show="isOpen()" class="relative w-full rounded-lg z-50 overflow-visible shadow-indigo-200 shadow-sm bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-200">
           <div class="flex flex-col w-full">
             <template x-for="(option, index) in filteredOptions()" :key="index">
                 <div @click="onOptionClick(index)" class="mx-2 my-2 rounded-lg hover:bg-primary-200 hover:bg-opacity-40">

@@ -9,7 +9,7 @@ class Player(AbstractUser):
     to add required phone number field to default User model.
 
     Phone number is necessary to communicate with the opposing team regarding
-    rescheduling matches and for the area manager to facilitate league 
+    rescheduling matches and for the area manager to facilitate league
     operation.
     """
 
@@ -20,7 +20,7 @@ class Player(AbstractUser):
         verbose_name_plural = "players"
 
     def __str__(self):
-        return self.first_name + ' ' + self.last_name
+        return self.first_name + " " + self.last_name
 
 
 class Team(models.Model):
@@ -37,6 +37,7 @@ class Team(models.Model):
         division: The division the team is assigned to.
         season: The season the team is registered for.
     """
+
     player1 = models.ForeignKey("Player", models.CASCADE, related_name="team_member_1")
     player2 = models.ForeignKey("Player", models.CASCADE, related_name="team_member_2")
     division = models.ForeignKey("Locations.Division", models.CASCADE)
@@ -46,4 +47,4 @@ class Team(models.Model):
         return f"{self.player1.last_name}/{self.player2.last_name}"
 
     class Meta:
-        unique_together = (['player1', 'season'], ['player2', 'season'])
+        unique_together = (["player1", "season"], ["player2", "season"])

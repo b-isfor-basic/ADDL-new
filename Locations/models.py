@@ -128,7 +128,7 @@ class Establishment(models.Model):
 class DivisionManager(models.Manager):
     def num_active_teams(self):
         return self.get_queryset().annotate(
-            num_teams=Coalesce(models.Count('team_set'))
+            num_teams=Coalesce(models.Count("team_set"))
         )
 
     def matches(self):
@@ -153,11 +153,7 @@ class Division(models.Model):
         to=Establishment, on_delete=models.SET_NULL, null=True, blank=True
     )
     matchNight = models.CharField(
-        "Match Night",
-        choices=WEEKDAY_CHOICES,
-        max_length=9,
-        null=True, 
-        blank=True
+        "Match Night", choices=WEEKDAY_CHOICES, max_length=9, null=True, blank=True
     )
     playerFee = models.IntegerField(
         "Player Fee",
@@ -179,7 +175,7 @@ class Division(models.Model):
     season = models.ManyToManyField(
         "Schedule.Season",
     )
-    
+
     objects = models.Manager()
     active = DivisionManager()
 

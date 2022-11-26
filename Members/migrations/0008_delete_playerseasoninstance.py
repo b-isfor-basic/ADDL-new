@@ -6,11 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Members', '0007_playerseasoninstance_doubles_wins_and_more'),
+        ("Members", "0007_playerseasoninstance_doubles_wins_and_more"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='PlayerSeasonInstance',
+            name="PlayerSeasonInstance",
         ),
     ]

@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             model_name="scoreset",
             name="match",
             field=models.ForeignKey(
-                default=uuid.UUID('c0d21b38-5d63-4500-a16c-e37cf1c56ecd'),
+                default=uuid.UUID("c0d21b38-5d63-4500-a16c-e37cf1c56ecd"),
                 on_delete=django.db.models.deletion.CASCADE,
                 to="Schedule.match",
             ),

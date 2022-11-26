@@ -9,41 +9,109 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Scores', '0003_alter_cricket_id_alter_five01_id_alter_three01_id_and_more'),
+        ("Scores", "0003_alter_cricket_id_alter_five01_id_alter_three01_id_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GameScore',
+            name="GameScore",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid1, editable=False, primary_key=True, serialize=False)),
-                ('format', models.CharField(choices=[('SN', 'Singles'), ('DB', 'Doubles')], max_length=2)),
-                ('game', models.CharField(choices=[('CKT', 'Cricket'), ('501', '501'), ('301', '301')], max_length=3)),
-                ('stars', models.PositiveIntegerField(blank=True, null=True)),
-                ('perfects', models.PositiveIntegerField(blank=True, null=True)),
-                ('game_point', models.PositiveIntegerField(default=0, validators=[django.core.validators.MaxValueValidator(1, 'Game point cannot exceed 1.')])),
-                ('in_thrown', models.PositiveIntegerField(blank=True, null=True, validators=[django.core.validators.MaxValueValidator(170, 'In cannot exceed 170.')])),
-                ('out_thrown', models.PositiveIntegerField(blank=True, null=True, validators=[django.core.validators.MaxValueValidator(170, 'Out cannot exceed 170.')])),
-                ('darts_thrown', models.PositiveIntegerField(blank=True, null=True)),
-                ('score_left', models.PositiveIntegerField(blank=True, null=True, validators=[django.core.validators.MaxValueValidator(501, 'Score left cannot exceed 501.')])),
-                ('scoreset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Scores.scoreset')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid1,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "format",
+                    models.CharField(
+                        choices=[("SN", "Singles"), ("DB", "Doubles")], max_length=2
+                    ),
+                ),
+                (
+                    "game",
+                    models.CharField(
+                        choices=[("CKT", "Cricket"), ("501", "501"), ("301", "301")],
+                        max_length=3,
+                    ),
+                ),
+                ("stars", models.PositiveIntegerField(blank=True, null=True)),
+                ("perfects", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "game_point",
+                    models.PositiveIntegerField(
+                        default=0,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                1, "Game point cannot exceed 1."
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "in_thrown",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                170, "In cannot exceed 170."
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "out_thrown",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                170, "Out cannot exceed 170."
+                            )
+                        ],
+                    ),
+                ),
+                ("darts_thrown", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "score_left",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MaxValueValidator(
+                                501, "Score left cannot exceed 501."
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "scoreset",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Scores.scoreset",
+                    ),
+                ),
             ],
         ),
         migrations.RemoveField(
-            model_name='five01',
-            name='scoreset',
+            model_name="five01",
+            name="scoreset",
         ),
         migrations.RemoveField(
-            model_name='three01',
-            name='scoreset',
+            model_name="three01",
+            name="scoreset",
         ),
         migrations.DeleteModel(
-            name='Cricket',
+            name="Cricket",
         ),
         migrations.DeleteModel(
-            name='Five01',
+            name="Five01",
         ),
         migrations.DeleteModel(
-            name='Three01',
+            name="Three01",
         ),
     ]

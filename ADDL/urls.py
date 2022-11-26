@@ -15,17 +15,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from Schedule.views import AnnouncementList
+from .flatpages import PrivacyPolicyView, TermsOfServiceView, IndexView
 
 
 urlpatterns = [
-    path('__debug__/', include('debug_toolbar.urls')),
-    path('', AnnouncementList, name='home'),
-    path('accounts/', include('django.contrib.auth.urls'), name='Accounts'),
-    path('admin/', admin.site.urls),
-    path('locations/', include('Locations.urls'), name='Locations'),
-    path('members/', include('Members.urls'), name='Members'),
-    path('schedule/', include('Schedule.urls'), name='Schedule'),
-    path('scores/', include('Scores.urls'), name='Scores'),
-    path('api/v1/', include('API.urls'))
+    path("__debug__/", include("debug_toolbar.urls")),
+    # Flatpages
+    path("", IndexView.as_view(), name="home"),
+    path("privacy/", PrivacyPolicyView.as_view(), name="privacy"),
+    path("terms/", TermsOfServiceView.as_view(), name="terms"),
+    # Django Pages
+    path("accounts/", include("django.contrib.auth.urls"), name="Accounts"),
+    path("admin/", admin.site.urls),
+    # App Pages
+    path("locations/", include("Locations.urls"), name="Locations"),
+    path("members/", include("Members.urls"), name="Members"),
+    path("schedule/", include("Schedule.urls"), name="Schedule"),
+    path("scores/", include("Scores.urls"), name="Scores"),
+    # API
+    path("api/v1/", include("API.urls")),
 ]

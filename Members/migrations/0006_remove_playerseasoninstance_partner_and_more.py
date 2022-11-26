@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Members', '0005_playerseasoninstance'),
+        ("Members", "0005_playerseasoninstance"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='playerseasoninstance',
-            name='partner',
+            model_name="playerseasoninstance",
+            name="partner",
         ),
         migrations.AddField(
-            model_name='playerseasoninstance',
-            name='matches_played',
+            model_name="playerseasoninstance",
+            name="matches_played",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

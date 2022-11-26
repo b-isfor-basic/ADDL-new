@@ -1,7 +1,26 @@
 {% extends 'base.html' %}
 
+{% block title %}Statistics{% endblock title %}
+
+{% block subheader %}
+{% include '../subheader.html' with title="Stats + Standings" %}   
+{% endblock subheader %}
+
 {% block content %}
-<h1>
-    You are viewing the current league standings.
-</h1>
+<div class="my-4">
+    <div class="fixed flex-shrink p-4 min-w-fit w-full">
+        <h1 class="font-black text-3xl mb-2">
+            Active Divisions
+        </h1>
+        <ul class="flex flex-row md:flex-col overflow-x-scroll md:overflow-y-scroll justify-between">
+            {% for division in active_divisions %}
+            <li><a href="{% url 'standings' division.id %}">{{ division }}</a></li>
+            {% endfor %}
+            <li><a href="{% url 'standings' %}">View All</a></li>
+        </ul>
+    </div>
+    <div class="flex-grow p-4 w-full">
+        
+    </div>
+</div>
 {% endblock content %}

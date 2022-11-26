@@ -20,86 +20,84 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@mq2cn^nh+kak)r-_jeb_$-&x+=5^^q2k!y++l3125mb5)!p7#'
+SECRET_KEY = "django-insecure-@mq2cn^nh+kak)r-_jeb_$-&x+=5^^q2k!y++l3125mb5)!p7#"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-INTERNAL_IPS = ['127.0.0.1', '127.0.0.1:8000']
+INTERNAL_IPS = ["127.0.0.1", "127.0.0.1:8000"]
 
 # Application definition
 INSTALLED_APPS = [
     # Django included packages
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.humanize',
-    'django.contrib.postgres',
-    
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.humanize",
+    "django.contrib.postgres",
     # Installed packages
-    'rest_framework',
-    'debug_toolbar',
-    'django_extensions',
-    'phonenumber_field',
-    'recurrence',
-    'compressor',
-    'widget_tweaks',
-    
+    "rest_framework",
+    "debug_toolbar",
+    "django_extensions",
+    "phonenumber_field",
+    "recurrence",
+    "compressor",
+    "widget_tweaks",
     # Created packages
-    'Scores.apps.ScoresConfig',
-    'Locations.apps.LocationsConfig',
-    'Schedule.apps.ScheduleConfig',
-    'Members.apps.MembersConfig',
+    "Scores.apps.ScoresConfig",
+    "Locations.apps.LocationsConfig",
+    "Schedule.apps.ScheduleConfig",
+    "Members.apps.MembersConfig",
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'ADDL.urls'
+ROOT_URLCONF = "ADDL.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'ADDL.wsgi.application'
+WSGI_APPLICATION = "ADDL.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ADDL',
-        'USER': 'brittney',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "ADDL",
+        "USER": "brittney",
+        "PASSWORD": "",
+        "HOST": "",
+        "PORT": "5432",
     }
 }
 
@@ -109,16 +107,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -126,9 +124,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'America/New_York'
+TIME_ZONE = "America/New_York"
 
 USE_I18N = True
 
@@ -138,42 +136,38 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = ['src/']
-STATIC_ROOT = './static/'
+STATIC_URL = "static/"
+STATICFILES_DIRS = ["src/"]
+STATIC_ROOT = "./static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Phonenumber_Field Settings
 
-PHONENUMBER_DB_FORMAT = 'NATIONAL'
-PHONENUMBER_DEFAULT_REGION = 'US'
+PHONENUMBER_DB_FORMAT = "NATIONAL"
+PHONENUMBER_DEFAULT_REGION = "US"
 
 # Compressor for Flowbite Integration
 # https://flowbite.com/docs/getting-started/django/
 
-COMPRESS_ROOT = BASE_DIR / 'static'
+COMPRESS_ROOT = BASE_DIR / "static"
 COMPRESS_ENABLED = True
-STATICFILES_FINDERS = (
-    'compressor.finders.CompressorFinder',
-    )
+STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
 
 # Django Extensions Graph Models
 # https://django-extensions.readthedocs.io/en/latest/graph_models.html
 
 # Graph Models ./manage.py graph_models -g -o my_project_visualized.png
 GRAPH_MODELS = {
-  'app_labels': ['Locations', 'Schedule', 'Members', 'Scores'],
-  'group_models': True,
+    "app_labels": ["Locations", "Schedule", "Members", "Scores"],
+    "group_models": True,
 }
 
 # Custom User Model
-AUTH_USER_MODEL = 'Members.Player'
+AUTH_USER_MODEL = "Members.Player"
 
 # Debug Toolbar Config
-DEBUG_TOOLBAR_CONFIG = {
-    'INSERT_BEFORE': '</main>'
-}
+DEBUG_TOOLBAR_CONFIG = {"INSERT_BEFORE": "</main>"}
