@@ -9,3 +9,4 @@ phonenumbers>=8.12.53
 psycopg2>=2.9.5
 dj-database-url>=1.0.0
 whitenoise>=6.2.0
+scout-apm>=2.26.0
