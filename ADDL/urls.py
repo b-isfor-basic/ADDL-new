@@ -19,7 +19,7 @@ from .flatpages import PrivacyPolicyView, TermsOfServiceView, IndexView
 
 
 urlpatterns = [
-    path("__debug__/", include("debug_toolbar.urls")),
+   #path("__debug__/", include("debug_toolbar.urls")),
     # Flatpages
     path("", IndexView.as_view(), name="home"),
     path("privacy/", PrivacyPolicyView.as_view(), name="privacy"),
