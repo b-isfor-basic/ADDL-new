@@ -7,8 +7,8 @@
   },
   "scripts": {
     "dev": "webpack --mode development --watch",
-    "watch": "tailwindcss -i ./static/src/input.css -o ./static/src/output.css --mode development --watch",
-    "build": "tailwindcss -i ./static/src/input.css -o ./static/src/output.css --mode production"
+    "watch": "tailwindcss -i ./src/src/input.css -o ./src/src/output.css --mode development --watch",
+    "build": "tailwindcss -i ./src/src/input.css -o ./src/src/output.css --mode production"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.3",
