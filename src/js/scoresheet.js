@@ -1,3 +1,6 @@
+import jQuery from "jquery";
+import { Alpine } from "alpinejs";
+
 const listPlayerID = ['away_0', 'away_1', 'home_0', 'home_1'];
 const listStats = ['stars', 'perfects', 'point'];
 const listAbbrPlayer = ['a0', 'a1', 'h0', 'h1'];
