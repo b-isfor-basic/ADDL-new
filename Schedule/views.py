@@ -12,8 +12,8 @@ def SeasonDetailView(request, *args, **kwargs):
     active_div_list = season.division_set.all()
 
     if "division" in request.GET.keys():
-        division = request.GET["division"]
-        matches = Season.active.matches()
+        division = request.GET.get("division")
+        matches = season.match_set.filter(division__id=division)
         divisions = season.division_set.get(id=division)
     else:
         matches = season.match_set.all()

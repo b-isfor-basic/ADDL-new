@@ -24,5 +24,7 @@ static/
 node_modules/
 
 
+# Local .env files
+.env
 addl.app.csr
 addl.app.key

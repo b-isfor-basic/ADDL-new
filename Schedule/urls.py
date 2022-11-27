@@ -1,8 +1,7 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
     path("", views.SeasonDetailView, name="schedule"),
-    path("?Pdivision=<division>\d/", views.SeasonDetailView, name="schedule"),
-    path("<int:season_number>/", views.SeasonDetailView, name="schedule"),
+    re_path(r"^(?P<query>\w+)/$", views.SeasonDetailView, name="schedule"),
 ]
