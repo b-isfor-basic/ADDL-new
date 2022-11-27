@@ -3,6 +3,7 @@
         {{ division }}
     </h2>
     <div class="relative overflow-x-auto shadow-lg shadow-violet-600/40">
+        {% if division.get_matches|length > 0 %}
         <table class="w-full">
             <thead class="text-sm text-white tk-objektiv-mk2 uppercase bg-primary-800">
                 <tr>
@@ -31,9 +32,8 @@
                                 {% if match.winner %}
                                 {{ match.winner }}
                                 {% else %}
-                                <a href="{% url 'add_scoresheet' match.id %}" class="inline-flex items-center font-medium text-primary-500">
-                                    Enter Scores
-                                    <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                                <a href="{% url 'add_scoresheet' match.id %}" class="inline-flex items-center font-medium text-primary-600 hover:underline after:content-['_↗']">
+                                    Enter Scores&nbsp;
                                 </a>
                                 {% endif %}
                             </td>
@@ -43,5 +43,10 @@
             {% endfor %}
             </tbody>
         </table>
+        {% else %}
+        <div class="p-4 text-center text-sm text-slate-600">
+            No matches scheduled yet.
+        </div>
+        {% endif %}
     </div>
 </div>

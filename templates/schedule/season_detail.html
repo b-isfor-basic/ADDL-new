@@ -16,7 +16,7 @@
         </h1>
         <ul class="flex flex-row md:flex-col overflow-x-scroll md:overflow-y-scroll justify-between">
             {% for division in active_divisions %}
-            <li><a href="{% url 'schedule' division.id %}">{{ division }}</a></li>
+            <li><a href="{% url 'schedule' %}?division={{ division.id }}">{{ division }}</a></li>
             {% endfor %}
             <li><a href="{% url 'schedule' %}">View All</a></li>
         </ul>
