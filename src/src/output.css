@@ -748,7 +748,6 @@ select {
   --tw-border-opacity: 1;
   border-color: rgb(251 191 36 / var(--tw-border-opacity));
   padding: 0.25rem;
-  font-weight: 700;
   --tw-text-opacity: 1;
   color: rgb(251 191 36 / var(--tw-text-opacity));
 }
@@ -1966,11 +1965,6 @@ select {
 
 .shadow-indigo-200 {
   --tw-shadow-color: #c7d2fe;
-  --tw-shadow: var(--tw-shadow-colored);
-}
-
-.shadow-primary-200 {
-  --tw-shadow-color: #b5b3f9;
   --tw-shadow: var(--tw-shadow-colored);
 }
 

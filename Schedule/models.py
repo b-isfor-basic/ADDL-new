@@ -123,26 +123,28 @@ class Match(models.Model):
     def __str__(self):
         return f"{self.awayTeam} vs. {self.homeTeam}"
 
-    @classmethod
+    @property
     def homeScore(self):
         homeScore = self.scoreset_set.filter(team=self.homeTeam).aggregate(
             wins=Sum("gamescore__game_point", default=0)
         )
+        return homeScore["wins"]
 
-    @classmethod
+    @property
     def awayScore(self):
         awayScore = self.scoreset_set.filter(team=self.awayTeam).aggregate(
             wins=Sum("gamescore__game_point", default=0)
         )
+        return awayScore["wins"]
 
     @property
     def winner(self):
-        if homeScore["wins"] == 0 and awayScore["wins"] == 0:
+        if self.homeScore == 0 and self.awayScore == 0:
             return None
         else:
-            if homeScore["wins"] == awayScore["wins"]:
+            if self.homeScore == self.awayScore:
                 return "Tie"
-            elif homeScore["wins"] > awayScore["wins"]:
+            elif self.homeScore > self.awayScore:
                 return "Home"
             else:
                 return "Away"
