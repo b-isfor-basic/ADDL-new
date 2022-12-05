@@ -30,7 +30,7 @@ if 'SECRET_KEY' in os.environ:
 if IS_HEROKU:
     ALLOWED_HOSTS = ["*"]
 else:
-    ALLOWED_HOSTS = ["0.0.0.0"]
+    ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost"]
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -200,3 +200,13 @@ if "CI" in os.environ:
 
 # Custom User Model
 AUTH_USER_MODEL = "Members.Player"
+
+#Email Settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.mail.me.com"
+EMAIL_PORT = 587
+EMAIL_USE_SSL = True
+EMAIL_SUBJECT_PREFIX = "[ADDL] "
+EMAIL_USE_LOCALTIME = True
+DEFAULT_FROM_EMAIL = "support@addl.app"
+

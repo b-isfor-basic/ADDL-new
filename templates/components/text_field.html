@@ -1,0 +1,28 @@
+
+
+  <label for="{{ field.id_for_label }}" class="text-gray-800 text-left text-sm uppercase">{{ field.label_tag }}</label>
+  
+  <div class="rounded-lg items-center justify-center bg-primary-100/30 border-primary-100 border shadow-violet-500/10 shadow-sm">
+    <div class="flex items-center">
+      {% if field.icon %}
+      <div class="text-primary-500 px-2 items-center">
+        {{ field.icon }}
+      </div>
+      {% endif %}
+      <input 
+        {% if 'password' in field.html_name %} type="password"
+        {% elif 'phoneNumber' in field.html_name %} type="tel"
+        {% else %} type="text" 
+        {% endif %} 
+        name="{{ field.html_name }}" 
+        id="{{ field.id_for_label }}" 
+        placeholder="{{ field.placeholder }}"
+        class="appearance-none w-full bg-white outline-none border-none rounded-lg focus:ring-1 focus:ring-amber-400" 
+        />
+    </div>
+  </div>
+    {% if field.errors %}
+    {% for error in field.errors %}
+    <p class="flex-wrap text-orange-600 text-sm italic">{{ error }}</p>
+    {% endfor %}
+  {% endif %}
