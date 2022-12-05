@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Registration{% endblock title %}
+
+{% block content %}
+
+<div class="flex flex-col sm:w-full md:w-1/2 mx-auto mt-0.5 space-y-4 justify-center rounded-lg py-4 md:py-6 px-2 md:px-4 bg-white shadow-lg shadow-gray-400/10">
+    <div class="w-full border-t-2 border-primary-500">
+        <h2 class="tk-rustica text-left text-xl md:text-2xl font-bold text-primary-500 uppercase">New Player Registration</h2>
+        <p class="pl-2 text-gray-700">All fields are required for submission.</p>
+    </div>
+    {% if form.non_field_errors %}
+    <div class="m-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline">{{ form.non_field_errors }}</span>
+    </div>
+    {% endif %}  
+    <form "flex-row w-full justify-center items-center" id="{{ form.id_for_label }}" method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="my-4">
+            {% include '../components/text_field.html' %}
+        </div>
+        {% endfor %}
+        <div class="my-4 mx-4 inline-flex items-center">
+        <input type="checkbox" name="terms" id="terms" class="form-checkbox rounded-md h-5 w-5 text-primary-500 bg-primary-100/20 border-primary-100 border shadow-violet-500/10 shadow-sm" required="">
+                <span class="ml-2 text-gray-900">I understand and agree to the <a href="{% url 'terms' %}" class="text-primary-500 hover:underline hover:text-primary-600">Terms of Service</a> and <a href="{% url 'privacy' %}" class="text-primary-500 hover:underline hover:text-primary-600">Privacy Policy</a>.</span></input>
+        </div>
+        <div class="flex items-end justify-center mt-6">
+            <button class="p-1 mx-4 mt-6 w-full bg-white rounded-lg text-primary font-semibold tk-rustica uppercase border border-primary-500 hover:transition-all hover:shadow-md hover:shadow-violet-500/20 hover:ease-in-out hover:duration-300 hover:bg-primary-100/20" type="submit">
+                <span class="text-center text-primary-500">
+                    Create Account
+                </span>
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

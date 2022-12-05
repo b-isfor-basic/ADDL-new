@@ -13,14 +13,14 @@ class Player(AbstractUser):
     operation.
     """
 
-    phoneNumber = PhoneNumberField()
+    phoneNumber = PhoneNumberField('Phone Number', blank=True)
 
     class Meta:
         verbose_name = "player"
         verbose_name_plural = "players"
 
     def __str__(self):
-        return self.first_name + " " + self.last_name
+        self.get_full_name()
 
 
 class Team(models.Model):
