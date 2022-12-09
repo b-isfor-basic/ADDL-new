@@ -202,11 +202,12 @@ if "CI" in os.environ:
 AUTH_USER_MODEL = "Members.Player"
 
 #Email Settings
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.mail.me.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_SUBJECT_PREFIX = "[ADDL] "
-EMAIL_USE_LOCALTIME = True
-DEFAULT_FROM_EMAIL = "support@addl.app"
-
+if IS_HEROKU:
+    EMAIL_HOST = os.environ.get("EMAIL_HOST")
+    EMAIL_PORT = os.environ.get("EMAIL_PORT")
+    EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+    EMAIL_USE_SSL = True
+    DEFAULT_FROM_EMAIL = "ADDL Support <support@addl.app>"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
