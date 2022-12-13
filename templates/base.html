@@ -73,7 +73,7 @@
               </a>
               {% else %}
               <a href="{% url 'login' %}" 
-                {% if 'accounts' in request.resolver_match.route %}
+                {% if 'members' in request.resolver_match.route %}
                 class="nav-link-active" aria-current="page"
                 {% else %}
                 class="nav-link-inactive"

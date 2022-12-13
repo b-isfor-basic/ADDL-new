@@ -25,7 +25,6 @@ urlpatterns = [
     path("privacy/", PrivacyPolicyView.as_view(), name="privacy"),
     path("terms/", TermsOfServiceView.as_view(), name="terms"),
     # Django Pages
-    path("accounts/", include("django.contrib.auth.urls"), name="Accounts"),
     path("admin/", admin.site.urls),
     # App Pages
     path("locations/", include("Locations.urls"), name="Locations"),
