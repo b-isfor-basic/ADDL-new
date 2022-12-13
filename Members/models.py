@@ -20,7 +20,7 @@ class Player(AbstractUser):
         verbose_name_plural = "players"
 
     def __str__(self):
-        self.get_full_name()
+        return str(self.get_full_name())
 
 
 class Team(models.Model):
