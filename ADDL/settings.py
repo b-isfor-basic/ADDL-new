@@ -166,25 +166,20 @@ STATIC_ROOT = BASE_DIR / "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
 # Phonenumber_Field Settings
 
 PHONENUMBER_DB_FORMAT = "NATIONAL"
 PHONENUMBER_DEFAULT_REGION = "US"
 
-# Compressor for Flowbite Integration
-# https://flowbite.com/docs/getting-started/django/
-# 
-# COMPRESS_ROOT = BASE_DIR / "static"
-# COMPRESS_ENABLED = True
-# STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
 
 # Enable WhiteNoise's GZip compression of static assets.
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
-# Django Extensions Graph Models
-# https://django-extensions.readthedocs.io/en/latest/graph_models.html
 
 # Test Runner Config
+
 class HerokuDiscoverRunner(DiscoverRunner):
     """Test Runner for Heroku CI, which provides a database for you.
     This requires you to set the TEST database (done for you by settings().)"""
@@ -195,13 +190,17 @@ class HerokuDiscoverRunner(DiscoverRunner):
 
 
 # Use HerokuDiscoverRunner on Heroku CI
+
 if "CI" in os.environ:
     TEST_RUNNER = "ADDL.settings.HerokuDiscoverRunner"
 
 # Custom User Model
+
 AUTH_USER_MODEL = "Members.Player"
 
+
 #Email Settings
+
 if IS_HEROKU:
     EMAIL_HOST = os.environ.get("EMAIL_HOST")
     EMAIL_PORT = os.environ.get("EMAIL_PORT")
@@ -211,3 +210,8 @@ if IS_HEROKU:
     DEFAULT_FROM_EMAIL = "ADDL Support <support@addl.app>"
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+# Login Redirects
+
+LOGIN_REDIRECT_URL = "profile"
