@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.views.generic import CreateView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (
-    PasswordResetCompleteView, 
+    LogoutView,
     PasswordResetConfirmView,
     PasswordResetDoneView,
-    LogoutView,
     PasswordResetView,
 )
 
@@ -13,6 +13,10 @@ from .models import Player
 from .forms import PlayerCreationForm, PlayerChangeForm
 
 
+class SuccessMessageMixin(SuccessMessageMixin):
+    success_message_template = "components/success.html"
+
+# TODO: This should be limited to only the user who is logged in and not all users.
 @login_required
 def PlayerProfileView(request):
     context = {"message": "This is the profile page view."}
@@ -37,3 +41,4 @@ class PasswordResetDoneView(PasswordResetDoneView):
 class PasswordResetConfirmView(PasswordResetConfirmView):
     template_name = "registration/password_reset_confirm.html"
     success_url = "members/password_reset_complete"
+    
