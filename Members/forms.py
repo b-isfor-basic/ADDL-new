@@ -13,10 +13,6 @@ class PlayerCreationForm(UserCreationForm):
             'email', 
             'phoneNumber', 
         )
-        fieldsets = [
-            ('Personal Info', {'fields': ('first_name', 'last_name', 'email', 'phoneNumber')}), 
-            ('Account Info', {'fields': ('username', 'password1', 'password2')})
-        ]
 
 
 class PlayerChangeForm(UserChangeForm):
@@ -29,8 +25,4 @@ class PlayerChangeForm(UserChangeForm):
             'email', 
             'phoneNumber', 
         )
-        fieldsets = [
-            ('Personal Info', {'fields': ('first_name', 'last_name', 'email', 'phoneNumber')}), 
-            ('Account Info', {'fields': ('username', 'password1', 'password2')})
-        ]
         

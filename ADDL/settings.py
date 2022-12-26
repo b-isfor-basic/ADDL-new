@@ -155,10 +155,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "src/"
 STATICFILES_DIRS = [BASE_DIR / "src/"]
-# STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_ROOT = BASE_DIR / "static/"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+
 
 
 # Default primary key field type
@@ -175,7 +176,6 @@ PHONENUMBER_DEFAULT_REGION = "US"
 
 # Enable WhiteNoise's GZip compression of static assets.
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 
 # Test Runner Config
@@ -214,7 +214,9 @@ else:
 
 # Login Redirects
 
-LOGIN_REDIRECT_URL = "profile"
+LOGIN_URL = "/members/login"
+LOGIN_REDIRECT_URL = "/members/profile"
+LOGOUT_REDIRECT_URL = "/members/login"
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
