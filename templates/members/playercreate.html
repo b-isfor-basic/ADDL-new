@@ -23,53 +23,54 @@
         <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 md:gap-5 align-middle items-center w-full text-slate-200 border-t border-t-slate-600 py-4">
           <h3 class="md:col-span-1 text-amber-400 text-lg md:text-xl font-black place-self-start pb-2">Account Information</h3>
           <div class="md:col-span-2 items-center space-y-2 md:space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="col-span-1">
                 <label for="id_username">Username<span class="text-rose-400">*</span></label>
                 <input type="text" name="username" id="id_username" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="username" required="">
+                <span class="text-sm text-rose-400 leading-5">{{ form.username.errors }}</span>
               </div>
               <div class="col-span-1">
                 <label for="id_email" class="text-slate-200">Email<span class="text-rose-400">*</span></label>
                 <input type="email" name="email" id="id_email" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="example@email.com" required="">
+                <span class="text-sm text-rose-400 leading-5">{{ form.email.errors }}</span>
+              </div>
+              <div class="col-span-1">
+                <label for="id_password1">Password<span class="text-rose-400">*</span></label>
+                <input type="password" name="password1" id="id_password1" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Pa$5w0rd" required="">
+              </div>
+              <div class="col-span-1">
+                <label for="id_password2" class="text-slate-200">Confirm Password<span class="text-rose-400">*</span></label>
+                <input type="password" name="password2" id="id_password2" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Pa$5w0rd" required="">
               </div>
             </div>
-            <div class="md:col-start-2 md:col-span-2 items-center">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-5">
-                <div class="col-span-1">
-                  <label for="id_password1">Password<span class="text-rose-400">*</span></label>
-                  <input type="password" name="password1" id="id_password1" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Pa$5w0rd" required="">
-                </div>
-                <div class="col-span-1">
-                  <label for="id_password2" class="text-slate-200">Confirm Password<span class="text-rose-400">*</span></label>
-                  <input type="password" name="password2" id="id_password2" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Pa$5w0rd" required="">
-                </div>
-              </div>
+              <div class="md:col-start-2 col-span-2">
+                <span class="text-sm text-rose-400 leading-5">{{ form.password1.errors }}{{ form.password2.errors}}</span>
+            </div>
         </fieldset>
 
-        <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 md:gap-5 align-middle items-center w-full text-slate-200 border-t border-t-slate-600 py-4">
+        <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 gap-5 align-middle items-center w-full text-slate-200 border-t border-t-slate-600 py-4">
           <h3 class="md:col-span-1 text-amber-400 text-lg md:text-xl font-black place-self-start pb-2">Player Information</h3>
           <div class="md:col-span-2 items-center space-y-2 md:space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="col-span-1">
                 <label for="id_first_name">First Name<span class="text-rose-400">*</span></label>
                 <input type="text" name="first_name" id="id_first_name" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Phil" required="">
+                <span class="text-sm text-rose-400 leading-5">{{ form.first_name.errors }}</span>
               </div>
               <div class="col-span-1">
                 <label for="id_last_name" class="text-slate-200">Last Name<span class="text-rose-400">*</span></label>
                 <input type="text" name="last_name" id="id_last_name" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Taylor" required="">
+                <span class="text-sm text-rose-400 leading-5">{{ form.last_name.errors }}</span>
               </div>
-            </div>
-          <div class="md:col-start-2 md:col-span-2 items-center">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-5">
               <div class="col-span-1">
                 <label for="id_phoneNumber">Phone Number<span class="text-rose-400">*</span></label>
-                <input type="tel" name="phoneNumber" id="id_phoneNumber" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="(555) 867-5309" required="">
+                <input type="tel" name="phoneNumber" id="id_phoneNumber" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="(555) 867-5309" data-mask="(000) 000-0000" required="">
+                <span class="text-sm text-rose-400">{{ form.phoneNumber.errors }}</span>
               </div>
             </div>
-          </div>
-          <div class="md:col-start-2 inline-flex items-center pt-4">
-            <input type="checkbox" name="terms" id="terms" class="form-checkbox rounded-md h-5 w-5 text-amber-400 bg-slate-800 border-amber-400 border shadow-slate-900/30 shadow-inner focus:ring-0 focus-within:ring-amber-400" required="">
-            <span class="ml-2 text-slate-200">I understand and agree to the <a href="{% url 'terms' %}" class="text-sky-400 hover:underline hover:text-amber-400">Terms of Service</a> and <a href="{% url 'privacy' %}" class="text-sky-400 hover:underline hover:text-amber-400">Privacy Policy</a>.</span></input>
+          <div class="md:col-start-2 col-span-2 items-center pt-4">
+            <input type="checkbox" name="terms" id="terms" class="form-checkbox rounded-md h-5 w-5 text-amber-400 bg-slate-800 border-amber-400 border shadow-slate-900/30 shadow-inner focus:ring-0 focus:outline-none active:text-slate-800" required="">
+            <span class="ml-2 text-slate-200">I understand and agree to the <a href="{% url 'terms' %}" class="text-cyan-400 hover:underline hover:text-amber-400">Terms of Service</a> and <a href="{% url 'privacy' %}" class="text-cyan-400 hover:underline hover:text-amber-400">Privacy Policy</a>.</span></input>
           </div>
         </fieldset>
         <div class="flex items-end justify-center mt-6">
@@ -84,3 +85,16 @@
 </div>
 
 {% endblock content %}
+
+{% block footerScripts %}
+<script
+	src="https://code.jquery.com/jquery-3.6.3.slim.min.js"
+	integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo="
+	crossorigin="anonymous"></script>
+<script 
+  src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" 
+  integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw==" 
+  crossorigin="anonymous" 
+  referrerpolicy="no-referrer"></script>
+{% endblock footerScripts %}
+

@@ -9,7 +9,7 @@
 {% endblock headerScripts %}
 
 {% block content %}
-<div class="w-full mt-24 space-y-2 justify-center align-center rounded-lg py-4 px-2 shadow-xl bg-slate-700 shadow-slate-900/30">
+<div class="w-full md:w-1/2 h-fit mt-24 space-y-2 justify-center items-center rounded-lg py-4 px-2 shadow-xl bg-slate-700 shadow-slate-900/30">
 
   <h2 class="tk-rustica place-self-start text-left text-2xl md:text-2xl font-bold text-amber-400 uppercase">Login</h2>
   <div id="card_body">
@@ -58,7 +58,7 @@
     </form>
   </div>
     
-    <div class="text-sky-400 text-center">
+    <div class="flex flex-row justify-around text-cyan-400 text-center">
       <button type="button" hx-get="{% url 'password_reset' %}" hx-target="#card_body" hx-swap="innerHTML" class="appearance-none hover:text-amber-400 hover:underline">Forgot Password?</button>
       <a href="{% url 'register' %}" class=" hover:text-amber-400 hover:underline">Register New Player</a>
     </div>

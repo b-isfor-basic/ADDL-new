@@ -91,7 +91,7 @@
     {% endcomment %}
     </header>
     
-    <main class="relative mx-auto offset-y-auto min-h-screen py-5 px-6 md:px-4 max-w-7xl align-middle justify-start">
+    <main class="flex w-full mx-auto offset-y-auto min-h-screen py-5 px-6 md:px-4 max-w-7xl justify-center items-start">
         {% block content %} 
         {% endblock %}
     </main>
@@ -102,11 +102,11 @@
           &copy;2022 Atlanta Doubles Dart League &middot; All Rights Reserved
         </p>
         <p>
-          <a href="{% url 'privacy' %}" class="text-sky-300 hover:text-amber-300 hover:underline">Privacy Policy</a>
+          <a href="{% url 'privacy' %}" class="text-cyan-300 hover:text-amber-300 hover:underline">Privacy Policy</a>
           <span class="text-gray-300"> | </span>
-          <a href="{% url 'terms' %}" class="text-sky-300 hover:text-amber-300 hover:underline">Terms of Service</a>
+          <a href="{% url 'terms' %}" class="text-cyan-300 hover:text-amber-300 hover:underline">Terms of Service</a>
           <span class="text-gray-300"> | </span>
-          <a href="#" class="text-sky-300 hover:text-amber-300 hover:underline">Contact Us</a>
+          <a href="#" class="text-cyan-300 hover:text-amber-300 hover:underline">Contact Us</a>
         </p>
       </div>
     </div>

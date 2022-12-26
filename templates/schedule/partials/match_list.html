@@ -1,11 +1,9 @@
-<div class="mb-9">
-    <h2 class="mb-2 text-center text-2xl tk-objektiv-mk2 uppercase font-extralight py-2">
-        {{ division }}
-    </h2>
-    <div class="relative overflow-x-auto shadow-lg shadow-violet-600/40">
+<div class="w-full mb-10 justify-center align-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
+    <h2 class="text-slate-400 text-xl md:text-2xl font-black p-2 leading-6">{{ division }}</h2>
+    
         {% if division.get_matches|length > 0 %}
-        <table class="w-full">
-            <thead class="text-sm text-white tk-objektiv-mk2 uppercase bg-primary-800">
+        <table class="p-1 w-full">
+            <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
                 <tr>
                     <th scope="col" class="p-2 font-light">Week</th>
                     <th scope="col" class="p-2 font-light">Match Date</th>
@@ -18,11 +16,11 @@
             <tbody>
                 {% regroup division.get_matches|dictsort:"weekNum" by weekNum as matches_list %}
                 {% for week in matches_list %}
-                <tr class="bg-white border-b border-primary-400 hover:bg-primary-100">
+                <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
                     <th rowspan={{ week.list|length }} scope="rowgroup" class="p-2 text-sm text-center">{{ week.grouper }}</th>      
                         {% for match in week.list %}
                             {% if not forloop.first %}
-                            <tr class="bg-white border-b border-primary-400 hover:bg-primary-100">
+                            <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
                             {% endif %}
                             <td class="p-2 text-sm text-center">{{ match.matchDate|date:"m.d.y" }}</td>
                             <td class="p-2 text-sm text-center">{{ match.awayTeam }}</td>
@@ -32,7 +30,7 @@
                                 {% if match.winner %}
                                 {{ match.winner }}
                                 {% else %}
-                                <a href="{% url 'add_scoresheet' match.id %}" class="inline-flex items-center font-medium text-primary-600 hover:underline after:content-['_↗']">
+                                <a href="{% url 'add_scoresheet' match.id %}" class="inline-flex items-center font-medium text-cyan-300 hover:underline hover:text-amber-400 after:content-['_↗']">
                                     Enter Scores&nbsp;
                                 </a>
                                 {% endif %}
@@ -43,10 +41,11 @@
             {% endfor %}
             </tbody>
         </table>
+    </div>
+
         {% else %}
-        <div class="bg-white border-b border-primary-400 p-4 text-center text-sm text-slate-600">
+        <div class="p-2 bg-slate-700 text-slate-200 border-b border-slate-800">
             No matches scheduled yet.
         </div>
         {% endif %}
     </div>
-</div>

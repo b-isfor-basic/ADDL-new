@@ -8,36 +8,43 @@
 
 {% block content %}
 
-<div class="my-4 grid grid-cols-4">
-    <div class="inline-block col-span-1 fixed">
+<div class="mt-24 w-full">
+    <div class="grid grid-flow-row grid-cols-1 md:grid-cols-4 justify-items-stretch">
+    <div class="col-span-1 fixed text-slate-200">
         {% if season %}
-        <h1 class="font-black text-3xl mb-2">
+        <h1 class="font-black text-amber-400 text-xl mb-2">
             Active Divisions
         </h1>
-        <ul class="flex flex-row md:flex-col overflow-x-scroll md:overflow-y-scroll justify-between">
+        <ul class="">
             {% for division in active_divisions %}
             <li><a href="{% url 'schedule' %}?division={{ division.id }}">{{ division }}</a></li>
             {% endfor %}
             <li><a href="{% url 'schedule' %}">View All</a></li>
         </ul>
     </div>
-    <div class="inline-block col-start-2 col-span-3">
-        <div id="matchtable" class="col-auto p-3">
-            {% if divisions|length > 1 %}
-                {% for division in divisions %}
+    {% if divisions|length > 1 %}
+    {% for division in divisions %}
+    <div class="relative md:col-start-2 md:col-span-3">
+            <div id="matchtable" class="m-3">
                     {% include './partials/match_list.html' with division=division %}
                 {% endfor %}
+            </div>
+        </div>
             {% else %}
                 {% with divisions as division %}
+                <div class="relative md:col-start-2 md:col-span-3">
+                    <div id="matchtable" class="m-3">
                     {% include './partials/match_list.html' %}
+                </div>
+            </div>
                 {% endwith %}
             {% endif %}
-        </div>
         {% else %}
         <h1>
             No active seasons.
         </h1>
         {% endif %}
     </div>
+</div>
 </div>
     {% endblock %}

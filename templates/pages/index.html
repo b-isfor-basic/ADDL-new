@@ -19,9 +19,9 @@
         <div class="container w-full min-h-fit">
           <div class="my-2 mx-auto p-3 border-l border-amber-400">
             <p class="font-semibold text-left text-amber-400">{{ item.title|title }}</p>
-            <p class="text-xs text-sky-400">{{ item.date_created|date:"m d y" }}</p>
+            <p class="text-xs text-cyan-400">{{ item.date_created|date:"m d y" }}</p>
             <p class="py-4 flex-none font-normal text-left text-sm text-slate-200 pl-3">{{ item.body }}</p>
-            <p class="text-xs text-right text-sky-400 italic">{{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }}</p>
+            <p class="text-xs text-right text-cyan-400 italic">{{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }}</p>
           </div>
         </div>
       </div>

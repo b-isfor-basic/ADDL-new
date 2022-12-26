@@ -16,17 +16,19 @@ from .forms import PlayerCreationForm, PlayerChangeForm
 class SuccessMessageMixin(SuccessMessageMixin):
     success_message_template = "components/success.html"
 
-# TODO: This should be limited to only the user who is logged in and not all users.
+# TODO: #25 This should be limited to only the user who is logged in and not all users.
 @login_required
 def PlayerProfileView(request):
     context = {"message": "This is the profile page view."}
     return render(request, "members/playerprofile.html", context)
 
 
-class PlayerCreateView(CreateView):
+class PlayerCreateView(SuccessMessageMixin, CreateView):
     model = Player
     template_name = "members/playercreate.html"
     form_class = PlayerCreationForm
+    success_url = "/members/login"
+    success_message = "You have successfully created an account. Please login."
 
 
 class PasswordResetView(PasswordResetView):
