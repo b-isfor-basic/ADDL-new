@@ -4,8 +4,10 @@
 {{ message }}
 
 {% if user.is_authenticated %}
+<div class="mt-24 text-slate-200">
     <h1>Logged in as {{ user.username }}</h1>
     <a href="{% url 'logout' %}">Logout</a>
+</div>
 {% endif %}
 
 {% endblock content %}
