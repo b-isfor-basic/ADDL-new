@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 import dj_database_url
 from django.test.runner import DiscoverRunner
 
@@ -30,8 +31,7 @@ if 'SECRET_KEY' in os.environ:
 if IS_HEROKU:
     ALLOWED_HOSTS = ["*"]
 else:
-    ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost"]
-
+    ALLOWED_HOSTS = []
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if not IS_HEROKU:
@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     "django_extensions",
     "phonenumber_field",
     "recurrence",
- #   "compressor",
     "widget_tweaks",
     # Created packages
     "Scores.apps.ScoresConfig",
@@ -64,7 +63,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    #"debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -103,9 +101,6 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "ADDL",
-        "USER": "brittney",
-        "PASSWORD": "",
-        "HOST": "",
         "PORT": "5432",
     }
 }
@@ -174,10 +169,6 @@ PHONENUMBER_DB_FORMAT = "NATIONAL"
 PHONENUMBER_DEFAULT_REGION = "US"
 
 
-# Enable WhiteNoise's GZip compression of static assets.
-
-
-
 # Test Runner Config
 
 class HerokuDiscoverRunner(DiscoverRunner):
@@ -216,17 +207,20 @@ else:
 
 LOGIN_URL = "/members/login"
 LOGIN_REDIRECT_URL = "/members/profile"
-LOGOUT_REDIRECT_URL = "/members/login"
+LOGOUT_REDIRECT_URL = "/"
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+if 'ENVIRONMENT' not in os.environ:
+    os.environ['ENVIRONMENT'] = 'production'
+
 sentry_sdk.init(
-    dsn="https://029ebd70cdbb4da78e1db1f5712cb6c1@o4504322212233216.ingest.sentry.io/4504322216951808",
+    dsn=os.environ.get("SENTRY_DSN"),
     integrations=[
         DjangoIntegration(),
     ],
-
+    max_breadcrumbs=50,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
@@ -234,5 +228,13 @@ sentry_sdk.init(
 
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
+    send_default_pii=True,
+    environment=os.environ.get("ENVIRONMENT"),
+    release=os.environ.get("GIT_SHA"),
 )
+
+SECURE_SSL_REDIRECT = True
+
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SECURE = True
