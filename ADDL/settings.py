@@ -233,8 +233,3 @@ sentry_sdk.init(
     release=os.environ.get("GIT_SHA"),
 )
 
-SECURE_SSL_REDIRECT = True
-
-SESSION_COOKIE_SECURE = True
-
-CSRF_COOKIE_SECURE = True
