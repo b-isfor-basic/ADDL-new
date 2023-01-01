@@ -1,6 +1,6 @@
 <div class="w-full mb-10 justify-center align-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
     <h2 class="text-slate-400 text-xl md:text-2xl font-black p-2 leading-6">{{ division }}</h2>
-    
+    <div class="w-full overflow-x-scroll">
         {% if division.get_matches|length > 0 %}
         <table class="p-1 w-full">
             <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
@@ -30,7 +30,7 @@
                                 {% if match.winner %}
                                 {{ match.winner }}
                                 {% else %}
-                                <a href="{% url 'add_scoresheet' match.id %}" class="inline-flex items-center font-medium text-cyan-300 hover:underline hover:text-amber-400 after:content-['_↗']">
+                                <a href="{% url 'add_scoresheet' match.id %}" class="inline-flex items-center font-medium text-blue-400 hover:underline hover:text-amber-400 after:content-['_↗']">
                                     Enter Scores&nbsp;
                                 </a>
                                 {% endif %}
@@ -42,6 +42,7 @@
             </tbody>
         </table>
     </div>
+</div>
 
         {% else %}
         <div class="p-2 bg-slate-700 text-slate-200 border-b border-slate-800">

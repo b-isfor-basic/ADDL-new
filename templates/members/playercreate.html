@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="w-full mt-24 p-5 justify-center align-center rounded-lg shadow-xl bg-slate-700 shadow-slate-900/30">
+<div class="w-full mt-8 p-5 justify-center align-center rounded-lg shadow-xl bg-slate-700 shadow-slate-900/30">
   <div class="justify-items-start flex-auto">
     <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">New Player Registration</h2>
     <p class="pt-4 text-slate-200 text-sm">Complete the form below to create an account. Fields marked with <span class="text-rose-400">*</span> are required.</p>
@@ -70,7 +70,7 @@
             </div>
           <div class="md:col-start-2 col-span-2 items-center pt-4">
             <input type="checkbox" name="terms" id="terms" class="form-checkbox rounded-md h-5 w-5 text-amber-400 bg-slate-800 border-amber-400 border shadow-slate-900/30 shadow-inner focus:ring-0 focus:outline-none active:text-slate-800" required="">
-            <span class="ml-2 text-slate-200">I understand and agree to the <a href="{% url 'terms' %}" class="text-cyan-400 hover:underline hover:text-amber-400">Terms of Service</a> and <a href="{% url 'privacy' %}" class="text-cyan-400 hover:underline hover:text-amber-400">Privacy Policy</a>.</span></input>
+            <span class="ml-2 text-slate-200">I understand and agree to the <a href="{% url 'terms' %}" class="text-blue-400 hover:underline hover:text-amber-400">Terms of Service</a> and <a href="{% url 'privacy' %}" class="text-blue-400 hover:underline hover:text-amber-400">Privacy Policy</a>.</span></input>
           </div>
         </fieldset>
         <div class="flex items-end justify-center mt-6">

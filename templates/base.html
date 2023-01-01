@@ -34,6 +34,7 @@
                 class="nav-link-inactive"
                 {% endif %}
               >Home</a>
+
             </li>
             <li class="hover:text-amber-300 px-1">
               <a href="{% url 'all_areas' %}" 
@@ -84,29 +85,23 @@
           </ul>
         </div>
       </div>
-    {% comment %}
-      <div class="relative  z-30">  
-        {% block subheader %}{% endblock subheader %}
-      </div>
-    {% endcomment %}
     </header>
     
-    <main class="flex w-full mx-auto offset-y-auto min-h-screen py-5 px-6 md:px-4 max-w-7xl justify-center items-start">
-        {% block content %} 
-        {% endblock %}
+    <main class="relative top-20 -mt-2 md:top-14 flex w-screen mx-auto min-h-screen mb-24 px-2 md:px-6 max-w-7xl justify-around items-start">
+        {% block content %}
+        {% endblock content %}
     </main>
 
-    <div class="static bottom-0 mt-auto w-screen justify-end bg-slate-900 p-8">
+    <div class="z-20 static bottom-0 mt-auto w-screen justify-end bg-slate-900 p-6">
       <div class="text-center tk-rustica py-3 text-xs flex-nowrap">
-        <p class="text-gray-400">
-          &copy;2022 Atlanta Doubles Dart League &middot; All Rights Reserved
-        </p>
+        <p class="text-slate-300">&copy;2023 Atlanta Doubles Dart League</p>
+        <p class="text-slate-300">All Rights Reserved</p>
         <p>
-          <a href="{% url 'privacy' %}" class="text-cyan-300 hover:text-amber-300 hover:underline">Privacy Policy</a>
-          <span class="text-gray-300"> | </span>
-          <a href="{% url 'terms' %}" class="text-cyan-300 hover:text-amber-300 hover:underline">Terms of Service</a>
-          <span class="text-gray-300"> | </span>
-          <a href="#" class="text-cyan-300 hover:text-amber-300 hover:underline">Contact Us</a>
+          <a href="{% url 'privacy' %}" class="text-blue-400 hover:text-amber-300 hover:underline">Privacy Policy</a>
+          <span class="text-slate-300"> | </span>
+          <a href="{% url 'terms' %}" class="text-blue-400 hover:text-amber-300 hover:underline">Terms of Service</a>
+          <span class="text-slate-300"> | </span>
+          <a href="#" class="text-blue-400 hover:text-amber-300 hover:underline">Contact Us</a>
         </p>
       </div>
     </div>
