@@ -1,50 +1,37 @@
-{% extends 'base.html' %}
+{% extends 'base_sidebar.html' %}
 
 {% block title %}Schedule{% endblock title %}
 
-{% block subheader %}
-{% include '../subheader.html' with title=season %}
-{% endblock %}
 
-{% block content %}
-
-<div class="mt-24 w-full">
-    <div class="grid grid-flow-row grid-cols-1 md:grid-cols-4 justify-items-stretch">
-    <div class="col-span-1 fixed text-slate-200">
-        {% if season %}
-        <h1 class="font-black text-amber-400 text-xl mb-2">
-            Active Divisions
-        </h1>
-        <ul class="">
-            {% for division in active_divisions %}
-            <li><a href="{% url 'schedule' %}?division={{ division.id }}">{{ division }}</a></li>
-            {% endfor %}
-            <li><a href="{% url 'schedule' %}">View All</a></li>
-        </ul>
-    </div>
-    {% if divisions|length > 1 %}
+{% block sidebar %}
+<div class="">
+    <h1 class="font-black text-amber-400 text-xl mb-2">
+        Active Divisions
+    </h1>
+    <ul class="">
+        {% for division in active_divisions %}
+        <li class="text-slate-200 hover:underline hover:text-blue-400"><a href="{% url 'schedule' %}?division={{ division.id }}">{{ division }}</a></li>
+        {% endfor %}
+        <li class="text-slate-200 hover:underline hover:text-blue-400"><a href="{% url 'schedule' %}">View All</a></li>
+    </ul> 
+</div>  
+{% endblock sidebar %}
+   
+{% block main %}
+<div class="">
+{% if divisions|length > 1 %}
     {% for division in divisions %}
-    <div class="relative md:col-start-2 md:col-span-3">
-            <div id="matchtable" class="m-3">
-                    {% include './partials/match_list.html' with division=division %}
-                {% endfor %}
-            </div>
+        <div id="matchtable" class="m-3">
+            {% include './partials/match_list.html' with division=division %}
+            {% endfor %}
         </div>
-            {% else %}
-                {% with divisions as division %}
-                <div class="relative md:col-start-2 md:col-span-3">
-                    <div id="matchtable" class="m-3">
-                    {% include './partials/match_list.html' %}
-                </div>
-            </div>
-                {% endwith %}
-            {% endif %}
-        {% else %}
-        <h1>
-            No active seasons.
-        </h1>
-        {% endif %}
-    </div>
+
+{% else %}
+    {% with divisions as division %}
+        <div id="matchtable" class="m-3">
+            {% include './partials/match_list.html' %}
+        </div>
+    {% endwith %}
+{% endif %}
 </div>
-</div>
-    {% endblock %}
+{% endblock main %}

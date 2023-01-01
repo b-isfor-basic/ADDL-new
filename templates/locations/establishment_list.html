@@ -1,22 +1,25 @@
-{% extends 'base.html' %}
+{% extends 'base_sidebar.html' %}
 
 {% block title %}Locations{% endblock %}
 
-{% block subheader %}
-{% include '../subheader.html' with title="Locations" %}
-{% endblock %}
-
-{% block content %}
-<div class="mt-24">
-  <div class="flex flex-wrap md:flex-nowrap">
-    <div class="text-cyan-400 justify-around md:flex-col md:flex-shrink-0 md:inline-flex md:justify-start">
-      <a href="{% url 'all_areas' %}?is_active=True" class="mx-auto tk-objektiv uppercase hover:underline hover:text-amber-400">
+{% block sidebar %}
+  <div class="">
+    <h1 class="font-black text-amber-400 text-xl mb-2">
+      Active Divisions
+    </h1>
+    <div class="text-slate-200 justify-around">
+      <p><a href="{% url 'all_areas' %}?is_active=True" class="mx-auto tk-objektiv uppercase hover:underline hover:text-blue-400">
         View Active
-      </a>
-      <a href="{% url 'all_areas' %}" class="tk-objektiv uppercase hover:underline hover:text-amber-400">
+      </a></p>
+      <p><a href="{% url 'all_areas' %}" class="tk-objektiv uppercase hover:underline hover:text-blue-400">
         View All
-      </a>
+      </a></p>
     </div>
+  </div>
+{% endblock sidebar %}
+
+{% block main %}
+
   {% if all_areas %}
   <div class="flex flex-wrap justify-around align-top">
     {% for area in all_areas %}
@@ -44,7 +47,5 @@
       <p>No establishments found.</p>
     </div>
     {% endif %}
-  </div>
-</div>
   
-{% endblock %}
+{% endblock main %}

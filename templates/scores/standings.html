@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_sidebar.html' %}
 
 {% block title %}Statistics{% endblock title %}
 
@@ -6,21 +6,19 @@
 {% include '../subheader.html' with title="Stats + Standings" %}   
 {% endblock subheader %}
 
-{% block content %}
-<div class="my-4">
-    <div class="fixed flex-shrink p-4 min-w-fit w-full">
-        <h1 class="font-black text-3xl mb-2">
-            Active Divisions
-        </h1>
-        <ul class="flex flex-row md:flex-col overflow-x-scroll md:overflow-y-scroll justify-between">
-            {% for division in active_divisions %}
-            <li><a href="{% url 'standings' division.id %}">{{ division }}</a></li>
-            {% endfor %}
-            <li><a href="{% url 'standings' %}">View All</a></li>
-        </ul>
-    </div>
-    <div class="flex-grow p-4 w-full">
-        
-    </div>
-</div>
-{% endblock content %}
+{% block sidebar %}
+<div class="">
+    <h1 class="font-black text-amber-400 text-xl mb-2">
+        Active Divisions
+    </h1>
+    <ul class="">
+        {% for division in active_divisions %}
+        <li class="text-slate-200 hover:underline hover:text-blue-400"><a href="{% url 'standings' %}?division={{ division.id }}">{{ division }}</a></li>
+        {% endfor %}
+        <li class="text-slate-200 hover:underline hover:text-blue-400"><a href="{% url 'standings' %}">View All</a></li>
+    </ul> 
+</div> 
+{% endblock sidebar %}
+
+{% block main %}
+{% endblock main %}

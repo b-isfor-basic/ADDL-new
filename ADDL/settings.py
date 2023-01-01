@@ -31,7 +31,7 @@ if 'SECRET_KEY' in os.environ:
 if IS_HEROKU:
     ALLOWED_HOSTS = ["*"]
 else:
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if not IS_HEROKU:
@@ -101,6 +101,9 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "ADDL",
+        "USER": "brittney",
+        "PASSWORD": "",
+        "HOST": "",
         "PORT": "5432",
     }
 }
@@ -220,6 +223,9 @@ sentry_sdk.init(
     integrations=[
         DjangoIntegration(),
     ],
+    _experiments={
+        "profiles_sample_rate": 1.0,
+    },
     max_breadcrumbs=50,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
