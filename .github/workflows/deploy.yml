@@ -22,6 +22,14 @@ jobs:
           DEFAULT_BRANCH: "prod"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
+  update-release:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
       - name: Sentry Release
         uses: getsentry/action-release@v1.2.1
         env:
@@ -29,8 +37,7 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          environment: production
+          environment: 'production'
           version: ${{ github.sha }}
-          version_prefix: v
+          version_prefix: 'v'
           set_commits: auto
-          projects: ADDL
