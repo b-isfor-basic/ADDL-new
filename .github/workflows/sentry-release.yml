@@ -1,0 +1,9 @@
+- name: Sentry Release
+  # You may pin to the exact commit or the version.
+  # uses: getsentry/action-release@bd5f874fcda966ba48139b0140fb3ec0cb3aabdd
+  uses: getsentry/action-release@v1.2.1
+  with:
+    environment: production
+    version_prefix: auto
+    set_commits: auto
+    projects: ADDL
