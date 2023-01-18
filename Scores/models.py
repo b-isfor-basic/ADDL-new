@@ -3,15 +3,35 @@ import uuid
 from django.conf import settings
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.postgres.fields import ArrayField
 
-from .managers import *
-
+from .managers import (
+    GamesManager,
+    ScoresetManager,
+    GameQuerySet,
+    PlayerStatsManager,
+    TeamStatsManager,
+)
 from Members.models import Team
 from Schedule.models import Match
+
+
+class Forfeit(TimeStampedModel, models.Model):
+    """
+    A forfeit for a match.
+
+    Fields:
+        id: A unique identifier for the forfeit.
+        match: The match the forfeit is for.
+        team: The team that forfeited.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
 
 
 class GameScore(models.Model):
@@ -27,7 +47,8 @@ class GameScore(models.Model):
         stars: The number of stars the player earned.
         perfects: The number of perfects the player earned.
         game_point: Points earned is 1 if player wins.
-        out_thrown: In 501 or 301, the score the winning player hit to finish the game.
+        out_thrown: In 501 or 301, the score the winning player hit to finish
+        the game.
             Only one player per team can have a non-zero value.
         in_thrown: In 301, the score a player hit to start the game.
             Only one player per team can have a non-zero value.
@@ -96,7 +117,8 @@ class GameScore(models.Model):
 
 class Scoreset(TimeStampedModel, models.Model):
     """
-    Links all of a player's games to the corresponding match for game result and stat calculation.
+    Links all of a player's games to the corresponding match for game result
+    and stat calculation.
     """
 
     match = models.ForeignKey(Match, models.CASCADE)
@@ -106,6 +128,8 @@ class Scoreset(TimeStampedModel, models.Model):
 
     objects = models.Manager()
     details = ScoresetManager()
+    player_stats = PlayerStatsManager()
+    team_stats = TeamStatsManager()
 
     class Meta:
         unique_together = ["match", "player"]
@@ -113,6 +137,12 @@ class Scoreset(TimeStampedModel, models.Model):
     @property
     def player_display(self):
         return "(" + str(self.match.weekNum) + ") " + self.player.last_name
+
+    @property
+    def singles_weekly_ppd(self):
+        return self.gamescore.filter(
+            gamescore__format="SN",
+        )
 
 
 class Approval(TimeStampedModel, models.Model):
@@ -127,3 +157,107 @@ class Approval(TimeStampedModel, models.Model):
     def create_approval(sender, instance, created, **kwargs):
         if created:
             Approval.objects.create(match=instance.match)
+
+
+
+class TeamScoreSummary(TimeStampedModel, models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    darts_thrown1 = models.IntegerField(blank=True, null=True)
+    score_left1 = models.IntegerField(blank=True, null=True)
+    darts_thrown2 = models.IntegerField(blank=True, null=True)
+    score_left2 = models.IntegerField(blank=True, null=True)
+
+    @property
+    def weekly_ppd(self):
+        darts_thrown = self.darts_thrown1 + self.darts_thrown2
+        scored = 1001 - (self.score_left1 + self.score_left2)
+        return round(scored / darts_thrown, 4)
+
+    class Meta:
+        unique_together = ["match", "team"]
+
+class ScoreSummary(TimeStampedModel, models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    total_stars = models.IntegerField(blank=True, null=True)
+    total_perfects = models.IntegerField(blank=True, null=True)
+    singles_points = models.IntegerField(default=0,validators=[MaxValueValidator(4)])
+    doubles_points = models.IntegerField(default=0, validators=[MaxValueValidator(6)])
+    high_in = models.IntegerField(blank=True, null=True)
+    high_out = models.IntegerField(blank=True, null=True)
+    darts_thrown1 = models.IntegerField(blank=True, null=True)
+    score_left1 = models.IntegerField(blank=True, null=True)
+    darts_thrown2 = models.IntegerField(blank=True, null=True)
+    score_left2 = models.IntegerField(blank=True, null=True)
+
+    @property
+    def total_points(self):
+        return self.singles_points + self.doubles_points
+    
+    @property
+    def singles_weekly_ppd(self):
+        darts_thrown = self.darts_thrown1 + self.darts_thrown2
+        scored = 1001 - (self.score_left1 + self.score_left2)
+        return round(scored / darts_thrown, 4)
+
+    @property
+    def avg_stars_per_game(self):
+        return round(self.total_stars / 10, 2)
+
+    @property
+    def win_pct(self):
+        return round(self.total_points / 10)
+
+    class Meta:
+        unique_together = ["match", "player"]
+
+
+class ScoreDetail(TimeStampedModel, models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+
+    score_summary = models.OneToOneField(ScoreSummary, on_delete=models.CASCADE)
+
+    stars_list = ArrayField(
+        models.PositiveIntegerField(), max_length=10, blank=True, null=True
+    )
+    perfects_list = ArrayField(
+        models.PositiveIntegerField(), max_length=10, blank=True, null=True
+    )
+    points_list = ArrayField(
+        models.PositiveIntegerField(MaxValueValidator(1)),
+        max_length=10,
+        blank=True,
+        null=True,
+    )
+    darts_thrown_list = ArrayField(
+        models.PositiveIntegerField(MaxValueValidator(50)),
+        max_length=2,
+        blank=True,
+        null=True,
+    )
+    score_left_list = ArrayField(
+        models.PositiveIntegerField(MaxValueValidator(501)),
+        max_length=2,
+        blank=True,
+        null=True,
+    )
+    in_list = ArrayField(
+        models.PositiveIntegerField(MaxValueValidator(170)),
+        max_length=2,
+        blank=True,
+        null=True,
+    )
+    out_list = ArrayField(
+        models.PositiveIntegerField(MaxValueValidator(170)),
+        max_length=4,
+        blank=True,
+        null=True,
+    )

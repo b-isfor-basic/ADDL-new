@@ -1,14 +1,16 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from django.forms import all_valid, formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.views.generic import ListView, FormView
 
+from Locations.models import Division
 from Members.models import Player
 from Schedule.models import Match, Season
 
-from .forms import GameScoreForm, ScoresetForm
-from .models import GameScore, Scoreset
+from .forms import GameScoreForm, ScoresetForm, PlayerScoreFormSet, TeamScoreFormSet
+from .models import GameScore, Scoreset, ScoreSummary, ScoreDetail, TeamScoreSummary
 
 ScoresetFormSet = formset_factory(ScoresetForm, extra=2, min_num=2, max_num=2)
 GameScoreFormSet = formset_factory(GameScoreForm, extra=10, min_num=0, max_num=10)
@@ -194,24 +196,6 @@ def ScoresheetCreateView(request, id, **kwargs):
     return render(request, "scores/add_scoresheet.html", context)
 
 
-def StandingsView(request, *args, **kwargs):
-    season = Season.details.get_active()
-    active_divisions = season.division_set.all()
-
-    if "division" in request.GET.keys():
-        qs = request.GET.get("division")
-        division = season.division_set.get(id=qs)
-    else:
-        division = active_divisions
-
-    context = {
-        "season": season,
-        "active_divisions": active_divisions,
-        "division": division,
-    }
-    return render(request, "scores/standings.html", context)
-
-
 def PlayerSearchView(request, **kwargs):
     template = "scores/partials/player_search.html"
 
@@ -222,8 +206,90 @@ def PlayerSearchView(request, **kwargs):
             | Q(last_name__icontains=qs)
             | Q(username__icontains=qs)
             | Q(email__icontains=qs)
-        )
+        ).values("id", "first_name", "last_name", "username", "email")
+
         context = {"object_list": object_list}
         return render(request, template, context)
     else:
         return None
+
+
+class StandingsView(ListView):
+    model = Scoreset
+    template_name = "scores/standings.html"
+    context_object_name = "player_stats"
+    queryset = Scoreset.player_stats.all()
+    season_filter = None
+    
+    def get_queryset(self, **kwargs):
+        if "season" in self.kwargs:
+            season = self.kwargs["season"]
+            self.season_filter = Season.objects.get(id=season)
+            self.division_set = self.season_filter.divisions.all() 
+            return Scoreset.player_stats.filter(season=season)
+        return super().get_queryset().filter(**kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #context["season_filter"] = self.season_filter or None
+        context["all_seasons"] = Season.objects.all()[:5]
+        if self.season_filter != None:
+            context["season_filter"] = self.season_filter
+            context["active_divisions"] = self.division_set
+        
+        return context
+        
+
+class TeamStatsListView(ListView):
+    model = Scoreset
+    template_name = "scores/team_stats.html"
+    context_object_name = "teams"
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+    def get_queryset(self, **kwargs):
+        if kwargs is not None:
+            return Scoreset.team_stats.all()
+        else:
+            return Scoreset.team_stats.filter(**kwargs)
+
+
+@permission_required("scores.add_score_summary")
+def CreateScoreSummaryView(request, id, **kwargs):
+    match = Match.objects.get(id=id)
+    template = "scores/add_score_summary.html"
+
+    if request.method == "POST":
+        team_scores = TeamScoreFormSet(request.POST, prefix="team", form_kwargs={"match": match})
+        player_scores = PlayerScoreFormSet(request.POST, prefix="player", form_kwargs={"match": match})
+
+        if team_scores.is_valid() & player_scores.is_valid():
+            for form in team_scores:
+                form.save()
+            for form in player_scores:
+                form.save()  
+            return HttpResponseRedirect("/schedule/")
+        else:
+            print("team_scores ", team_scores.errors)
+            print("player_scores ", player_scores.errors)
+            context = {
+                "match": match,
+                "team_scores": team_scores,
+                "player_scores": player_scores,
+            }
+    
+    team_scores = TeamScoreFormSet(prefix="team", form_kwargs={"match": match})
+    player_scores = PlayerScoreFormSet(prefix="player", form_kwargs={"match": match})
+
+    context = {
+        "match": match,
+        "team_scores": team_scores,
+        "player_scores": player_scores,
+    }
+
+    return render(request, template, context)
+            
+    

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Score Entry{% endblock %}
+
+{% block headerScripts %}
+<svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+  <symbol id="chevron-r" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+  </symbol>
+</svg>
+{% endblock headerScripts %}
+
+{% block content %}
+
+<div class="w-full mt-8 p-5 justify-center align-center">
+  <div class="justify-items-start flex-auto">
+  <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">Match Play Score Entry</h2>
+  <h3 class="text-slate-200 text-sm md:text-base font-semibold tracking-wider">
+    {{ match.season }}
+    <svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5"><use href="#chevron-r" /></svg>
+    Week {{ match.weekNum }}
+    <svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5"><use href="#chevron-r" /></svg>
+    {{ match.division }}
+  </h3>
+  <p class="pt-4 text-slate-400 text-sm">Complete the form below to record scores. Fields marked with <span class="text-rose-400">*</span> are required.</p>
+</div>
+
+<form method="post" class="justify-evenly items-center pt-4">
+  {% csrf_token %}
+  {{ team_scores.management_form }}
+  {{ player_scores.management_form }}
+  {% if team_scores.non_form_errors %}
+  <div class="m-4 relative flex justify-center items-center ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-600/10" id="errorBox">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="absolute -top-2 -left-2 fill-rose-900 stroke-rose-300 h-5 w-5 flex-none">
+      <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
+    </svg>
+    <strong class="text-rose-400 font-semibold">Error!</strong>
+    <p class="text-rose-400">{{ team_scores.non_form_errors }}</p>
+  </div>
+  {% endif %} 
+  {% if player_scores.non_form_errors %}
+  <div class="m-4 relative flex justify-center items-center ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-600/10" id="errorBox">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="absolute -top-2 -left-2 fill-rose-900 stroke-rose-300 h-5 w-5 flex-none">
+      <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
+    </svg>
+    <strong class="text-rose-400 font-semibold">Error!</strong>
+    <p class="text-rose-400">{{ player_scores.non_form_errors }}</p>
+  </div>
+  {% endif %} 
+
+  <!-- ========= Team Score Formset Begin ========== -->
+  
+  <div class="w-full p-4 justify-center align-center rounded-lg shadow-xl bg-slate-700/50 shadow-slate-900/40 border border-slate-900">
+    <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 md:gap-3 w-full text-slate-200">
+      <div class="md:col-span-1 border-b md:border-r md:border-b-0 border-slate-600">
+        <h3 class="text-amber-500 text-2xl font-black place-self-start justify-start pb-2">Doubles 501</h3>
+        <div class="text-slate-400 text-sm space-y-3 p-1">
+          <p>All scores are required<span class="text-rose-400">*</span> unless the team forfeit their match.</p>
+          <p>In the event of a forfeit, only check the forfeit box for the appropriate team and submit the form. 
+            <strong>All other fields should be left blank for both teams</strong>. The non-forfeiting's team scores will be adjusted accordingly.
+          </p>
+          <p>If any game is missing a value for darts thrown or score left, the game should be recorded as 50-0 for the winning team or 50-2
+            for the losing team.
+          </p>
+         </div>
+      </div>
+      {% for form in team_scores %}
+      <div class="md:col-span-1 items-center space-y-2 md:space-y-4 py-5 md:m-2">
+        <div class="grid grid-flow-row grid-rows-8">
+          <div class="row-span-1 inline-flex">
+            <h3 class="text-amber-400 text-lg font-black mr-4">{% if forloop.first %}Away Team{%else%}Home Team{% endif %}</h3>
+            <h4 class="text-slate-400 text-lg">{% if forloop.first %}{{ match.awayTeam }}{%else%}{{ match.homeTeam }}{% endif %}</h4>
+          </div>
+          {{ form.match }}
+          {{ form.team }}
+
+          <div class="row-span-1 pl-2 inline-flex items-baseline">
+            <label for="{{ form.mark_as_forfeit.id_for_label }}" class="text-sm font-medium text-slate-400">Forfeit Match?</label>
+            <div class="ml-2">{{ form.mark_as_forfeit }}</div>
+            <p class="text-sm text-rose-400">{{ form.mark_as_forfeit.errors }}</p>
+          </div>
+
+          <div class="row-start-3 row-span-3 mt-2">
+            <h4 class="text-slate-200 font-bold place-self-start">Game 1</h4>
+            <fieldset class="mx-2 grid grid-flow-col md:grid-cols-2 gap-5">
+              <div class="col-span-1">
+                <label for="{{ form.darts_thrown1.id_for_label }}" class="text-sm font-medium text-slate-400">Darts Thrown<span class="text-rose-400">*</span></label>
+                <div class="mt-1">{{ form.darts_thrown1 }}</div>
+                <p class="text-sm text-rose-400">{{ form.darts_thrown1.errors }}</p>
+              </div>
+              <div class="col-span-1">
+                <label for="{{ form.score_left1.id_for_label }}" class="text-sm font-medium text-slate-400">Score Left<span class="text-rose-400">*</span></label>
+                <div class="mt-1">{{ form.score_left1 }}</div>
+                <p class="text-sm text-rose-400">{{ form.score_left1.errors }}</p>
+              </div>
+            </fieldset>
+          </div>
+          <div class="row-start-6 row-span-3 mt-2">
+            <h4 class="text-slate-200 font-bold place-self-start">Game 2</h4>
+            <fieldset class="mx-2 grid grid-flow-col md:grid-cols-2 gap-5">
+              <div class="col-span-1">
+                <label for="{{ form.darts_thrown2.id_for_label }}" class="text-sm font-medium text-slate-400">Darts Thrown<span class="text-rose-400">*</span></label>
+                <div class="mt-1">{{ form.darts_thrown2 }}</div>
+                <p class="text-sm text-rose-400">{{ form.darts_thrown2.errors }}</p>
+              </div>
+              <div class="col-span-1">
+                <label for="{{ form.score_left2.id_for_label }}" class="text-sm font-medium text-slate-400">Score Left<span class="text-rose-400">*</span></label>
+                <div class="mt-1">{{ form.score_left2 }}</div>
+                <p class="text-sm text-rose-400">{{ form.score_left2.errors }}</p>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </fieldset>
+  </div>
+
+  <!--- ======= Away Player Score Formset Begin ======== -->
+
+
+  
+      <div class="w-full mt-12 p-4 justify-center align-center rounded-lg shadow-xl bg-slate-700/50 shadow-slate-900/30">
+        <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 md:gap-3 w-full text-slate-200">
+          <div class="md:col-span-1 border-b md:border-r md:border-b-0 border-slate-600">
+            <h3 class="text-amber-500 text-2xl font-black place-self-start justify-start pb-2">Away Team Scores</h3>
+            <div class="text-slate-400 text-sm space-y-3 p-1">
+              <p>All scores are required<span class="text-rose-400">*</span> unless the team forfeit their match.</p>
+              <p>If any game is missing a value for darts thrown or score left, the game should be recorded as 50-0 for the winning player and/or 50-2
+                for the losing player.
+              </p>
+            </div>
+
+
+          </div>
+          <div class="md:col-span-2 md:col-start-2 items-center space-y-2 md:space-y-4 py-5 md:m-2">
+            {% for form in player_scores|slice:":2" %}
+              <div class="mb-8">
+                {% include "./partials/player_score_formset.html" with team="away" %}
+              </div>
+            {% endfor %}
+          </div>
+        </fieldset>
+      </div>
+
+      <!--- ======= Home Player Score Formset Begin ======== -->
+
+      <div class="w-full mt-12 p-4 justify-center align-center rounded-lg shadow-xl bg-slate-700/50 shadow-slate-900/30">
+        <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 md:gap-3 w-full text-slate-200">
+          <div class="md:col-span-1 border-b md:border-r md:border-b-0 border-slate-600">
+            <h3 class="text-amber-500 text-2xl font-black place-self-start justify-start pb-2">Home Team Scores</h3>
+            <div class="text-slate-400 text-sm space-y-6 p-1">
+              <p>All scores are required<span class="text-rose-400">*</span> unless the team forfeit their match.</p>
+              <p>If any game is missing a value for darts thrown or score left, the game should be recorded as 50-0 for the winning player and/or 50-2
+                for the losing player.
+              </p>
+            </div>
+          </div>
+          <div class="md:col-span-2 md:col-start-2 items-center space-y-2 md:space-y-4 py-5 md:m-2">
+            {% for form in player_scores|slice:"2:" %}
+            <div class="mb-8">
+                {% include "./partials/player_score_formset.html" with team="home" %}
+              </div>
+            {% endfor %}
+          </div>
+        </fieldset>
+      </div>
+
+
+
+ 
+        <div class="items-end w-full p-2">
+            <button class="p-1 my-4 w-full bg-slate-800 shadow-inner shadow-slate-900/40 ring-1 ring-slate-900/30 rounded-lg text-amber-400 font-semibold tk-rustica uppercase border border-amber-400 hover:bg-amber-900/60 hover:ease-in-out hover:duration-500" type="submit">
+                <span class="text-amber-400">Submit</span>
+            </button>
+        </div>
+    </form>
+  </div>
+</div>
+
+
+{% endblock %}

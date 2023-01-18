@@ -1,6 +1,6 @@
 from django.db import models
-from django.db.models import F
-from django.db.models.aggregates import Count, Max, Min, Sum, Avg
+from django.db.models.aggregates import Avg, Count, Max, Min, Sum
+from django.db.models.functions import Cast, Ln, Round
 
 
 class SinglesCricketGameManager(models.Manager):
@@ -55,94 +55,18 @@ class GameQuerySet(models.QuerySet):
         return super(GameQuerySet, self).filter(game_point=1, **kwargs)
 
 
-class GamesManager(SinglesCricketGameManager, DoublesCricketGameManager, Singles501GameManager, Doubles501GameManager, Doubles301GameManager, models.Manager):
+class GamesManager(
+    SinglesCricketGameManager,
+    DoublesCricketGameManager,
+    Singles501GameManager,
+    Doubles501GameManager,
+    Doubles301GameManager,
+    models.Manager,
+):
     pass
 
 
 class ScoresetManager(models.Manager):
-    """
-    Provides methods for calculating scoreset stats.
-    ::
-    get_wins
-        Returns a queryset with total win points annotated.
-    get_stars
-        Returns a queryset with total stars annotated.
-    get_perfects
-        Returns a queryset with total perfects annotated.
-    get_in_thrown
-        Returns a queryset with high in thrown annotated.
-    get_out_thrown
-        Returns a queryset with high out thrown annotated.
-    get_best_week_501
-        Returns a queryset with low darts thrown annotated.
-    get_ppd
-        Returns a queryset with average PPD annotated.
-    """
-    def get_queryset(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .select_related("match", "match__season", "team", "player")
-            .prefetch_related("gamescore_set")
-        )
-
-    def get_wins(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .annotate(Sum("gamescore__game_point"))
-        )
-
-    def get_stars(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .annotate(Sum("gamescore__stars"))
-        )
-
-    def get_perfects(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .annotate(Sum("gamescore__perfects"))
-        )
-
-    def get_ppd(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .annotate(
-                Avg(
-                    F((501 * Count("gamescore__id")) - Sum("gamescore__score_left"))
-                    / F(Sum("gamescore__darts_thrown"))
-                )
-            )
-        )
-
-    def get_best_week_501(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .filter(gamescore__score_left=0)
-            .annotate(Min("gamescore__darts_thrown"))
-        )
-
-    def get_high_in(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .filter(gamescore__in_thrown__isnull=False)
-            .annotate(Max("gamescore__in_thrown"))
-        )
-
-    def get_high_out(self):
-        return (
-            super(ScoresetManager, self)
-            .get_queryset()
-            .filter(gamescore__out_thrown__isnull=False)
-            .annotate(Max("gamescore__out_thrown"))
-        )
-
     def create_new(self, match, team, player):
         if player in match.season.team_set.filter(id=team.id).players.all():
             sub = False
@@ -150,3 +74,171 @@ class ScoresetManager(models.Manager):
             sub = True
         scoreset = self.create(match=match, team=team, player=player, is_sub=sub)
         return scoreset
+
+
+class PlayerStatsManager(models.Manager):
+    """
+    This is a custom manager that returns a queryset of player stats.
+    Primary purpose is to provide a queryset for the PlayerStatsListView.
+
+    The queryset is annotated with the following fields:
+        games_played: The number of games played by the player.
+        singles_points: The number of points earned in singles games.
+        doubles_points: The number of points earned in doubles games.
+        total_points: The total number of points earned.
+        win_percentage: The percentage of games won by the player.
+        total_stars: The total number of stars earned by the player.
+        avg_stars_per_game: The average number of stars earned per game.
+        total_perfects: The total number of perfects earned by the player.
+        best_singles_501: The fewest darts thrown in a 501 singles game.
+        high_in: The highest in thrown by the player.
+        high_out: The highest out thrown by the player.
+        avg_ppd: The average points per dart thrown in 501 singles games.
+    """
+
+    def get_queryset(self, **kwargs):
+        return (
+            super()
+            .get_queryset(**kwargs)
+            .prefetch_related("gamescore_set", "player")
+            .values("player_id", "player__first_name", "player__last_name")
+            .annotate(
+                games_played=(Count("match_id", distinct=True) * 10),
+                singles_points=Sum(
+                    "gamescore__game_point", filter=models.Q(gamescore__format="SN")
+                ),
+                doubles_points=Sum(
+                    "gamescore__game_point", filter=models.Q(gamescore__format="DB")
+                ),
+                total_points=Sum("gamescore__game_point"),
+                win_percentage=Round(
+                    Cast(
+                        (
+                            Sum("gamescore__game_point")
+                            / (Count("match_id", distinct=True) * 10.00)
+                            * 100.00
+                        ),
+                        models.FloatField(),
+                    ),
+                    2,
+                ),
+                total_stars=Sum("gamescore__stars"),
+                avg_stars_per_game=Round(
+                    Cast(Avg("gamescore__stars"), models.FloatField()), 2
+                ),
+                total_perfects=Sum("gamescore__perfects"),
+                best_singles_501=Min(
+                    "gamescore__darts_thrown",
+                    filter=models.Q(
+                        gamescore__format="SN",
+                        gamescore__game="501",
+                        gamescore__game_point=1,
+                    ),
+                ),
+                high_in=Max("gamescore__in_thrown"),
+                high_out=Max("gamescore__out_thrown"),
+                avg_ppd=Round(
+                    Cast(
+                        (
+                            (
+                                501.0
+                                * Count(
+                                    "gamescore",
+                                    distinct=True,
+                                    filter=models.Q(
+                                        gamescore__format="SN", gamescore__game="501"
+                                    ),
+                                )
+                                - Sum(
+                                    "gamescore__score_left",
+                                    filter=models.Q(
+                                        gamescore__format="SN", gamescore__game="501"
+                                    ),
+                                )
+                            )
+                            / Sum(
+                                "gamescore__darts_thrown",
+                                filter=models.Q(
+                                    gamescore__format="SN", gamescore__game="501"
+                                ),
+                            )
+                        ),
+                        models.FloatField(),
+                    ),
+                    4,
+                ),
+                rating=Round(
+                    (Ln(models.F("avg_ppd")) * 3.5)
+                    + ((models.F("win_percentage") / 100) * 8)
+                    + (models.F("avg_stars_per_game") * 5),
+                    4,
+                ),
+            )
+        )
+
+
+class TeamStatsManager(models.Manager):
+    def get_queryset(self, **kwargs):
+        return (
+            super()
+            .get_queryset(**kwargs)
+            .prefetch_related("gamescore_set", "team")
+            .values("team")
+            .annotate(
+                total_wins=Sum("gamescore__game_point"),
+                total_losses=Count(
+                    "gamescore__game_point",
+                    filter=models.Q(gamescore__game_point=0),
+                    distinct=True,
+                ),
+                win_percentage=Round(
+                    Cast(
+                        (
+                            Sum("gamescore__game_point")
+                            / (Count("match_id", distinct=True) * 20.00)
+                            * 100.00
+                        ),
+                        models.FloatField(),
+                    ),
+                    2,
+                ),
+                best_doubles_501=Min(
+                    "gamescore__darts_thrown",
+                    filter=models.Q(
+                        gamescore__format="DB",
+                        gamescore__game="501",
+                        gamescore__game_point=1,
+                    ),
+                ),
+                avg_doubles_ppd=Round(
+                    Cast(
+                        (
+                            501.0
+                            * Count(
+                                "gamescore",
+                                distinct=True,
+                                filter=models.Q(
+                                    gamescore__format="DB", gamescore__game="501"
+                                ),
+                            )
+                            - Sum(
+                                "gamescore__score_left",
+                                filter=models.Q(
+                                    gamescore__format="DB", gamescore__game="501"
+                                ),
+                                distinct=True,
+                            )
+                        )
+                        / Sum(
+                            "gamescore__darts_thrown",
+                            filter=models.Q(
+                                gamescore__format="DB", gamescore__game="501"
+                            ),
+                            distinct=True,
+                        ),
+                        models.FloatField(),
+                    ),
+                    4,
+                ),
+            )
+        )

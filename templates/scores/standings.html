@@ -7,7 +7,17 @@
 {% endblock subheader %}
 
 {% block sidebar %}
-<div class="">
+<div class="mb-4">
+    <h1 class="font-black text-amber-400 text-xl mb-2">
+        Seasons
+    </h1>
+    <ul class="">
+        {% for season in all_seasons %}
+        <li class="text-slate-200 hover:underline hover:text-blue-400"><a href="{% url 'standings' %}?season={{ season.id }}">{{ season.season_number }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="mb-4">
     <h1 class="font-black text-amber-400 text-xl mb-2">
         Active Divisions
     </h1>
@@ -21,4 +31,9 @@
 {% endblock sidebar %}
 
 {% block main %}
+<div class="space-y-4">
+    {% for row in player_stats %}
+        <p class="text-slate-200">{{ row.player__first_name }} {{ row.player__last_name }} | {{ row.total_points }}</p>
+    {% endfor %}
+</div>
 {% endblock main %}

@@ -16,13 +16,12 @@ class MatchAdmin(admin.ModelAdmin):
         "division",
         "awayTeam",
         "homeTeam",
-        "winner",
     ]
 
 
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):
-    list_filter = ("season", "created_by")
+    list_filter = ["created_by"]
     list_display = ["title", "created_by", "active_date", "inactive_date"]
 
 

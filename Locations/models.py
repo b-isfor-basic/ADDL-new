@@ -139,6 +139,9 @@ class DivisionManager(models.Manager):
 
 
 class Division(models.Model):
+    class Meta:
+        ordering = ["area__number", "matchNight"]
+
     WEEKDAY_CHOICES = [
         ("Monday", "Monday"),
         ("Tuesday", "Tuesday"),
@@ -172,9 +175,6 @@ class Division(models.Model):
         blank=True,
         null=True,
     )
-    season = models.ManyToManyField(
-        "Schedule.Season",
-    )
 
     objects = models.Manager()
     active = DivisionManager()
@@ -184,15 +184,6 @@ class Division(models.Model):
 
     def get_absolute_url(self):
         return reverse("division_detail", kwargs={"pk": self.id})
-
-    def board_groups(self):
-        boards = self.capacity
-        if boards % 2 != 0:
-            boards -= 1
-        groups = []
-        for i in range(1, boards, 2):
-            groups.append([i, i + 1])
-        return groups
 
     def get_matches(self):
         from Schedule.models import Season

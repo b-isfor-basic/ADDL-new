@@ -1,18 +1,14 @@
-import datetime
 import uuid
 
 from django.db import models
-from django.db.models import Sum, Q, Count, F
+from django.db.models import Sum, Q, Count
 from django.utils import timezone
-from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 
-from django_extensions.db.models import CreationDateTimeField, AutoSlugField
 from recurrence.fields import RecurrenceField
-from recurrence.models import Rule
 
 from Locations.models import Division, Establishment
-from Members.models import Team
+from Members.models import Team, Player
 
 
 class Scheduler(models.Model):
@@ -36,17 +32,19 @@ class SeasonManager(models.Manager):
                 .filter(season_start_before_today & season_end_after_today)
                 .first()
             )
-        return (
-            self.get_queryset()
-            .filter(Q(match_play_start_dt__gte=timezone.now()))
-            .earliest("match_play_start_dt")
-        )
+       
+        return Season.objects.latest('match_play_start_dt')
 
     def get_team_stats(self, season):
-        return self.get_queryset().filter(season=season).team_set.annotate(
-            wins=Sum("scoreset__gamescore__game_point"),
-            losses=Count("player1__scoreset"),
+        return (
+            self.get_queryset()
+            .filter(season_number=season)
+            .divisions.team_set.annotate(
+                wins=Sum("scoreset__gamescore__game_point"),
+                losses=Count("player1__scoreset"),
+            )
         )
+
 
 class Season(models.Model):
     """
@@ -67,6 +65,7 @@ class Season(models.Model):
     playoffFinalsLocation = models.ForeignKey(
         to=Establishment, blank=True, null=True, on_delete=models.SET_NULL
     )
+    divisions = models.ManyToManyField(Division)
 
     objects = models.Manager()
     details = SeasonManager()
@@ -83,8 +82,8 @@ class MatchManager(models.Manager):
     def by_season(self, season):
         return self.get_queryset().filter(season__season_number=season)
 
-    def by_division(self, area):
-        return self.get_queryset().filter(division=area)
+    def by_division(self, division):
+        return self.get_queryset().filter(division=division)
 
 
 class Match(models.Model):
@@ -126,24 +125,24 @@ class Match(models.Model):
     @property
     def homeScore(self):
         homeScore = self.scoreset_set.filter(team=self.homeTeam).aggregate(
-            wins=Sum("gamescore__game_point", default=0)
+            home_pts=Sum("gamescore__game_point", default=0)
         )
-        return homeScore["wins"]
+        return homeScore["home_pts"]
 
     @property
     def awayScore(self):
         awayScore = self.scoreset_set.filter(team=self.awayTeam).aggregate(
-            wins=Sum("gamescore__game_point", default=0)
+            away_pts=Sum("gamescore__game_point", default=0)
         )
-        return awayScore["wins"]
+        return awayScore["away_pts"]
 
     @property
     def winner(self):
-        if self.homeScore == 0 and self.awayScore == 0:
+        if (self.homeScore == 0) and (self.awayScore == 0):
             return None
         else:
             if self.homeScore == self.awayScore:
-                return "Tie"
+                return "Draw"
             elif self.homeScore > self.awayScore:
                 return "Home"
             else:
@@ -158,13 +157,11 @@ class Announcement(models.Model):
     """
 
     title = models.CharField(max_length=100)
-    title_slug = AutoSlugField(populate_from="title")
     body = models.TextField()
     active_date = models.DateTimeField()
     inactive_date = models.DateTimeField()
-    season = models.ForeignKey(Season, models.CASCADE, blank=True, null=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)
-    date_created = CreationDateTimeField()
+    created_by = models.ForeignKey(Player, models.SET_NULL, null=True, related_name="announcements_created")
+    edited_by = models.ForeignKey(Player, models.SET_NULL, null=True, blank=True, related_name="announcements_edited")
 
     def __str__(self):
         return str(self.title).title()
