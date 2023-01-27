@@ -68,6 +68,11 @@ class Establishment(models.Model):
         null=True,
         blank=True,
     )
+    shortName = models.CharField(
+        max_length=35,
+        null=True,
+        blank=True,
+    )
     streetLine1 = models.CharField(
         max_length=95,
         verbose_name="Street Address 1",
@@ -101,6 +106,12 @@ class Establishment(models.Model):
     class Meta:
         ordering = ["number"]
 
+    def __str__(self):
+        if self.shortName:
+            return f"{self.number} - {self.shortName}"
+        else:
+            return f"{self.number} - {self.name}"
+
     def get_address(self):
         address = ""
         if self.streetLine1 != None:
@@ -114,9 +125,6 @@ class Establishment(models.Model):
         if self.zipCode != None:
             address += str(self.zipCode)
         return "".join(address)
-
-    def __str__(self):
-        return f"{self.number} - {self.name}"
 
     def get_absolute_url(self):
         return reverse("area", kwargs={"pk": self.id})
@@ -139,6 +147,9 @@ class DivisionManager(models.Manager):
 
 
 class Division(models.Model):
+    class Meta:
+        ordering = ["area__number", "matchNight"]
+
     WEEKDAY_CHOICES = [
         ("Monday", "Monday"),
         ("Tuesday", "Tuesday"),
@@ -172,27 +183,15 @@ class Division(models.Model):
         blank=True,
         null=True,
     )
-    season = models.ManyToManyField(
-        "Schedule.Season",
-    )
 
     objects = models.Manager()
     active = DivisionManager()
 
     def __str__(self):
-        return f"Area {self.area.number} - {self.matchNight}"
+        return f"{self.area} ({self.matchNight})"
 
     def get_absolute_url(self):
         return reverse("division_detail", kwargs={"pk": self.id})
-
-    def board_groups(self):
-        boards = self.capacity
-        if boards % 2 != 0:
-            boards -= 1
-        groups = []
-        for i in range(1, boards, 2):
-            groups.append([i, i + 1])
-        return groups
 
     def get_matches(self):
         from Schedule.models import Season

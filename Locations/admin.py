@@ -9,7 +9,7 @@ class DivisionInline(admin.StackedInline):
 @admin.register(Establishment)
 class EstablishmentAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {"fields": ("number", "name", "is_active")}),
+        (None, {"fields": ("number", "name", "shortName", "is_active")}),
         (
             "Address",
             {"fields": ("streetLine1", "streetLine2", "city", "state", "zipCode")},

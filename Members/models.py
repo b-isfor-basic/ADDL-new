@@ -38,13 +38,10 @@ class Team(models.Model):
         season: The season the team is registered for.
     """
 
-    player1 = models.ForeignKey("Player", models.CASCADE, related_name="team_member_1")
-    player2 = models.ForeignKey("Player", models.CASCADE, related_name="team_member_2")
+    players = models.ManyToManyField("Player", related_name="teams", max_length=2)
     division = models.ForeignKey("Locations.Division", models.CASCADE)
     season = models.ForeignKey("Schedule.Season", models.CASCADE)
 
     def __str__(self):
-        return f"{self.player1.last_name}/{self.player2.last_name}"
-
-    class Meta:
-        unique_together = (["player1", "season"], ["player2", "season"])
+        names = [player.last_name for player in self.players.all()]
+        return f"{names[0]}/{names[1]}"

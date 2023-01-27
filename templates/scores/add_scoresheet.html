@@ -6,50 +6,93 @@
 
 {% block title %}Scoresheet{% endblock title %} 
 
-{% block subheader %} 
-  {% include '../subheader.html' with title="Scoresheet" %} 
-{% endblock %} 
 
 {% block content %}
-<div class="w-full bg-primary-100 border-primary-500 border-b text-primary-600">
+<div class="pt-10 w-full border-slate-500 border-b text-amber-400">
   <div class="tk-objective-mk2 font-extrabold text-center text-3xl">
     <h1>Atlanta Doubles Dart League</h1>
   </div>
   <div class="tk-objective-mk2 text-center font-normal text-xl pb-2">
     <h2>Match Play Scoresheet</h2>
   </div>
-</div>
 
-<!-- Player Entry -->
 
-<form method="post">
-    {% csrf_token %}
-  <div class="flex flex-col w-full flex-1">
-    <div class="inline-flex flex-row justify-evenly">
-      {% if match %}
+
+  <!-- Player Entry -->
+
+  <form method="post">
+      {% csrf_token %}
+    <div class="flex flex-col w-full flex-1">
+      <div class="inline-flex flex-row justify-evenly">
+        {% if match %}
+        <div class="flex-col w-1/2 text-center m-4">
+          <div class="content-center border-t border-slate-500">
+            <h2 class="w-full m-2 text-left text-2xl text-slate-300 tk-objektiv-mk2 font-black uppercase">Away</h2>
+            <h3 class="w-full text-left text-lg m-2">{{ match.awayTeam }}</h3>
+            {{ away_player_forms.management_form }}
+            {% for away_form in away_player_forms %}
+            <div class="flex flex-col w-full">
+              <div x-data="selectConfigs()" x-init="fetchOptions()" class="w-full rounded-lg items-center m-2 bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-100 shadow-indigo-300 shadow-sm">
+                <div @click.away="close()" class="inline-flex items-center w-full">
+                  <input 
+                    id="{{ away_form.player.id_for_label }}"
+                    name="{{ away_form.player.html_name }}"
+                    x-model="filter"
+                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    x-cloak 
+                    @click.inside="open()"
+                    @keydown.enter.stop.prevent="selectOption()"
+                    @keydown.arrow-up.prevent="focusPrevOption()"
+                    @keydown.arrow-down.prevent="focusNextOption()"
+                    class="appearance-none inline-flex bg-transparent m-2 pl-2 w-full text-slate-400"></input>
+                  <div class="text-gray-300 w-8 pl-2 pr-1 items-center">
+                    <button @click="toggle()" class="w-6 h-6 text-gray-600 outline-none focus:outline-none" type="button">
+                        <svg  xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline x-show="isOpen()" points="18 15 12 9 6 15"></polyline>
+                          <polyline x-show="!isOpen()" points="18 15 12 20 6 15"></polyline>
+                        </svg>
+                    </button>
+                  </div>
+                </div>
+            <div x-show="isOpen()" class="relative w-full rounded-lg z-50 overflow-y-auto shadow-indigo-200 shadow-sm bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-200">
+              <div class="flex flex-col w-full">
+                <template x-for="(option, index) in filteredOptions()" :key="index">
+                    <div 
+                      @click="onOptionClick(index)" @d class="mx-2 my-2 rounded-lg hover:bg-primary-100 hover:bg-opacity-90">
+                      <div class="p-2 tk-rustica text-left">
+                        <span x-text="option.first_name + ' ' + option.last_name"></span>
+                      </div>
+                    </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+          {% endfor %}
+        </div>
+      </div>
       <div class="flex-col w-1/2 text-center m-4">
-        <div class="content-center border-t border-primary-500">
-          <h2 class="w-full m-2 text-left text-2xl text-primary-600 tk-objektiv-mk2 font-black uppercase">Away</h2>
-          <h3 class="w-full text-left text-lg m-2">{{ match.awayTeam }}</h3>
-          {{ away_player_forms.management_form }}
-          {% for away_form in away_player_forms %}
+        <div class="content-center border-t border-slate-500">
+          <h2 class="w-full m-2 text-left text-2xl text-slate-300 tk-objektiv-mk2 font-black uppercase">Home</h2>
+          <h3 class="w-full text-left text-lg m-2">{{ match.homeTeam }}</h3>
+        {{ home_player_forms.management_form }}
+          {% for home_form in home_player_forms %}
           <div class="flex flex-col w-full">
-            <div x-data="selectConfigs()" x-init="fetchOptions()" class="w-full rounded-lg items-center m-2 bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-100 shadow-indigo-300 shadow-sm">
+            <div x-data="selectConfigs()" :id="$id('home')" x-init="fetchOptions()" class="w-full rounded-lg items-center m-2 bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-100 shadow-indigo-300 shadow-sm">
               <div @click.away="close()" class="inline-flex items-center w-full">
                 <input 
-                  id="{{ away_form.player.id_for_label }}"
-                  name="{{ away_form.player.html_name }}"
+                  id="{{ home_form.player.id_for_label }}"
+                  name="{{ home_form.player.html_name }}"
                   x-model="filter"
                   x-transition:leave="transition ease-in duration-100"
                   x-transition:leave-start="opacity-100"
                   x-transition:leave-end="opacity-0"
                   x-cloak 
                   @click.inside="open()"
-                  @keydown.enter.stop.prevent="selectOption()"
-                  @keydown.arrow-up.prevent="focusPrevOption()"
-                  @keydown.arrow-down.prevent="focusNextOption()"
-                  class="appearance-none inline-flex bg-transparent m-2 pl-2 w-full text-gray-800"></input>
-                <div class="text-gray-300 w-8 pl-2 pr-1 items-center">
+                  class="appearance-none inline-flex bg-transparent m-2 pl-2 w-full text-slate-400"></input>
+                <div class="text-gray-300 w-8 m-2 pl-2 pr-1 items-center">
                   <button @click="toggle()" class="w-6 h-6 text-gray-600 outline-none focus:outline-none" type="button">
                       <svg  xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline x-show="isOpen()" points="18 15 12 9 6 15"></polyline>
@@ -58,11 +101,10 @@
                   </button>
                 </div>
               </div>
-          <div x-show="isOpen()" class="relative w-full rounded-lg z-50 overflow-y-auto shadow-indigo-200 shadow-sm bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-200">
+          <div x-show="isOpen()" class="relative w-full rounded-lg z-50 overflow-visible shadow-indigo-200 shadow-sm bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-200">
             <div class="flex flex-col w-full">
               <template x-for="(option, index) in filteredOptions()" :key="index">
-                  <div 
-                    @click="onOptionClick(index)" @d class="mx-2 my-2 rounded-lg hover:bg-primary-100 hover:bg-opacity-90">
+                  <div @click="onOptionClick(index)" class="mx-2 my-2 rounded-lg hover:bg-primary-200 hover:bg-opacity-40">
                     <div class="p-2 tk-rustica text-left">
                       <span x-text="option.first_name + ' ' + option.last_name"></span>
                     </div>
@@ -74,64 +116,20 @@
       </div>
         {% endfor %}
       </div>
+    {% endif %}
     </div>
-    <div class="flex-col w-1/2 text-center m-4">
-      <div class="content-center border-t border-primary-500">
-        <h2 class="w-full m-2 text-left text-2xl text-primary-600 tk-objektiv-mk2 font-black uppercase">Home</h2>
-        <h3 class="w-full text-left text-lg m-2">{{ match.homeTeam }}</h3>
-      {{ home_player_forms.management_form }}
-        {% for home_form in home_player_forms %}
-        <div class="flex flex-col w-full">
-          <div x-data="selectConfigs()" :id="$id('home')" x-init="fetchOptions()" class="w-full rounded-lg items-center m-2 bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-100 shadow-indigo-300 shadow-sm">
-            <div @click.away="close()" class="inline-flex items-center w-full">
-              <input 
-                id="{{ home_form.player.id_for_label }}"
-                name="{{ home_form.player.html_name }}"
-                x-model="filter"
-                x-transition:leave="transition ease-in duration-100"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                x-cloak 
-                @click.inside="open()"
-                class="appearance-none inline-flex bg-transparent m-2 pl-2 w-full text-gray-800"></input>
-              <div class="text-gray-300 w-8 m-2 pl-2 pr-1 items-center">
-                <button @click="toggle()" class="w-6 h-6 text-gray-600 outline-none focus:outline-none" type="button">
-                    <svg  xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline x-show="isOpen()" points="18 15 12 9 6 15"></polyline>
-                      <polyline x-show="!isOpen()" points="18 15 12 20 6 15"></polyline>
-                    </svg>
-                </button>
-              </div>
-            </div>
-        <div x-show="isOpen()" class="relative w-full rounded-lg z-50 overflow-visible shadow-indigo-200 shadow-sm bg-clip-padding backdrop-filter backdrop-blur-sm bg-primary-100 bg-opacity-20 border-primary-200">
-          <div class="flex flex-col w-full">
-            <template x-for="(option, index) in filteredOptions()" :key="index">
-                <div @click="onOptionClick(index)" class="mx-2 my-2 rounded-lg hover:bg-primary-200 hover:bg-opacity-40">
-                  <div class="p-2 tk-rustica text-left">
-                    <span x-text="option.first_name + ' ' + option.last_name"></span>
-                  </div>
-                </div>
-            </template>
-          </div>
-        </div>
-      </div>
-    </div>
-      {% endfor %}
-    </div>
-  {% endif %}
   </div>
-</div>
-  {{ away_0_game.management_form }}
-  {{ away_1_game.management_form }}
-  {{ home_0_game.management_form }}
-  {{ home_1_game.management_form }} 
-
-    <!--          ======= SINGLES CRICKET =======         -->
+    {{ away_0_game.management_form }}
+    {{ away_1_game.management_form }}
+    {{ home_0_game.management_form }}
+    {{ home_1_game.management_form }} 
+  
+      <!--          ======= SINGLES CRICKET =======         -->
 
 
     <div class="justify-around mt-8 mb-4">
-      <div class="flex-auto p-3 border-primary-500 border-t">
-        <h2 class="text-left text-2xl text-primary-600 tk-objektiv-mk2 font-black uppercase">Singles Cricket</h2>
+      <div class="flex-auto p-3 border-slate-500 border-t">
+        <h2 class="text-left text-2xl text-slate-300 tk-objektiv-mk2 font-black uppercase">Singles Cricket</h2>
       </div>
     </div>
 
@@ -139,7 +137,7 @@
    
     <div class="block grid-rows-5">
       
-      <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+      <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
         <div class="col-span-1"></div>
         <div class="col-span-1">Stars</div>
         <div class="col-span-1">Perfects</div>
@@ -187,7 +185,7 @@
     
     <div class="block grid-rows-5">
       
-      <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+      <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
         <div class="col-span-1"></div>
         <div class="col-span-1">Stars</div>
         <div class="col-span-1">Perfects</div>
@@ -238,14 +236,14 @@
 
 
 <div class="flex flex-auto mt-8 mb-4">
-  <div class="flex-auto inline-flex justify-between align-middle p-3 border-primary-500 border-t">
-    <h2 class="text-left text-2xl text-primary-600 tk-objektiv-mk2 font-black uppercase">Doubles Cricket</h2>
+  <div class="flex-auto inline-flex justify-between align-middle p-3 border-slate-500 border-t">
+    <h2 class="text-left text-2xl text-slate-300 tk-objektiv-mk2 font-black uppercase">Doubles Cricket</h2>
   </div>
 </div>
 
 <div class="grid grid-cols-2 gap-4 p-2">
   <div class="block grid-rows-5">
-    <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+    <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
       <div class="col-span-1"></div>
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
@@ -290,7 +288,7 @@
   </div>
 
   <div class="block grid-rows-5">
-    <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+    <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
       <div class="col-span-1"></div>
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
@@ -339,14 +337,14 @@
 
 
  <div class="justify-around mt-8 mb-4">
-  <div class="flex-auto p-3 border-primary-500 border-t">
-    <h2 class="text-left text-2xl text-primary-600 tk-objektiv-mk2 font-black uppercase">Singles 501</h2>
+  <div class="flex-auto p-3 border-slate-500 border-t">
+    <h2 class="text-left text-2xl text-slate-300 tk-objektiv-mk2 font-black uppercase">Singles 501</h2>
   </div>
 </div>
 
 <div class="grid grid-cols-2 gap-4 p-2">
   <div class="block grid-rows-5">
-      <div class="grid grid-cols-8 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+      <div class="grid grid-cols-8 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
         <div class="col-span-2"></div>
         <div class="col-span-1">Stars</div>
         <div class="col-span-1">Perfects</div>
@@ -404,7 +402,7 @@
   
   
   <div class="block grid-rows-5">
-    <div class="grid grid-cols-8 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+    <div class="grid grid-cols-8 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
       <div class="col-span-2"></div>
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
@@ -466,14 +464,14 @@
 
 
  <div class="justify-around mt-8 mb-4">
-  <div class="flex-auto p-3 border-primary-500 border-t">
-    <h2 class="text-left text-2xl text-primary-600 tk-objektiv-mk2 font-black uppercase">Doubles 301</h2>
+  <div class="flex-auto p-3 border-slate-500 border-t">
+    <h2 class="text-left text-2xl text-slate-300 tk-objektiv-mk2 font-black uppercase">Doubles 301</h2>
   </div>
 </div>
 
 <div class="grid grid-cols-2 gap-4 p-2">
   <div class="block grid-rows-5">
-    <div class="grid grid-cols-7 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+    <div class="grid grid-cols-7 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
       <div class="col-span-2"></div>
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
@@ -526,7 +524,7 @@
   
   
   <div class="block grid-rows-5">
-    <div class="grid grid-cols-7 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+    <div class="grid grid-cols-7 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
       <div class="col-span-2"></div>
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
@@ -582,14 +580,14 @@
 
 
 <div class="justify-around mt-8 mb-4">
-  <div class="flex-auto p-3 border-primary-500 border-t">
-    <h2 class="text-left text-2xl text-primary-600 tk-objektiv-mk2 font-black uppercase">Doubles 501</h2>
+  <div class="flex-auto p-3 border-slate-500 border-t">
+    <h2 class="text-left text-2xl text-slate-300 tk-objektiv-mk2 font-black uppercase">Doubles 501</h2>
   </div>
 </div>
 
 <div class="grid grid-cols-2 gap-4 p-2">
   <div class="block grid-rows-5">
-    <div class="grid grid-cols-8 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+    <div class="grid grid-cols-8 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
       <div class="col-span-2"></div>
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
@@ -647,7 +645,7 @@
   
   
   <div class="block grid-rows-5">
-    <div class="grid grid-cols-8 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+    <div class="grid grid-cols-8 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
       <div class="col-span-2"></div>
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
@@ -706,8 +704,8 @@
 </div>
 
 <div class="justify-around mt-8 mb-4">
-  <div class="flex-auto p-3 border-primary-500 border-t">
-    <h2 class="text-left text-2xl text-primary-600 tk-objektiv-mk2 font-black uppercase">Match Summary</h2>
+  <div class="flex-auto p-3 border-slate-500 border-t">
+    <h2 class="text-left text-2xl text-slate-300 tk-objektiv-mk2 font-black uppercase">Match Summary</h2>
   </div>
 </div>
 
@@ -715,7 +713,7 @@
    
   <div class="block grid-rows-3">
     
-    <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+    <div class="grid grid-cols-4 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
       <div class="col-span-1"></div>
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
@@ -739,7 +737,7 @@
   </div>
 
   <div class="block grid-rows-3">
-    <div class="my-2 grid grid-cols-4 grid-flow-dense items-center font-bold text-primary-500 text-xs uppercase text-center">
+    <div class="my-2 grid grid-cols-4 grid-flow-dense items-center font-bold text-slate-400 text-xs uppercase text-center">
       <div class="col-span-1"></div>
       <div class="col-span-1">Stars</div>
       <div class="col-span-1">Perfects</div>
@@ -764,7 +762,7 @@
 </div>
 
   <div class="flex min-w-full justify-center p-8">
-    <button type="submit" class="bg-white rounded-md text-primary-500 font-semibold tk-rustica uppercase border-2 border-primary-500">
+    <button type="submit" class="bg-white rounded-md text-slate-400 font-semibold tk-rustica uppercase border-2 border-slate-500">
       <span class="m-3">Submit</span>
     </button>
   </div>

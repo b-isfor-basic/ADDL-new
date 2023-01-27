@@ -6,7 +6,7 @@ from .models import Establishment, Division
 class DivisionForm(forms.ModelForm):
     class Meta:
         model = Division
-        fields = ("matchNight", "playerFee", "capacity", "divisionManager", "season")
+        fields = ("matchNight", "playerFee", "capacity", "divisionManager")
 
 
 class EstablishmentForm(forms.ModelForm):

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Scoreset, GameScore, Approval
+from .models import Scoreset, GameScore, Approval, ScoreSummary, ScoreDetail, TeamScoreSummary
 
 
 @admin.register(Scoreset)
@@ -32,3 +32,21 @@ class GameScoreAdmin(admin.ModelAdmin):
 class ApprovalAdmin(admin.ModelAdmin):
     list_filter = ["match__division", "match__weekNum", "approved"]
     list_display = ["match", "approved", "approved_by"]
+
+
+@admin.register(ScoreSummary)
+class ScoreSummaryAdmin(admin.ModelAdmin):
+    list_filter = ["match__division", "match__weekNum"]
+    list_display = ["team", "player", "total_points", "singles_weekly_ppd", "total_stars", "avg_stars_per_game", "total_perfects", "win_pct"]
+
+
+@admin.register(ScoreDetail)
+class ScoreDetailAdmin(admin.ModelAdmin):
+    list_filter = ["match__division", "match__weekNum"]
+    list_display = ["team", "player"]
+
+
+@admin.register(TeamScoreSummary)
+class TeamScoreSummaryAdmin(admin.ModelAdmin):
+    list_filter = ["match__division", "match__weekNum"]
+    list_display = ["team", "weekly_ppd"]

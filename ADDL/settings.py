@@ -215,7 +215,9 @@ LOGOUT_REDIRECT_URL = "/"
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-if 'ENVIRONMENT' not in os.environ:
+if not IS_HEROKU:
+    os.environ['ENVIRONMENT'] = 'development'
+else:
     os.environ['ENVIRONMENT'] = 'production'
 
 sentry_sdk.init(
@@ -224,7 +226,7 @@ sentry_sdk.init(
         DjangoIntegration(),
     ],
     _experiments={
-        "profiles_sample_rate": 1.0,
+        "profiles_sample_rate": 0.2,
     },
     max_breadcrumbs=50,
     # Set traces_sample_rate to 1.0 to capture 100%

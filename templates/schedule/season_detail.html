@@ -23,8 +23,9 @@
     {% for division in divisions %}
         <div id="matchtable" class="m-3">
             {% include './partials/match_list.html' with division=division %}
-            {% endfor %}
         </div>
+    </div>
+            {% endfor %}
 
 {% else %}
     {% with divisions as division %}

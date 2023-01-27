@@ -1,6 +1,10 @@
 from django import forms
+from django.db.models import Q
 
-from .models import GameScore, Scoreset
+from Members.models import Player, Team
+from Schedule.models import Match, Season
+
+from .models import GameScore, Scoreset, ScoreSummary, TeamScoreSummary, Forfeit
 
 
 class ScoresetForm(forms.ModelForm):
@@ -21,6 +25,12 @@ class SinglesCricketScoreForm(forms.Form):
     home_stars = forms.IntegerField(required=False, min_value=0)
     home_perfects = forms.IntegerField(required=False, min_value=0)
     home_point = forms.IntegerField(min_value=0, max_value=1)
+
+    class Meta:
+        fieldsets = {
+            "away player": ["away_stars", "away_perfects", "away_point"],
+            "home player": ["home_stars", "home_perfects", "home_point"],
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -70,32 +80,40 @@ class DoublesCricketScoreForm(forms.Form):
     h1_perfects = forms.IntegerField(required=False, min_value=0)
     h1_point = forms.IntegerField(min_value=0, max_value=1)
 
+    class Meta:
+        fieldsets = {
+            "away-1": ["a0_stars", "a0_perfects", "a0_point"],
+            "away-2": ["a1_stars", "a1_perfects", "a1_point"],
+            "home-1": ["h0_stars", "h0_perfects", "h0_point"],
+            "home-2": ["h1_stars", "h1_perfects", "h1_point"],
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def clean(self):
-        cleaned_data = super().clean()
-        a0_point = cleaned_data.get("a0_point")
-        a1_point = cleaned_data.get("a1_point")
-        h0_point = cleaned_data.get("h0_point")
-        h1_point = cleaned_data.get("h1_point")
+        cleaned_data = super().clean(self)
+        a0_point = self.cleaned_data.get("a0_point")
+        a1_point = self.cleaned_data.get("a1_point")
+        h0_point = self.cleaned_data.get("h0_point")
+        h1_point = self.cleaned_data.get("h1_point")
 
         # Verify that only one team has win points, or that both players on a team have points for winning games
-        if a0_point + a1_point == h0_point + h1_point:
+        if (a0_point + a1_point) == (h0_point + h1_point):
             raise forms.ValidationError(
                 "Invalid score. Only one team can have a game point."
             )
-        elif a0_point != a1_point | h0_point != h1_point:
+        elif (a0_point != a1_point) | (h0_point != h1_point):
             raise forms.ValidationError(
                 "Invalid score. Both players on a team must have the same score."
             )
 
         for player in ["a0", "a1", "h0", "h1"]:
-            stars = cleaned_data.get(f"{player}_stars")
-            perfects = cleaned_data.get(f"{player}_perfects")
+            stars = self.cleaned_data.get(f"{player}_stars")
+            perfects = self.cleaned_data.get(f"{player}_perfects")
             if stars / 3 < perfects:
                 raise forms.ValidationError(
-                    f"{player.title()} Stars invalid. Perfects = 3 Stars. Please add 3 Stars to the total Stars per Perfect."
+                    f"{player.first_name()} Stars invalid. Perfects = 3 Stars. Please add 3 Stars to the total Stars per Perfect."
                 )
 
         return cleaned_data
@@ -136,11 +154,233 @@ class GameScoreForm(forms.ModelForm):
         }
 
 
-class ScoreForm(forms.BaseModelFormSet):
-    class Meta:
-        model = GameScore
-        fields = {"stars", "perfects", "game_point"}
+class BasePlayerScoreFormSet(forms.BaseModelFormSet):
 
-    def __init__(self, *args, **kwargs):
-        super(ScoreForm, self).__init__(*args, **kwargs)
-        self.queryset = GameScore.objects.none()
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        match = kwargs.pop("match")
+        if index < 2:
+            kwargs.update({'prefix': f'away-player-{index}', 'initial': {"match": match.id, "team": match.awayTeam}})
+        else:
+            player_num = index - 2
+            kwargs.update({'prefix': f'home-player-{player_num}', 'initial': {"match": match.id, "team": match.homeTeam}})
+        return kwargs
+
+    def clean(self):
+        """
+        Verify that the total points does not exceed 20 and that doubles points
+        for a team match.
+        """
+        
+        super().clean()
+
+        doubles_pts = []
+        total_points = 0
+        for form in self.forms:
+            singles = form.cleaned_data.get("singles_wins")
+            doubles = form.cleaned_data.get("doubles_wins")
+            if singles is None:
+                singles = 0
+            if doubles is None:
+                doubles = 0
+            total_points += singles + doubles
+            doubles_pts.append(doubles)
+
+        if total_points > 20:
+            raise forms.ValidationError(
+                "Invalid score. Total points for match cannot exceed 20."
+            )
+                        
+        if doubles_pts[0] != doubles_pts[1]:
+            raise forms.ValidationError(
+                "Invalid score. Both players on a team must have the same doubles score. \
+                    Please verify away player 1 and away player 2 scores."
+            )
+        
+        if doubles_pts[2] != doubles_pts[3]:
+            raise forms.ValidationError(
+                "Invalid score. Both players on a team must have the same doubles score. \
+                    Please verify home player 1 and home player 2 scores."
+            )
+        
+        if any(self.errors):
+            return
+
+        return self.cleaned_data
+
+class BaseTeamScoreFormSet(forms.BaseModelFormSet):
+
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        match = kwargs.pop("match")
+        if index < 1:
+            kwargs.update({'prefix': 'away-team', 'initial': {"match": match.id, "team": match.awayTeam}})
+        else:
+            kwargs.update({'prefix': 'home-team', 'initial': {"match": match.id, "team": match.homeTeam}})
+        return kwargs
+
+    def clean(self):
+        """
+        Verify that only one team has 0 score left for each game.
+        """
+        super().clean()
+    
+        pts_left = []
+        for form in self.forms:
+            score_left1 = form.cleaned_data.get("score_left1")
+            score_left2 = form.cleaned_data.get("score_left2")
+            team_pts_left = [score_left1, score_left2]
+            pts_left.append(team_pts_left)
+        
+        for i in list(range(0, 2)):
+            if pts_left[0][i] == pts_left[1][i]:
+                raise forms.ValidationError(
+                    f"Invalid score for Doubles 501 - Game {str(i+1)}. \
+                        Both teams cannot have the same score left. If the \
+                        value is unknown, the winning team should enter 0 \
+                        and the losing team should enter 2."
+                )
+            
+        if any(self.errors):
+            return
+        
+        return self.cleaned_data
+
+
+class TeamScoreSummaryForm(forms.ModelForm):
+    """
+    Summarized match scores for entry by area managers.
+    """
+    mark_as_forfeit = forms.BooleanField( 
+        required=False,
+        initial=False,
+        widget=forms.widgets.CheckboxInput(
+            attrs={"class": "form-checkbox rounded-md h-[18px] w-[18px] text-rose-500 bg-slate-800 border-rose-500 border shadow-slate-900/30 shadow-inner focus:ring-0 focus:outline-none active:text-slate-800"}
+        )
+    )
+
+    class Meta:
+        model = TeamScoreSummary
+        fields = [
+            "match",
+            "team",
+            "darts_thrown1",
+            "score_left1",
+            "darts_thrown2",
+            "score_left2",
+        ]
+        widgets = {
+            "match": forms.widgets.HiddenInput(),
+            "team": forms.widgets.HiddenInput(),
+            "darts_thrown1": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "score_left1": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "darts_thrown2": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "score_left2": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+        }
+
+    def clean(self):
+        """
+        Verify if the match is being marked as a forfeit.
+        """
+        super().clean()
+
+        forfeit = self.cleaned_data.get("mark_as_forfeit")
+        if forfeit:
+            record = Forfeit.objects.create(
+                match=self.cleaned_data.get("match"),
+                team=self.cleaned_data.get("team"),
+            )
+            return record
+
+        if any(self.errors):
+            return
+
+        return self.cleaned_data
+
+
+class PlayerScoreSummaryForm(forms.ModelForm):
+    """
+    Summarized match scores for entry by area managers.
+    """
+    class Meta:
+        model = ScoreSummary
+        fields = [
+            "match",
+            "team",
+            "player",
+            "darts_thrown1",
+            "score_left1",
+            "darts_thrown2",
+            "score_left2",
+            "high_in",
+            "high_out",
+            "total_stars",
+            "total_perfects",
+            "singles_points",
+            "doubles_points"
+        ]
+        widgets = {
+            'match': forms.HiddenInput(),
+            'team': forms.HiddenInput(),
+            "darts_thrown1": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "score_left1": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "darts_thrown2": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "score_left2": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "high_in": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "high_out": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "total_stars": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "total_perfects": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "singles_points": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "doubles_points": forms.widgets.NumberInput(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+            "player": forms.widgets.Select(
+                attrs={"class": "w-full h-fit px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"}
+            ),
+        }
+
+    def clean(self):
+        """
+        Clean the form and verify that total_perfects is not greater than total_stars.
+        """
+        super().clean()
+        
+        total_stars = self.cleaned_data.get("total_stars")
+        total_perfects = self.cleaned_data.get("total_perfects")
+        if total_perfects is not None:
+            if total_perfects * 3 > total_stars:
+                raise forms.ValidationError(
+                    "Invalid score. Perfects = 3 Stars. Please add 3 Stars to the total Stars per Perfect."
+                )
+
+        if any(self.errors):
+            return self.errors
+        
+        return self.cleaned_data
+
