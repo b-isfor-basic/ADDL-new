@@ -14,6 +14,8 @@ from .managers import (
     GameQuerySet,
     PlayerStatsManager,
     TeamStatsManager,
+    PlayerScoreSummaryManager,
+    TeamScoreSummaryManager,
 )
 from Members.models import Team
 from Schedule.models import Match
@@ -159,7 +161,6 @@ class Approval(TimeStampedModel, models.Model):
             Approval.objects.create(match=instance.match)
 
 
-
 class TeamScoreSummary(TimeStampedModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
@@ -169,6 +170,9 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
     darts_thrown2 = models.IntegerField(blank=True, null=True)
     score_left2 = models.IntegerField(blank=True, null=True)
 
+    objects = models.Manager()
+    team_stats = TeamScoreSummaryManager()
+
     @property
     def weekly_ppd(self):
         darts_thrown = self.darts_thrown1 + self.darts_thrown2
@@ -177,6 +181,7 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
 
     class Meta:
         unique_together = ["match", "team"]
+
 
 class ScoreSummary(TimeStampedModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -194,10 +199,13 @@ class ScoreSummary(TimeStampedModel, models.Model):
     darts_thrown2 = models.IntegerField(blank=True, null=True)
     score_left2 = models.IntegerField(blank=True, null=True)
 
+    objects = models.Manager()
+    stats = PlayerScoreSummaryManager()
+
     @property
     def total_points(self):
         return self.singles_points + self.doubles_points
-    
+
     @property
     def singles_weekly_ppd(self):
         darts_thrown = self.darts_thrown1 + self.darts_thrown2
@@ -206,11 +214,28 @@ class ScoreSummary(TimeStampedModel, models.Model):
 
     @property
     def avg_stars_per_game(self):
-        return round(self.total_stars / 10, 2)
+        if self.total_stars:
+            return round(self.total_stars / 10, 2)
+        else:
+            return 0
 
     @property
     def win_pct(self):
-        return round(self.total_points / 10)
+        if self.total_points:
+            return round(self.total_points/10, 2) * 100
+        else:
+            return 0
+    
+    @property
+    def weekly_best_501(self):
+        if self.score_left1 == 0 and self.score_left2 == 0:
+            return min(self.darts_thrown1, self.darts_thrown2)
+        elif self.score_left1 == 0:
+            return self.darts_thrown1
+        elif self.score_left2 == 0:
+            return self.darts_thrown2
+        else:
+            return None
 
     class Meta:
         unique_together = ["match", "player"]
@@ -218,13 +243,10 @@ class ScoreSummary(TimeStampedModel, models.Model):
 
 class ScoreDetail(TimeStampedModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
-
     score_summary = models.OneToOneField(ScoreSummary, on_delete=models.CASCADE)
-
     stars_list = ArrayField(
         models.PositiveIntegerField(), max_length=10, blank=True, null=True
     )

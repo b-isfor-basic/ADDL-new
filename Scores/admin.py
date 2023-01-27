@@ -37,7 +37,7 @@ class ApprovalAdmin(admin.ModelAdmin):
 @admin.register(ScoreSummary)
 class ScoreSummaryAdmin(admin.ModelAdmin):
     list_filter = ["match__division", "match__weekNum"]
-    list_display = ["team", "player", "total_points"]
+    list_display = ["team", "player", "total_points", "singles_weekly_ppd", "total_stars", "avg_stars_per_game", "total_perfects", "win_pct"]
 
 
 @admin.register(ScoreDetail)

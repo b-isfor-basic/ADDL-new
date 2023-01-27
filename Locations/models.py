@@ -68,6 +68,11 @@ class Establishment(models.Model):
         null=True,
         blank=True,
     )
+    shortName = models.CharField(
+        max_length=35,
+        null=True,
+        blank=True,
+    )
     streetLine1 = models.CharField(
         max_length=95,
         verbose_name="Street Address 1",
@@ -101,6 +106,12 @@ class Establishment(models.Model):
     class Meta:
         ordering = ["number"]
 
+    def __str__(self):
+        if self.shortName:
+            return f"{self.number} - {self.shortName}"
+        else:
+            return f"{self.number} - {self.name}"
+
     def get_address(self):
         address = ""
         if self.streetLine1 != None:
@@ -114,9 +125,6 @@ class Establishment(models.Model):
         if self.zipCode != None:
             address += str(self.zipCode)
         return "".join(address)
-
-    def __str__(self):
-        return f"{self.number} - {self.name}"
 
     def get_absolute_url(self):
         return reverse("area", kwargs={"pk": self.id})
@@ -180,7 +188,7 @@ class Division(models.Model):
     active = DivisionManager()
 
     def __str__(self):
-        return f"Area {self.area.number} - {self.matchNight}"
+        return f"{self.area} ({self.matchNight})"
 
     def get_absolute_url(self):
         return reverse("division_detail", kwargs={"pk": self.id})

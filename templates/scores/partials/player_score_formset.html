@@ -5,6 +5,15 @@
     </div>
     {{ form.match }}
     {{ form.team }}
+    {% if form.non_field_errors %}
+    <div class="m-4 relative flex justify-center items-center ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-600/10" id="errorBox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="absolute -top-2 -left-2 fill-rose-900 stroke-rose-300 h-5 w-5 flex-none">
+        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
+      </svg>
+      <strong class="text-rose-400 font-semibold">Error!&nbsp</strong>
+      <p class="text-rose-400">{{ form.non_field_errors }}</p>
+    </div>
+    {% endif %} 
     <div class="row-span-2 inline-flex w-full items-center mt-2">
       <label for="{{ form.player.id_for_label }}" class="font-medium text-slate-200">Select Player<span class="text-rose-400">*</span></label>
       <div class="ml-2 flex-grow">{{ form.player }}</div>
@@ -13,7 +22,7 @@
     <div class="row-span-7 mt-2">
       <h4 class="row-span-1 text-slate-200 font-bold place-self-start">Singles 501</h4>
       <h4 class="row-span-1 text-sm font-bold place-self-start">Game 1</h4>
-      <fieldset class="row-span-2 mx-2 grid grid-flow-col md:grid-cols-2 gap-5">
+      <fieldset class="row-span-2 mx-2 grid grid-flow-col grid-cols-2 gap-2 md:gap-5">
         <div class="col-span-1">
           <label for="{{ form.darts_thrown1.id_for_label }}" class="text-sm font-medium text-slate-400">Darts Thrown<span class="text-rose-400">*</span></label>
           <div class="mt-1">{{ form.darts_thrown1 }}</div>
@@ -27,7 +36,7 @@
       </fieldset>    
       <div class="row-span-1 mb-6">
       <h4 class="text-slate-200 text-sm font-bold place-self-start">Game 2</h4>
-      <fieldset class="row-span-2 mx-2 grid grid-flow-col md:grid-cols-2 gap-5">
+      <fieldset class="row-span-2 mx-2 grid grid-flow-col grid-cols-2 gap-2 md:gap-5">
         <div class="col-span-1">
           <label for="{{ form.darts_thrown2.id_for_label }}" class="text-sm font-medium text-slate-400">Darts Thrown<span class="text-rose-400">*</span></label>
           <div class="mt-1">{{ form.darts_thrown2 }}</div>
@@ -42,7 +51,7 @@
     </div>
     <div class="row-span-7 mt-2">
       <h4 class="row-span-1 text-slate-200 font-bold place-self-start">All Games</h4>
-      <fieldset class="row-span-2 mx-2 grid grid-flow-col md:grid-cols-2 gap-5">
+      <fieldset class="row-span-2 mx-2 grid grid-flow-col grid-cols-2 gap-2 md:gap-5">
         <div class="col-span-1">
           <label for="{{ form.high_in.id_for_label }}" class="text-sm font-medium text-slate-400">Player's Highest In</label>
           <div class="mt-1">{{ form.high_in }}</div>
@@ -54,7 +63,7 @@
           <p class="text-sm text-rose-400">{{ form.high_out.errors }}</p>
         </div>
       </fieldset>
-      <fieldset class="row-span-2 mx-2 grid grid-flow-col md:grid-cols-2 gap-5">
+      <fieldset class="row-span-2 mx-2 grid grid-flow-col grid-cols-2 gap-2 md:gap-5">
         <div class="col-span-1">
           <label for="{{ form.total_stars.id_for_label }}" class="text-sm font-medium text-slate-400">Total Stars</label>
           <div class="mt-1">{{ form.total_stars }}</div>
@@ -66,7 +75,7 @@
           <p class="text-sm text-rose-400">{{ form.total_perfects.errors }}</p>
         </div>
       </fieldset>
-      <fieldset class="row-span-2 mx-2 grid grid-flow-col md:grid-cols-2 gap-5">
+      <fieldset class="row-span-2 mx-2 grid grid-flow-col grid-cols-2 gap-2 md:gap-5">
         <div class="col-span-1">
           <label for="{{ form.singles_points.id_for_label }}" class="text-sm font-medium text-slate-400">Singles Game Points<span class="text-rose-400">*</span></label>
           <div class="mt-1">{{ form.singles_points }}</div>

@@ -99,11 +99,11 @@ class DoublesCricketScoreForm(forms.Form):
         h1_point = self.cleaned_data.get("h1_point")
 
         # Verify that only one team has win points, or that both players on a team have points for winning games
-        if a0_point + a1_point == h0_point + h1_point:
+        if (a0_point + a1_point) == (h0_point + h1_point):
             raise forms.ValidationError(
                 "Invalid score. Only one team can have a game point."
             )
-        elif a0_point != a1_point | h0_point != h1_point:
+        elif (a0_point != a1_point) | (h0_point != h1_point):
             raise forms.ValidationError(
                 "Invalid score. Both players on a team must have the same score."
             )
@@ -235,13 +235,12 @@ class BaseTeamScoreFormSet(forms.BaseModelFormSet):
         for i in list(range(0, 2)):
             if pts_left[0][i] == pts_left[1][i]:
                 raise forms.ValidationError(
-                    f"Invalid score for Doubles 501 - Game ({str(i)}). \
+                    f"Invalid score for Doubles 501 - Game {str(i+1)}. \
                         Both teams cannot have the same score left. If the \
                         value is unknown, the winning team should enter 0 \
                         and the losing team should enter 2."
                 )
             
-        
         if any(self.errors):
             return
         
@@ -292,8 +291,6 @@ class TeamScoreSummaryForm(forms.ModelForm):
         Verify if the match is being marked as a forfeit.
         """
         super().clean()
-        if any(self.errors):
-            return
 
         forfeit = self.cleaned_data.get("mark_as_forfeit")
         if forfeit:
@@ -302,6 +299,9 @@ class TeamScoreSummaryForm(forms.ModelForm):
                 team=self.cleaned_data.get("team"),
             )
             return record
+
+        if any(self.errors):
+            return
 
         return self.cleaned_data
 
@@ -384,6 +384,3 @@ class PlayerScoreSummaryForm(forms.ModelForm):
         
         return self.cleaned_data
 
-
-PlayerScoreFormSet = forms.modelformset_factory(ScoreSummary, form=PlayerScoreSummaryForm, formset=BasePlayerScoreFormSet, extra=4, max_num=4)
-TeamScoreFormSet = forms.modelformset_factory(TeamScoreSummary, form=TeamScoreSummaryForm, formset=BaseTeamScoreFormSet, extra=2, max_num=2)

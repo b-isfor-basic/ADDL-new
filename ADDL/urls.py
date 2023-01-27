@@ -15,15 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .flatpages import PrivacyPolicyView, TermsOfServiceView, IndexView
 
 
 urlpatterns = [
    # path("__debug__/", include("debug_toolbar.urls")),
     # Flatpages
-    path("", IndexView.as_view(), name="home"),
-    path("privacy/", PrivacyPolicyView.as_view(), name="privacy"),
-    path("terms/", TermsOfServiceView.as_view(), name="terms"),
+    path("", include("Common.urls"), name="Common"),
     # Django Pages
     path("admin/", admin.site.urls),
     # App Pages

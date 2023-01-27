@@ -10,40 +10,13 @@ from recurrence.fields import RecurrenceField
 from Locations.models import Division, Establishment
 from Members.models import Team, Player
 
+from .managers import SeasonManager, MatchManager
+
 
 class Scheduler(models.Model):
     title = models.CharField(max_length=48)
     description = models.TextField(null=True, blank=True)
     frequency = RecurrenceField()
-
-
-class SeasonManager(models.Manager):
-    def get_active(self):
-        season_start_before_today = Q(match_play_start_dt__lte=timezone.now())
-        season_end_after_today = Q(match_play_end_dt__gte=timezone.now())
-
-        if (
-            self.get_queryset()
-            .filter(season_start_before_today & season_end_after_today)
-            .exists()
-        ):
-            return (
-                self.get_queryset()
-                .filter(season_start_before_today & season_end_after_today)
-                .first()
-            )
-       
-        return Season.objects.latest('match_play_start_dt')
-
-    def get_team_stats(self, season):
-        return (
-            self.get_queryset()
-            .filter(season_number=season)
-            .divisions.team_set.annotate(
-                wins=Sum("scoreset__gamescore__game_point"),
-                losses=Count("player1__scoreset"),
-            )
-        )
 
 
 class Season(models.Model):
@@ -76,14 +49,6 @@ class Season(models.Model):
 
     def __str__(self):
         return f"Season {self.season_number}"
-
-
-class MatchManager(models.Manager):
-    def by_season(self, season):
-        return self.get_queryset().filter(season__season_number=season)
-
-    def by_division(self, division):
-        return self.get_queryset().filter(division=division)
 
 
 class Match(models.Model):
