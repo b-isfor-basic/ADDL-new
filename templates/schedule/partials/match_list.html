@@ -1,5 +1,5 @@
 <div class="w-full mb-10 justify-center align-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
-    <h2 class="text-slate-400 text-xl md:text-2xl font-black p-2 leading-6">{{ division }}</h2>
+    <h2 class="text-slate-400 text-xl md:text-2xl font-black p-2 leading-6">{% if division %}{{ division }}{% endif %}</h2>
     <div class="w-full overflow-x-scroll">
         {% if division.get_matches|length > 0 %}
         <table class="p-1 w-full">
