@@ -10,13 +10,15 @@
     "build": "tailwindcss -i ./src/src/input.css -o ./src/src/output.css --mode production"
   },
   "dependencies": {
+    "@preline/tabs": "^1.3.1",
     "@tailwindcss/forms": "^0.5.3",
     "alpinejs": "^3.10.5",
     "jquery": "^3.6.1",
+    "preline": "^1.7.0",
     "tailwindcss": "^3.2.4"
   },
   "name": "addl",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "tailwind.config.js",
   "repository": {
     "type": "git",
@@ -26,4 +28,4 @@
   "bugs": {
     "url": "https://github.com/b-isfor-basic/ADDL-new/issues"
   }
-  }
+}

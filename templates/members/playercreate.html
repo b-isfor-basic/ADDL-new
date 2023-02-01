@@ -12,10 +12,12 @@
   <form class="justify-evenly items-center pt-4" id="{{ form.id }}" method="post" action="{% url 'register' %}">
         {% csrf_token %}
   {% if form.non_field_errors %}
-    <div class="m-4 relative flex justify-center items-center ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-600/10">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="absolute -top-2 -left-2 fill-rose-900 stroke-rose-300 h-5 w-5 flex-none">
-        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
-      </svg>
+    <div id="errorBox" class="m-4 relative flex justify-center items-center ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-600/10">
+      <button type="button" data-hs-remove-element="#errorBox">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="absolute -top-2 -left-2 fill-rose-900 stroke-rose-300 h-5 w-5 flex-none">
+          <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
+        </svg>
+      </button>
       <strong class="text-rose-400 font-semibold">Error!</strong>
       <p class="text-rose-400">{{ form.non_field_errors }}</p>
     </div>
@@ -37,14 +39,12 @@
               <div class="col-span-1">
                 <label for="id_password1">Password<span class="text-rose-400">*</span></label>
                 <input type="password" name="password1" id="id_password1" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Pa$5w0rd" required="">
+                <span class="text-sm text-rose-400 leading-5">{{ form.password1.errors }}{{ form.password2.errors}}</span>
               </div>
               <div class="col-span-1">
                 <label for="id_password2" class="text-slate-200">Confirm Password<span class="text-rose-400">*</span></label>
                 <input type="password" name="password2" id="id_password2" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Pa$5w0rd" required="">
               </div>
-            </div>
-              <div class="md:col-start-2 col-span-2">
-                <span class="text-sm text-rose-400 leading-5">{{ form.password1.errors }}{{ form.password2.errors}}</span>
             </div>
         </fieldset>
 

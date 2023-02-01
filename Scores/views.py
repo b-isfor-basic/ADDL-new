@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.forms import all_valid, formset_factory, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, resolve_url
-from django.views.generic import ListView, UpdateView, DetailView
+from django.views.generic import ListView, UpdateView, TemplateView
 
 from Members.models import Player
 from Schedule.models import Match, Season
@@ -322,15 +322,3 @@ class EditScoreSummaryView(UpdateView):
     def get_object(self, **kwargs):
         return ScoreSummary.objects.get(id=self.kwargs["id"])
 
-
-class ViewScoreSummaryView(DetailView):
-    model = ScoreSummary
-    template_name = "scores/score_summary.html"
-    context_object_name = "score_summary"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
-    def get_object(self, **kwargs):
-        return ScoreSummary.objects.get(id=self.kwargs["id"])
