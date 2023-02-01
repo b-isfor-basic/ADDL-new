@@ -1,7 +1,8 @@
 module.exports = {
   content: [
     './templates/**/*.html',
-    './templates/**/partials/*.html'
+    './templates/**/partials/*.html',
+    './node_modules/preline/dist/*.js'
   ],
   theme: {
     extend: {
@@ -17,11 +18,16 @@ module.exports = {
           '700': '#180391',
           '800': '#0f016a',
           '900': '#05002e',
-        },      
+        }, 
       },
+      fontFamily: {
+        sans: ['rustica', 'sans-serif'],
+        body: ['objektiv-mk2', 'sans-serif'],
+      }, 
     },
   },
   plugins: [
     require('@tailwindcss/forms'),
-  ],
+    require('preline/plugin')
+  ]
 }

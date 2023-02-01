@@ -154,7 +154,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "src/"
-STATICFILES_DIRS = [BASE_DIR / "src/"]
+STATICFILES_DIRS = [BASE_DIR / "src/",
+                    BASE_DIR / "node_modules/",]
 STATIC_ROOT = BASE_DIR / "static/"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
@@ -226,13 +227,13 @@ sentry_sdk.init(
         DjangoIntegration(),
     ],
     _experiments={
-        "profiles_sample_rate": 0.2,
+        "profiles_sample_rate": 0.5,
     },
     max_breadcrumbs=50,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
+    traces_sample_rate=0.5,
 
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.

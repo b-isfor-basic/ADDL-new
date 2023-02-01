@@ -32,8 +32,7 @@ class Team(models.Model):
     per season. The division cannot be changed during the season.
 
     Fields:
-        player1: The first player on the team.
-        player2: The second player on the team.
+        players: The players that make up the team.
         division: The division the team is assigned to.
         season: The season the team is registered for.
     """
@@ -44,4 +43,11 @@ class Team(models.Model):
 
     def __str__(self):
         names = [player.last_name for player in self.players.all()]
+        if len(names) == 1:
+            return names[0]
         return f"{names[0]}/{names[1]}"
+
+    @property
+    def name(self):
+        names = [player.last_name for player in self.players.all()]
+        return names.join('/')

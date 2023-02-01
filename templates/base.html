@@ -10,7 +10,7 @@
     
     <script src='https://js.sentry-cdn.com/029ebd70cdbb4da78e1db1f5712cb6c1.min.js' crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://use.typekit.net/ptc0kya.css">
-    <link rel="icon" href="{% static 'images/favicon.ico'%}" type="image/x-icon">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'src/output.css' %}">
     
     {% block headerScripts %}
@@ -34,7 +34,6 @@
                 class="nav-link-inactive"
                 {% endif %}
               >Home</a>
-
             </li>
             <li class="hover:text-amber-300 px-1">
               <a href="{% url 'all_areas' %}" 
@@ -109,5 +108,6 @@
   
   {% block footerScripts %}
   {% endblock footerScripts %}
+  <script type="module" src="{% static '/preline/dist/preline.js' %}"></script>
   </body>
 </html>

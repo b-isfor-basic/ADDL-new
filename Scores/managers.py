@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Count, Max, Min, Sum, F, Q, Case, When, Avg
+from django.db.models import Count, Max, Min, Sum, F, Q, Case, When, Avg, Subquery
 from django.db.models.functions import Ln, Round
 from django.db.models.lookups import LessThanOrEqual
 
@@ -305,25 +305,34 @@ class PlayerScoreSummaryManager(models.Manager):
             best_week_singles_ppd=Max('weekly_ppd')
         )
 
+    def team_rating(self):
+        qs = self.get_queryset()
+        return qs.values('team', 'team__division', F('rating')).annotate(
+            team_rating=Round(Avg('rating'), 4)
+        )
+
 
 class TeamScoreSummaryManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset()        
+        qs = super().get_queryset().prefetch_related('team')
         return qs.annotate(weekly_ppd=Round(
                 (1001.0-(F('score_left1')+F('score_left2')))
                 /(F('darts_thrown1')+F('darts_thrown2')), 4
             )).values("team", "team__division").annotate(
-            total_darts_thrown=(Sum("darts_thrown1")+Sum("darts_thrown2")),
-            total_score_left=(Sum("score_left1")+Sum("score_left2")),
-            games_included=(Count("id", distinct=True)*2.0),
-            avg_doubles_ppd=Round((501.0*F("games_included")-F("total_score_left"))/F("total_darts_thrown"), 4),
-            best_501_game=Case(
-                When(
-                    LessThanOrEqual(
-                        Min('darts_thrown1', filter=Q(score_left1=0)),
-                        Min('darts_thrown2', filter=Q(score_left2=0))
-                    ), then=Min('darts_thrown1', filter=Q(score_left1=0))
-                ), default=Min('darts_thrown2', filter=Q(score_left2=0))
-            ),
-            best_week_doubles_ppd=Max('weekly_ppd')
-        )
+                total_darts_thrown=(Sum("darts_thrown1")+Sum("darts_thrown2")),
+                total_score_left=(Sum("score_left1")+Sum("score_left2")),
+                games_included=(Count("id", distinct=True)*2.0),
+                avg_doubles_ppd=Round((501.0*F("games_included")-F("total_score_left"))/F("total_darts_thrown"), 4),
+                best_501_game=Case(
+                    When(
+                        LessThanOrEqual(
+                            Min('darts_thrown1', filter=Q(score_left1=0)),
+                            Min('darts_thrown2', filter=Q(score_left2=0))
+                        ), then=Min('darts_thrown1', filter=Q(score_left1=0))
+                    ), default=Min('darts_thrown2', filter=Q(score_left2=0))
+                ),
+                best_week_doubles_ppd=Max('weekly_ppd')
+            )
+        
+        
+        
