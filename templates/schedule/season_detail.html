@@ -19,7 +19,7 @@
    
 {% block main %}
 <div class="pl-5">
-{% if divisions|length > 1 %}
+{% if divisions %}
     {% for division in divisions %}
         <div id="matchtable" class="m-3">
             {% include './partials/match_list.html' with division=division %}
@@ -29,7 +29,7 @@
 
 {% else %}
         <div id="matchtable" class="m-3">
-            {% include './partials/match_list.html' with division=divisions%}
+            {% include './partials/match_list.html' with division=divisions.first %}
         </div>
 {% endif %}
 </div>
