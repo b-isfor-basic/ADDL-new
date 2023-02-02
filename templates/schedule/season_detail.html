@@ -28,11 +28,9 @@
             {% endfor %}
 
 {% else %}
-    {% with divisions as division %}
         <div id="matchtable" class="m-3">
-            {% include './partials/match_list.html' %}
+            {% include './partials/match_list.html' with division=divisions%}
         </div>
-    {% endwith %}
 {% endif %}
 </div>
 {% endblock main %}
