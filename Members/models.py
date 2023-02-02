@@ -43,11 +43,13 @@ class Team(models.Model):
 
     def __str__(self):
         names = [player.last_name for player in self.players.all()]
-        if len(names) == 1:
-            return names[0]
+        if len(names) < 2:
+            return "Invalid Name"
         return f"{names[0]}/{names[1]}"
 
     @property
     def name(self):
         names = [player.last_name for player in self.players.all()]
-        return names.join('/')
+        if len(names) < 2:
+            return "Invalid Name"
+        return f"{names[0]}/{names[1]}"
