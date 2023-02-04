@@ -1,11 +1,21 @@
 from django.contrib import admin
-from .models import ScoreSummary, ScoreDetail, TeamScoreSummary
+
+from .models import ScoreDetail, ScoreSummary, TeamScoreSummary
 
 
 @admin.register(ScoreSummary)
 class ScoreSummaryAdmin(admin.ModelAdmin):
     list_filter = ["match__division", "match__weekNum"]
-    list_display = ["team", "player", "total_points", "singles_weekly_ppd", "total_stars", "avg_stars_per_game", "total_perfects", "win_pct"]
+    list_display = [
+        "team",
+        "player",
+        "total_points",
+        "total_stars",
+        "total_perfects",
+        "high_in",
+        "high_out",
+        "singles_weekly_ppd",
+    ]
 
 
 @admin.register(ScoreDetail)

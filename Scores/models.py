@@ -1,24 +1,18 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django_extensions.db.models import TimeStampedModel
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.postgres.fields import ArrayField
+from django_extensions.db.models import TimeStampedModel
 
-from .managers import (
-    GamesManager,
-    ScoresetManager,
-    GameQuerySet,
-    PlayerStatsManager,
-    TeamStatsManager,
-    PlayerScoreSummaryManager,
-    TeamScoreSummaryManager,
-)
 from Members.models import Team
 from Schedule.models import Match
+
+from .managers import (GameQuerySet, GamesManager, PlayerScoreSummaryManager,
+                       ScoresetManager, TeamScoreSummaryManager)
 
 
 class Forfeit(TimeStampedModel, models.Model):
@@ -130,8 +124,6 @@ class Scoreset(TimeStampedModel, models.Model):
 
     objects = models.Manager()
     details = ScoresetManager()
-    player_stats = PlayerStatsManager()
-    team_stats = TeamStatsManager()
 
     class Meta:
         unique_together = ["match", "player"]
@@ -181,16 +173,22 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
 
     class Meta:
         unique_together = ["match", "team"]
+        verbose_name_plural = "Team Score Summaries"
 
 
 class ScoreSummary(TimeStampedModel, models.Model):
+    '''
+    Holds summarized scores for each :model: 'Members.Player' in a :model: 'Matches.Match'.
+    Creation of this model is limited to area managers and admins. Stats can be queried
+    by calling 'ScoreSummary.stats'
+    '''
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     total_stars = models.IntegerField(blank=True, null=True)
     total_perfects = models.IntegerField(blank=True, null=True)
-    singles_points = models.IntegerField(default=0,validators=[MaxValueValidator(4)])
+    singles_points = models.IntegerField(default=0, validators=[MaxValueValidator(4)])
     doubles_points = models.IntegerField(default=0, validators=[MaxValueValidator(6)])
     high_in = models.IntegerField(blank=True, null=True)
     high_out = models.IntegerField(blank=True, null=True)
@@ -212,33 +210,10 @@ class ScoreSummary(TimeStampedModel, models.Model):
         scored = 1001 - (self.score_left1 + self.score_left2)
         return round(scored / darts_thrown, 4)
 
-    @property
-    def avg_stars_per_game(self):
-        if self.total_stars:
-            return round(self.total_stars / 10, 2)
-        else:
-            return 0
-
-    @property
-    def win_pct(self):
-        if self.total_points:
-            return round(self.total_points/10, 2) * 100
-        else:
-            return 0
-    
-    @property
-    def weekly_best_501(self):
-        if self.score_left1 == 0 and self.score_left2 == 0:
-            return min(self.darts_thrown1, self.darts_thrown2)
-        elif self.score_left1 == 0:
-            return self.darts_thrown1
-        elif self.score_left2 == 0:
-            return self.darts_thrown2
-        else:
-            return None
 
     class Meta:
         unique_together = ["match", "player"]
+        verbose_name_plural = "Player Score Summaries"
 
 
 class ScoreDetail(TimeStampedModel, models.Model):
