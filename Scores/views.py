@@ -245,22 +245,6 @@ def StandingsView(request, **kwargs):
         return render(request, template, context)
 
 
-class TeamStatsListView(ListView):
-    model = Scoreset
-    template_name = "scores/team_stats.html"
-    context_object_name = "teams"
-    paginate_by = 10
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
-    def get_queryset(self, **kwargs):
-        if kwargs is not None: 
-            return Scoreset.team_stats.all()
-        else:
-            return Scoreset.team_stats.filter(**kwargs)
-
 
 @permission_required("scores.add_score_summary")
 def CreateScoreSummaryView(request, id, **kwargs):

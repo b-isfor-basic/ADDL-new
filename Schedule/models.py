@@ -1,7 +1,7 @@
 import uuid
 
 from django.db import models
-from django.db.models import Sum, Q, Count
+from django.db.models import Sum, F, Q, Count
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
 
@@ -103,15 +103,15 @@ class Match(models.Model):
 
     @property
     def homeScore(self):
-        homeScore = self.scoreset_set.filter(team=self.homeTeam).aggregate(
-            home_pts=Sum("gamescore__game_point", default=0)
+        homeScore = self.scoresummary_set.filter(team=self.homeTeam).aggregate(
+            home_pts=Sum(F("singles_points") + F("doubles_points"), default=0)
         )
         return homeScore["home_pts"]
 
     @property
     def awayScore(self):
-        awayScore = self.scoreset_set.filter(team=self.awayTeam).aggregate(
-            away_pts=Sum("gamescore__game_point", default=0)
+        awayScore = self.scoresummary_set.filter(team=self.awayTeam).aggregate(
+            away_pts=Sum(F("singles_points") + F("doubles_points"), default=0)
         )
         return awayScore["away_pts"]
 

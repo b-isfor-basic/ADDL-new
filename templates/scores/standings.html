@@ -227,8 +227,21 @@
                 </tbody>
             </table>
         </div>
-    </div>          
+    </div>    
     <div class="w-full col-span-1 md:col-start-2 mb-10 justify-center items-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
+        <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Best Week Doubles PPD</h3>
+        <div class="w-full">
+            <table class="p-1 w-full">
+                {% include './partials/table_head.html' with stat_title='Best PPD' %}
+                <tbody>
+                    {% for record in team_stats|dictsortreversed:"best_week_doubles_ppd" %}
+                            {% include './partials/table_body.html' with stat=record.best_week_doubles_ppd|floatformat:"4" %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>      
+    <div class="w-full col-span-1 md:col-start-3 mb-10 justify-center items-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Best Doubles 501 Game</h3>
         <div class="w-full">
             <table class="p-1 w-full">
@@ -241,7 +254,9 @@
             </table>
         </div>
     </div>
-    <div class="w-full col-span-1 md:col-start-3 mb-10 justify-center items-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
+</div>
+<div class="grid grid-flow-row md:grid-flow-col md:grid-cols-3 px-4 w-full gap-1 md:gap-6 justify-items-center content-center">
+    <div class="w-full col-span-1 md:col-start-1 mb-10 justify-center items-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Total Points</h3>
         <div class="w-full">
             <table class="p-1 w-full">
@@ -256,3 +271,4 @@
     </div>
 </div>
 {% endblock tab_2_body %}
+
