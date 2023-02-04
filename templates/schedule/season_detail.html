@@ -19,17 +19,20 @@
    
 {% block main %}
 <div class="pl-5">
-{% if divisions %}
-    {% for division in divisions %}
+{% if divisions|length > 1 %}
+{% regroup matches by division as matches_list %}
+    {% for group in matches_list %}
         <div id="matchtable" class="m-3">
-            {% include './partials/match_list.html' with division=division %}
+            {% include './partials/match_list.html' with division=group.grouper match_list=group.list %}
         </div>
     </div>
-            {% endfor %}
+        {% endfor %}
+
+
 
 {% else %}
         <div id="matchtable" class="m-3">
-            {% include './partials/match_list.html' with division=divisions.first %}
+            {% include './partials/match_list.html' with division=divisions match_list=matches %}
         </div>
 {% endif %}
 </div>

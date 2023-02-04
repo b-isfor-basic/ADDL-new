@@ -220,8 +220,8 @@ def StandingsView(request, **kwargs):
         season_id = request.GET.get("season")
         season = Season.objects.get(id=season_id)
         active_divisions = season.divisions.all()
-        player_stats = ScoreSummary.stats.filter(match__season=season_id)
-        team_stats = TeamScoreSummary.team_stats.filter(match__season=season_id)
+        player_stats = ScoreSummary.stats.filter(match__week__season=season_id)
+        team_stats = TeamScoreSummary.team_stats.filter(match__week__season=season_id)
         context = {
             "season": season,
             "season_list": season_list,
@@ -233,8 +233,8 @@ def StandingsView(request, **kwargs):
     else:
         season = Season.objects.latest("match_play_start_dt")
         active_divisions = season.divisions.all()
-        player_stats = ScoreSummary.stats.filter(match__season=season.id)
-        team_stats = TeamScoreSummary.team_stats.filter(match__season=season.id)
+        player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
+        team_stats = TeamScoreSummary.team_stats.filter(match__week__season=season.id)
         context = {
             "season": season,
             "season_list": season_list,

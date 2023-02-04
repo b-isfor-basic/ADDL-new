@@ -105,7 +105,7 @@ class GameScore(models.Model):
     def player_display(self):
         return (
             "("
-            + str(self.scoreset.match.weekNum)
+            + str(self.scoreset.match.week.week_number)
             + ") "
             + self.scoreset.player.last_name
         )
@@ -130,7 +130,7 @@ class Scoreset(TimeStampedModel, models.Model):
 
     @property
     def player_display(self):
-        return "(" + str(self.match.weekNum) + ") " + self.player.last_name
+        return "(" + str(self.match.week.week_number) + ") " + self.player.last_name
 
     @property
     def singles_weekly_ppd(self):

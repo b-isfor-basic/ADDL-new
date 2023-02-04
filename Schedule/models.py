@@ -51,16 +51,30 @@ class Season(models.Model):
         return f"Season {self.season_number}"
 
 
+class ScheduleWeek(models.Model):
+    """
+    ScheduleWeeks are used to track the progress of the season.
+    """
+
+    season = models.ForeignKey(Season, models.CASCADE)
+    week_number = models.PositiveIntegerField()
+    match_date = models.DateField()
+    division = models.ForeignKey(Division, models.CASCADE)
+    playoff_week = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["season", "division", "week_number"]
+        unique_together = ["season", "week_number", "division"]
+
+    def __str__(self):
+        return f"S{self.season.season_number} - Area {self.division.area.number} - W{self.week_number}"
+
 class Match(models.Model):
     """
     Scheduled matches.
     """
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    season = models.ForeignKey(Season, models.CASCADE)
-    division = models.ForeignKey(Division, models.CASCADE)
-    weekNum = models.IntegerField(blank=True, null=True)
-    matchDate = models.DateField(blank=True, null=True)
+    week = models.ForeignKey(ScheduleWeek, models.CASCADE, null=True)
     boards = ArrayField(
         models.PositiveIntegerField(blank=True, null=True),
         size=2,
