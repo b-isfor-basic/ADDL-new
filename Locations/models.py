@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.db import models
 from django.db.models.functions import Coalesce
@@ -188,7 +190,9 @@ class Division(models.Model):
     active = DivisionManager()
 
     def __str__(self):
-        return f"{self.area} ({self.matchNight})"
+        night = self.matchNight
+        night_abbr = re.sub(r"(nesday|urday|day)", '', night)
+        return f"{self.area} ({night_abbr})"
 
     def get_absolute_url(self):
         return reverse("division_detail", kwargs={"pk": self.id})
@@ -197,4 +201,4 @@ class Division(models.Model):
         from Schedule.models import Season
 
         season = Season.details.get_active()
-        return self.match_set.filter(season=season)
+        return self.scheduleweek_set.filter(season=season).matches.all()
