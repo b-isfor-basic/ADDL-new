@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 from .forms import AnnouncementForm
-from .models import Season
+from .models import Season, ScheduleWeek
 
 
 def SeasonDetailView(request, *args, **kwargs):
@@ -13,10 +13,10 @@ def SeasonDetailView(request, *args, **kwargs):
 
     if "division" in request.GET.keys():
         division = request.GET.get("division")
-        matches = season.match_set.filter(division__id=division)
+        matches = ScheduleWeek.objects.filter(season=season, division=division).all()
         divisions = season.divisions.get(id=division)
     else:
-        matches = season.match_set.all()
+        matches = ScheduleWeek.objects.filter(season=season).all()
         divisions = season.divisions.all()
 
     context = {

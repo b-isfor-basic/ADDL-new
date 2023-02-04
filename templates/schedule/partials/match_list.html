@@ -1,7 +1,7 @@
 <div class="w-full mb-10 justify-center align-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
     <h2 class="text-slate-400 text-xl md:text-2xl font-black p-2 leading-6">{% if division %}{{ division }}{% endif %}</h2>
     <div class="w-full overflow-x-scroll">
-        {% if division.get_matches|length > 0 %}
+        {% if match_list|length > 0 %}
         <table class="p-1 w-full">
             <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
                 <tr>
@@ -9,24 +9,21 @@
                     <th scope="col" class="p-2 font-light">Match Date</th>
                     <th scope="col" class="p-2 font-light">Away Team</th>
                     <th scope="col" class="p-2 font-light">Home Team</th>
-                    <th scope="col" class="p-2 font-light">Boards</th>
                     <th scope="col" class="p-2 font-light">Results</th>
                 </tr>
             </thead>
             <tbody>
-                {% regroup division.get_matches|dictsort:"weekNum" by weekNum as matches_list %}
-                {% for week in matches_list %}
-                <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
-                    <th rowspan={{ week.list|length }} scope="rowgroup" class="p-2 text-sm text-center">{{ week.grouper }}</th>      
-                        {% for match in week.list %}
-                            {% if not forloop.first %}
-                            <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
+                {% for week in match_list %}
+                <tr class="bg-slate-700 text-slate-200 border-b border-b-slate-800 hover:bg-slate-700/50 border-t border-t-amber-800">
+                    <th rowspan={{ week.match_set.all|length }} scope="rowgroup" class="p-2 text-sm text-center border-t border-t-amber-800">{{ week.week_number }}</th>      
+                    <th rowspan={{ week.match_set.all|length }} scope="rowgroup" class="p-2 text-sm text-center border-t border-t-amber-800">{{ week.match_date }}</th>      
+                    {% for match in week.match_set.all %}
+                        {% if not forloop.first %}
+                            <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50 ">
                             {% endif %}
-                            <td class="p-2 text-sm text-center">{{ match.matchDate|date:"m.d.y" }}</td>
-                            <td class="p-2 text-sm text-center">{{ match.awayTeam }}</td>
-                            <td class="p-2 text-sm text-center">{{ match.homeTeam }}</td>
-                            <td class="p-2 text-sm text-center">{% if match.boards %}{{ match.boards|join:" & " }}{% else %}{% endif %}</td>
-                            <td class="p-2 text-sm text-center">
+                            <td class="p-2 text-sm text-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.awayTeam }}</td>
+                            <td class="p-2 text-sm text-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.homeTeam }}</td>
+                            <td class="p-2 text-sm text-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">
                                 {% if match.winner %}
                                 {{ match.winner }}
                                 {% else %}
@@ -38,6 +35,7 @@
                         </tr>
                         {% endfor %}
                 </tr>
+                
             {% endfor %}
             </tbody>
         </table>

@@ -69,7 +69,7 @@ class GamesManager(
 
 class ScoresetManager(models.Manager):
     def create_new(self, match, team, player):
-        if player in match.season.team_set.filter(id=team.id).players.all():
+        if player in match.week.season.team_set.filter(id=team.id).players.all():
             sub = False
         else:
             sub = True

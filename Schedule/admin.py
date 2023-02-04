@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Season, Match, Announcement, Scheduler
+from .models import Season, Match, Announcement, Scheduler, ScheduleWeek
 
 
 @admin.register(Season)
@@ -9,15 +9,13 @@ class SeasonAdmin(admin.ModelAdmin):
 
 @admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):
-    list_filter = ["season", "division"]
+    list_filter = ["week__season", "week__division", "week__week_number"]
     list_display = [
-        "weekNum",
-        "matchDate",
-        "division",
         "awayTeam",
         "homeTeam",
+        "boards"
     ]
-
+    
 
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):
@@ -28,3 +26,17 @@ class AnnouncementAdmin(admin.ModelAdmin):
 @admin.register(Scheduler)
 class RecurringEventAdmin(admin.ModelAdmin):
     list_display = ["title"]
+
+
+class MatchInline(admin.TabularInline):
+    model = Match
+    extra = 5
+    
+
+
+@admin.register(ScheduleWeek)
+class ScheduleWeekAdmin(admin.ModelAdmin):
+    list_filter = ["season", "division"]
+    list_display = ["season", "week_number", "division", "playoff_week"]
+
+    inlines = [MatchInline]
