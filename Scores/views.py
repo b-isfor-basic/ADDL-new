@@ -239,7 +239,8 @@ def StandingsView(request, season_number, **kwargs):
 
 
 
-@permission_required("scores.add_scoresummary")
+#@permission_required("scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit")
+@login_required
 def CreateScoreSummaryView(request, id, **kwargs):
     match = Match.objects.get(id=id)
     PlayerScoreFormSet = modelformset_factory(ScoreSummary, form=PlayerScoreSummaryForm, formset=BasePlayerScoreFormSet, extra=4, max_num=4)
@@ -282,7 +283,7 @@ def CreateScoreSummaryView(request, id, **kwargs):
     return render(request, template, context)
 
 
-@permission_required("scores.edit_scoresummary")
+@permission_required("scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit")
 class EditScoreSummaryView(UpdateView):
     model = ScoreSummary
     template_name = "scores/score_summary.html"
