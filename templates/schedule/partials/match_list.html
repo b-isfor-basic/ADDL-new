@@ -29,7 +29,7 @@
                               </svg> {% endif %}{{ match.homeTeam }} {% if match.winner %}({{ match.homeScore }}){% endif %}</td>
                             <td class="p-2 text-sm text-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">
                                 {% if match.winner %}
-                                <a href="{% url 'standings' %}" class="inline-flex items-center font-medium text-blue-400 hover:underline hover:text-amber-400 after:content-['_↗']">
+                                <a href="{% url 'standings' latest_season %}" class="inline-flex items-center font-medium text-blue-400 hover:underline hover:text-amber-400 after:content-['_↗']">
                                     View&nbsp;
                                 </a>
                                 {% else %}
