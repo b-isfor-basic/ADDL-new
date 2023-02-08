@@ -4,6 +4,6 @@
         <td class="p-2 text-sm text-center">{{ record.team__division }}</td>
     {% endif %}
     <td class="p-2 text-sm text-center">{% if record.player__first_name %}{{ record.player__first_name }} {{ record.player__last_name }}{% else %}{{ record.team }}{% endif %}</td>
-    <td class="p-2 text-sm text-center">{{ stat }}</td>
+    <td class="p-2 text-sm text-center">{% if stat %}{{ stat }}{% else %}N/A{% endif %}</td>
 </tr>
                 

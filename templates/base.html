@@ -54,7 +54,7 @@
               >Play</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'standings' %}" 
+              <a href="{% url 'standings' latest_season %}" 
                 {% if 'scores' in request.resolver_match.route %}
                 class="nav-link-active" aria-current="page"
                 {% else %}
@@ -87,6 +87,16 @@
     </header>
     
     <main class="relative top-20 -mt-2 md:top-14 flex w-screen mx-auto min-h-screen mb-24 px-2 md:px-6 max-w-8xl justify-around items-start">
+        {% block messages %}
+          {% if messages %}
+          <div class="pt-4 z-40">
+            {% for message in messages %}
+              {% if message.tags == 'error' %} {% include './components/error.html' %} {% elif message.tags == 'success' %} {% include './components/success.html' %} {% else %}{{ message }}{% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+        {% endblock messages %}
+
         {% block content %}
         {% endblock content %}
     </main>

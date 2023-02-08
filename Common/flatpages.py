@@ -5,15 +5,15 @@ from Schedule.models import Announcement
 
 
 class PrivacyPolicyView(TemplateView):
-    template_name = "pages/privacy.html"
+    template_name = "common/privacy.html"
 
 
 class TermsOfServiceView(TemplateView):
-    template_name = "pages/terms.html"
+    template_name = "common/terms.html"
 
 
 class IndexView(ListView):
     model = Announcement
     queryset = Announcement.objects.filter(inactive_date__gte=timezone.now())
-    template_name = "pages/index.html"
+    template_name = "common/index.html"
     context_object_name = "announcement_list"

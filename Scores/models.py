@@ -177,11 +177,12 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
 
 
 class ScoreSummary(TimeStampedModel, models.Model):
-    '''
+    """
     Holds summarized scores for each :model: 'Members.Player' in a :model: 'Matches.Match'.
     Creation of this model is limited to area managers and admins. Stats can be queried
     by calling 'ScoreSummary.stats'
-    '''
+    """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -209,7 +210,6 @@ class ScoreSummary(TimeStampedModel, models.Model):
         darts_thrown = self.darts_thrown1 + self.darts_thrown2
         scored = 1001 - (self.score_left1 + self.score_left2)
         return round(scored / darts_thrown, 4)
-
 
     class Meta:
         unique_together = ["match", "player"]

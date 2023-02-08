@@ -1,0 +1,27 @@
+<div class="w-full mb-10 justify-center items-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
+    <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">{{ division }} Standings</h3>
+    <div class="">
+        <table class="p-1 w-full">
+            <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
+                <tr>
+                    <th scope="col" class="p-2 font-light"></th>
+                    {% if division|length > 1 %}
+                    <th scope="col" class="p-2 font-light"></th>
+                    {% endif %}
+                    <th scope="col" class="p-2 font-light">Name</th>
+                    <th scope="col" class="p-2 font-light">{{ stat_title }}</th>
+                </tr>
+            </thead>
+            <tbody>   
+                <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
+                    <td class="p-2 text-sm text-center">{{ forloop.counter }}</td>
+                    {% if division|length > 1 %}
+                        <td class="p-2 text-sm text-center">{{ record.team__division }}</td>
+                    {% endif %}
+                    <td class="p-2 text-sm text-center">{% if record.player__first_name %}{{ record.player__first_name }} {{ record.player__last_name }}{% else %}{{ record.team }}{% endif %}</td>
+                    <td class="p-2 text-sm text-center">{% if stat %}{{ stat }}{% else %}N/A{% endif %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>        
