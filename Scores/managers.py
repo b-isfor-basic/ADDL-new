@@ -1,7 +1,7 @@
 from django.db import models
-from django.db.models import Count, Max, Min, Sum, F, Q, Case, When, Avg, Subquery
+from django.db.models import Avg, Case, Count, F, Max, Min, Q, Sum, Value, When
 from django.db.models.functions import Ln, Round
-from django.db.models.lookups import LessThanOrEqual
+from django.db.models.lookups import LessThan, LessThanOrEqual
 
 
 class SinglesCricketGameManager(models.Manager):
@@ -77,11 +77,10 @@ class ScoresetManager(models.Manager):
         return scoreset
 
 
-
 class PlayerScoreSummaryManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
-        '''
-        Accepts a queryset and returns an aggregated queryset of 
+        """
+        Accepts a queryset and returns an aggregated queryset of
         ScoreSummary objects grouped by player with annotations
         for all stats.
         For Average PPD calculation:
@@ -92,80 +91,110 @@ class PlayerScoreSummaryManager(models.Manager):
             - games_played: total games played (10 games per match)
         Reported Stats:
 
-        '''
+        """
         qs = super().get_queryset()
-        return qs.annotate(
-                weekly_ppd=Round(
-                    (1001.0-(F('score_left1')+F('score_left2'))) 
-                    /(F('darts_thrown1')+F('darts_thrown2'))
-                    , 4
+        return (
+            qs.annotate(
+                weekly_ppd=(
+                    ((501.0*2) - (F("score_left1")+F("score_left2")))
+                    / (F("darts_thrown1") + F("darts_thrown2"))
                 )
-            ).values("player", "player__first_name", "player__last_name", "team__division").annotate(
-            # Get total_darts_thrown, total_score_left, games_included to calculate average ppd
-            total_darts_thrown=(Sum("darts_thrown1")+Sum("darts_thrown2")),
-            total_score_left=(Sum("score_left1")+Sum("score_left2")),
-            games_included=(Count("id", distinct=True)*2),
-            # Get total games_played to calculate win percentage
-            games_played=(Count("id", distinct=True)*10),
-            total_wins=(Sum("singles_points") + Sum("doubles_points")),
-            singles_wins=Sum("singles_points"),
-            doubles_wins=Sum("doubles_points"),
-            stars=Sum("total_stars"),
-            perfects=Sum("total_perfects"),
-            max_high_in=Max("high_in", default=0),
-            max_high_out=Max("high_out", default=0),
-            avg_ppd=Round((501.0*F("games_included")-F("total_score_left"))/F("total_darts_thrown"), 4),
-            avg_ppd2=Avg("weekly_ppd"),
-            win_percentage=(F("total_wins")/(Count("id")*10.0)),
-            avg_stars_per_game=Round((Sum("total_stars")/(Count("id")*10.0)), 2, output_field=models.FloatField()),
-            rating=Round(
-                (Ln(F("avg_ppd"))*3.5) 
-                +((F("win_percentage"))*8.0) 
-                +((F("avg_stars_per_game"))*5.0)
-                ,4
-            ),
-            best_501_game=Case(
-                When(
-                    LessThanOrEqual(
-                        Min('darts_thrown1', filter=Q(score_left1=0)),
-                        Min('darts_thrown2', filter=Q(score_left2=0))
-                    ), then=Min('darts_thrown1', filter=Q(score_left1=0))
-                ), default=Min('darts_thrown2', filter=Q(score_left2=0))
-            ),
-            best_week_singles_ppd=Max('weekly_ppd')
+            )
+            .values(
+                "player", "player__first_name", "player__last_name", "team__division"
+            )
+            .annotate(
+                # Get total_darts_thrown, total_score_left, games_included to calculate average ppd
+                total_darts_thrown=(Sum("darts_thrown1") + Sum("darts_thrown2")),
+                total_score_left=(Sum("score_left1") + Sum("score_left2")),
+                games_included=(Count("id", distinct=True) * 2),
+                # Get total games_played to calculate win percentage
+                games_played=(Count("id", distinct=True) * 10),
+                total_wins=(
+                    Sum("singles_points", default=0) + Sum("doubles_points", default=0)
+                ),
+                singles_wins=Sum("singles_points", default=0),
+                doubles_wins=Sum("doubles_points", default=0),
+                stars=Sum("total_stars", default=0),
+                perfects=Sum("total_perfects", default=0),
+                max_high_in=Max("high_in", default=0),
+                max_high_out=Max("high_out", default=0),
+                avg_ppd=(((501.0 * F("games_included")) - F("total_score_left"))
+                / F("total_darts_thrown")),
+                avg_ppd2=Avg("weekly_ppd"),
+                win_percentage=(F("total_wins") / (Count("id", distinct=True) * 10.0)),
+                avg_stars_per_game=(Sum("total_stars") / (Count("id", distinct=True) * 10.0)),
+                rating=(Ln(F("avg_ppd")) * 3.5)
+                + ((F("win_percentage")) * 8.0)
+                + ((F("avg_stars_per_game")) * 5.0),
+                best_501_game=Case(
+                    When(
+                        LessThanOrEqual(
+                            Min("darts_thrown1", filter=Q(score_left1=0)),
+                            Min("darts_thrown2", filter=Q(score_left2=0)),
+                        ),
+                        then=Min("darts_thrown1", filter=Q(score_left1=0)),
+                    ),
+                    default=Min("darts_thrown2", filter=Q(score_left2=0)),
+                ),
+                best_week_singles_ppd=Max("weekly_ppd"),
+            )
         )
 
     def team_rating(self):
         qs = self.get_queryset()
-        return qs.values('team', 'team__division').alias(rating=Round(
-                 (Ln(F("avg_ppd"))*3.5)
-                 +((F("win_percentage"))*8.0)
-                 +((F("avg_stars_per_game"))*5.0)
-                 ,4
-            )).annotate(rating=F('rating'))    
+        return (
+            qs.values("team", "team__division")
+            .alias(
+                rating=Round(
+                    (Ln(F("avg_ppd")) * 3.5)
+                    + ((F("win_percentage")) * 8.0)
+                    + ((F("avg_stars_per_game")) * 5.0),
+                    4,
+                )
+            )
+            .annotate(rating=F("rating"))
+        )
+
+    def team_total_points(self):
+        qs = self.get_queryset()
+        return (
+            qs.values("team", "team__division")
+            .annotate(total_points=Sum("singles_points") + Sum("doubles_points"))
+            .order_by("-total_points")
+        )
 
 
 class TeamScoreSummaryManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset().prefetch_related('team')
-        return qs.annotate(weekly_ppd=Round(
-                (1001.0-(F('score_left1')+F('score_left2')))
-                /(F('darts_thrown1')+F('darts_thrown2')), 4
-            )).values("team", "team__division").annotate(
-                total_darts_thrown=(Sum("darts_thrown1")+Sum("darts_thrown2")),
-                total_score_left=(Sum("score_left1")+Sum("score_left2")),
-                games_included=(Count("id", distinct=True)*2.0),
-                avg_doubles_ppd=Round((501.0*F("games_included")-F("total_score_left"))/F("total_darts_thrown"), 4),
+        qs = super().get_queryset().select_related("team", "match", "match__week")
+        return (
+            qs.annotate(
+                weekly_doubles_ppd=(
+                    (1001.0 - (F("score_left1") + F("score_left2")))
+                    / (F("darts_thrown1") + F("darts_thrown2"))
+                )
+            )
+            .values("team", "team__division")
+            .annotate(
+                total_darts_thrown=(Sum("darts_thrown1") + Sum("darts_thrown2")),
+                total_score_left=(Sum("score_left1") + Sum("score_left2")),
+                games_included=(Count("id", distinct=True) * 2.0),
+                avg_doubles_ppd=(
+                    ((501.0 * F("games_included")) - F("total_score_left"))
+                    / F("total_darts_thrown")
+                ),
                 best_501_game=Case(
                     When(
                         LessThanOrEqual(
-                            Min('darts_thrown1', filter=Q(score_left1=0)),
-                            Min('darts_thrown2', filter=Q(score_left2=0))
-                        ), then=Min('darts_thrown1', filter=Q(score_left1=0))
-                    ), default=Min('darts_thrown2', filter=Q(score_left2=0))
+                            Min("darts_thrown1", filter=Q(score_left1=0)),
+                            Min("darts_thrown2", filter=Q(score_left2=0)),
+                        ),
+                        then=Min("darts_thrown1", filter=Q(score_left1=0)),
+                    ),
+                    default=Min("darts_thrown2", filter=Q(score_left2=0)),
                 ),
-                best_week_doubles_ppd=Max('weekly_ppd')
+                best_week_doubles_ppd=Max(F("weekly_doubles_ppd")),
             )
-        
-        
+        )
         

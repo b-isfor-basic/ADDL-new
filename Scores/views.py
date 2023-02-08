@@ -1,15 +1,17 @@
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib import messages
 from django.db.models import Q
 from django.forms import all_valid, formset_factory, modelformset_factory
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404, resolve_url
-from django.views.generic import ListView, UpdateView, TemplateView
+from django.shortcuts import render, resolve_url
+from django.views.generic import UpdateView
 
 from Members.models import Player
 from Schedule.models import Match, Season
-from Locations.models import Division
 
-from .forms import GameScoreForm, ScoresetForm, PlayerScoreSummaryForm, TeamScoreSummaryForm, BasePlayerScoreFormSet, BaseTeamScoreFormSet
+from .forms import (BasePlayerScoreFormSet, BaseTeamScoreFormSet,
+                    GameScoreForm, PlayerScoreSummaryForm, ScoresetForm,
+                    TeamScoreSummaryForm)
 from .models import GameScore, Scoreset, ScoreSummary, TeamScoreSummary
 
 ScoresetFormSet = formset_factory(ScoresetForm, extra=2, min_num=2, max_num=2)
@@ -212,41 +214,32 @@ def PlayerSearchView(request, **kwargs):
     else:
         return None
 
-
-def StandingsView(request, **kwargs):
+def StandingsView(request, season_number, **kwargs):
     template = "scores/standings.html"
+    season = Season.objects.get(season_number=season_number)
     season_list = Season.objects.all()
-    if "season" in request.GET.keys():
-        season_id = request.GET.get("season")
-        season = Season.objects.get(id=season_id)
-        active_divisions = season.divisions.all()
-        player_stats = ScoreSummary.stats.filter(match__week__season=season_id)
-        team_stats = TeamScoreSummary.team_stats.filter(match__week__season=season_id)
-        context = {
-            "season": season,
-            "season_list": season_list,
-            "active_divisions": active_divisions,
-            "player_stats": player_stats,
-            "team_stats": team_stats,
-        }
-        return render(request, template, context)
-    else:
-        season = Season.objects.latest("match_play_start_dt")
-        active_divisions = season.divisions.all()
-        player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
-        team_stats = TeamScoreSummary.team_stats.filter(match__week__season=season.id)
-        context = {
-            "season": season,
-            "season_list": season_list,
-            "active_divisions": active_divisions,
-            "player_stats": player_stats,
-            "team_stats": team_stats,
-        }
-        return render(request, template, context)
+    active_divisions = season.divisions.all()
+    player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
+    team_stats = TeamScoreSummary.team_stats.filter(match__week__season=season.id)
+    division_set = None
+    if "division" in request.GET.keys():
+        division_id = request.GET.get("division")
+        division_set = season.divisions.get(id=division_id)
+        player_stats = player_stats.filter(match__week__division_id=division_id)
+        team_stats = team_stats.filter(match__week__division=division_id)
+    context = {
+         "season": season,
+         "season_list": season_list,
+         "active_divisions": active_divisions,
+         "division_set": division_set,
+         "player_stats": player_stats,
+         "team_stats": team_stats,
+    }
+    return render(request, template, context)
 
 
 
-@permission_required("scores.add_score_summary")
+@permission_required("scores.add_scoresummary")
 def CreateScoreSummaryView(request, id, **kwargs):
     match = Match.objects.get(id=id)
     PlayerScoreFormSet = modelformset_factory(ScoreSummary, form=PlayerScoreSummaryForm, formset=BasePlayerScoreFormSet, extra=4, max_num=4)
@@ -265,20 +258,20 @@ def CreateScoreSummaryView(request, id, **kwargs):
             request.POST, prefix="player", form_kwargs={"match": match}
         )
 
-        if team_scores.is_valid() & player_scores.is_valid():
+        if all_valid([team_scores, player_scores]) and team_scores.is_valid() and player_scores.is_valid():
             for form in team_scores:
                 form.save()
             for form in player_scores:
                 form.save()
+            messages.add_message(request, messages.SUCCESS, "Scoresheet submitted successfully.")
             return HttpResponseRedirect("/schedule/")
         else:
-            print("team_scores ", team_scores.errors)
-            print("player_scores ", player_scores.errors)
             context = {
                 "match": match,
                 "team_scores": team_scores,
                 "player_scores": player_scores,
             }
+            messages.add_message(request, messages.ERROR, "There were some issues with your submission. Please review the form and try again.")
 
     context = {
         "match": match,
@@ -289,7 +282,7 @@ def CreateScoreSummaryView(request, id, **kwargs):
     return render(request, template, context)
 
 
-@permission_required("scores.edit_score_summary")
+@permission_required("scores.edit_scoresummary")
 class EditScoreSummaryView(UpdateView):
     model = ScoreSummary
     template_name = "scores/score_summary.html"

@@ -10,7 +10,7 @@ from recurrence.fields import RecurrenceField
 from Locations.models import Division, Establishment
 from Members.models import Team, Player
 
-from .managers import SeasonManager, MatchManager
+from .managers import SeasonManager, MatchManager, ScheduleManager
 
 
 class Scheduler(models.Model):
@@ -62,6 +62,9 @@ class ScheduleWeek(models.Model):
     division = models.ForeignKey(Division, models.CASCADE)
     playoff_week = models.BooleanField(default=False)
 
+    objects = models.Manager()
+    details = ScheduleManager()
+
     class Meta:
         ordering = ["season", "division", "week_number"]
         unique_together = ["season", "week_number", "division"]
@@ -69,10 +72,12 @@ class ScheduleWeek(models.Model):
     def __str__(self):
         return f"S{self.season.season_number} - Area {self.division.area.number} - W{self.week_number}"
 
+
 class Match(models.Model):
     """
     Scheduled matches.
     """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     week = models.ForeignKey(ScheduleWeek, models.CASCADE, null=True)
     boards = ArrayField(
@@ -139,8 +144,16 @@ class Announcement(models.Model):
     body = models.TextField()
     active_date = models.DateTimeField()
     inactive_date = models.DateTimeField()
-    created_by = models.ForeignKey(Player, models.SET_NULL, null=True, related_name="announcements_created")
-    edited_by = models.ForeignKey(Player, models.SET_NULL, null=True, blank=True, related_name="announcements_edited")
+    created_by = models.ForeignKey(
+        Player, models.SET_NULL, null=True, related_name="announcements_created"
+    )
+    edited_by = models.ForeignKey(
+        Player,
+        models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="announcements_edited",
+    )
 
     def __str__(self):
         return str(self.title).title()
