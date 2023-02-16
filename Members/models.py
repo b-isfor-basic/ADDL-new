@@ -41,6 +41,8 @@ class Team(models.Model):
     division = models.ForeignKey("Locations.Division", models.CASCADE)
     season = models.ForeignKey("Schedule.Season", models.CASCADE)
 
+    objects = models.Manager()
+
     def __str__(self):
         names = [player.last_name for player in self.players.all()]
         if len(names) < 2:

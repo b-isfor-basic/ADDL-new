@@ -214,19 +214,20 @@ def PlayerSearchView(request, **kwargs):
     else:
         return None
 
-def StandingsView(request, season_number, **kwargs):
+
+def StandingsView(request, season_number=Season.objects.latest('match_play_start_dt').season_number, division_id=None, **kwargs):
     template = "scores/standings.html"
     season = Season.objects.get(season_number=season_number)
     season_list = Season.objects.all()
     active_divisions = season.divisions.all()
     player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
-    team_stats = TeamScoreSummary.team_stats.filter(match__week__season=season.id)
+    team_stats = TeamScoreSummary.team_stats.all_stats(match__week__season=season.id)
     division_set = None
-    if "division" in request.GET.keys():
-        division_id = request.GET.get("division")
+    if division_id != None:
+        division_id = division_id
         division_set = season.divisions.get(id=division_id)
         player_stats = player_stats.filter(match__week__division_id=division_id)
-        team_stats = team_stats.filter(match__week__division=division_id)
+        team_stats = TeamScoreSummary.team_stats.all_stats(Q(match__week__season=season.id) & Q(match__week__division_id=division_id))
     context = {
          "season": season,
          "season_list": season_list,
