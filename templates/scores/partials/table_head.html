@@ -1,10 +1,13 @@
 <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
     <tr>
-        <th scope="col" class="p-2 font-light">Rank</th>
+        <th class="p-2 font-light">Rank</th>
         {% if division|length > 1 %}
-        <th scope="col" class="p-2 font-light">Division</th>
+        <th class="p-2 font-light">Division</th>
         {% endif %}
-        <th scope="col" class="p-2 font-light">Name</th>
-        <th scope="col" class="p-2 font-light">{{ stat_title }}</th>
+        <th class="p-2 font-light">Name</th>
+        <th class="p-2 font-light">{{ stat_title }}</th>
+        {% if 'Rating' in stat_title %}
+        <th class="p-2 font-light">Rating Score</th>
+        {% endif %}
     </tr>
 </thead>

@@ -86,7 +86,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "Schedule.context_processors.latest_season"
+                "Common.context_processors.latest_season"
             ],
         },
     },

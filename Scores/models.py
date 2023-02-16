@@ -186,6 +186,7 @@ class ScoreSummary(TimeStampedModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    is_sub = models.BooleanField(default=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     total_stars = models.IntegerField(blank=True, null=True)
     total_perfects = models.IntegerField(blank=True, null=True)
