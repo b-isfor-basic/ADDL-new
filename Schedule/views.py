@@ -13,10 +13,10 @@ def SeasonDetailView(request, *args, **kwargs):
 
     if "division" in request.GET.keys():
         division = request.GET.get("division")
-        matches = ScheduleWeek.objects.filter(season=season, division=division).all().prefetch_related('match_set', 'match_set__scoresummary_set', 'match_set__awayTeam', 'match_set__homeTeam').select_related('division')
+        matches = ScheduleWeek.objects.all().prefetch_related('match_set', 'match_set__scoresummary_set', 'match_set__awayTeam', 'match_set__awayTeam__players', 'match_set__homeTeam', 'match_set__homeTeam__players').select_related('division').filter(season=season, division=division)
         divisions = season.divisions.get(id=division)
     else:
-        matches = ScheduleWeek.objects.filter(season=season).all().prefetch_related('match_set', 'match_set__scoresummary_set',  'match_set__awayTeam', 'match_set__homeTeam').select_related('division')
+        matches = ScheduleWeek.objects.all().prefetch_related('match_set', 'match_set__scoresummary_set', 'match_set__awayTeam', 'match_set__awayTeam__players', 'match_set__homeTeam', 'match_set__homeTeam__players').select_related('division').filter(season=season)
         divisions = season.divisions.all()
 
     context = {
