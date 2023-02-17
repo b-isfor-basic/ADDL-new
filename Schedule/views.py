@@ -8,15 +8,15 @@ from .models import Season, ScheduleWeek
 
 
 def SeasonDetailView(request, *args, **kwargs):
-    season = Season.details.get_active()
+    season = Season.objects.all().prefetch_related('divisions', 'divisions__team_set').latest('match_play_start_dt')
     active_div_list = season.divisions.all()
 
     if "division" in request.GET.keys():
         division = request.GET.get("division")
-        matches = ScheduleWeek.objects.filter(season=season, division=division).all()
+        matches = ScheduleWeek.objects.filter(season=season, division=division).all().prefetch_related('match_set', 'match_set__scoresummary_set', 'match_set__awayTeam', 'match_set__homeTeam').select_related('division')
         divisions = season.divisions.get(id=division)
     else:
-        matches = ScheduleWeek.objects.filter(season=season).all()
+        matches = ScheduleWeek.objects.filter(season=season).all().prefetch_related('match_set', 'match_set__scoresummary_set',  'match_set__awayTeam', 'match_set__homeTeam').select_related('division')
         divisions = season.divisions.all()
 
     context = {
