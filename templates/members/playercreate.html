@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}Registration{% endblock title %}
 
 {% block content %}
@@ -87,14 +89,7 @@
 {% endblock content %}
 
 {% block footerScripts %}
-<script
-	src="https://code.jquery.com/jquery-3.6.3.slim.min.js"
-	integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo="
-	crossorigin="anonymous"></script>
-<script 
-  src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" 
-  integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw==" 
-  crossorigin="anonymous" 
-  referrerpolicy="no-referrer"></script>
+<script src="{% static './jquery/dist/jquery.slim.min.js' %}"></script>
+<script src="{% static './jquery-mask-plugin/dist/jquery.mask.min.js' %}"></script>
 {% endblock footerScripts %}
 

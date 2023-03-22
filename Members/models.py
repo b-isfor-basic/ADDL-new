@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+from .managers import TeamStatsManager
 
 class Player(AbstractUser):
     """
@@ -18,6 +19,7 @@ class Player(AbstractUser):
     class Meta:
         verbose_name = "player"
         verbose_name_plural = "players"
+        ordering = ['first_name', 'last_name']
 
     def __str__(self):
         return str(self.get_full_name())
@@ -42,6 +44,7 @@ class Team(models.Model):
     season = models.ForeignKey("Schedule.Season", models.CASCADE)
 
     objects = models.Manager()
+    stats = TeamStatsManager()
 
     def __str__(self):
         names = [player.last_name for player in self.players.all()]

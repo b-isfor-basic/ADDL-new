@@ -1,200 +1,21 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.db.models import Q
-from django.forms import all_valid, formset_factory, modelformset_factory
+from django.forms import all_valid, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, resolve_url
 from django.views.generic import UpdateView
 
-from Members.models import Player
+from Members.models import Player, Team
 from Schedule.models import Match, Season
 
-from .forms import (BasePlayerScoreFormSet, BaseTeamScoreFormSet,
-                    GameScoreForm, PlayerScoreSummaryForm, ScoresetForm,
-                    TeamScoreSummaryForm)
-from .models import GameScore, Scoreset, ScoreSummary, TeamScoreSummary
-
-ScoresetFormSet = formset_factory(ScoresetForm, extra=2, min_num=2, max_num=2)
-GameScoreFormSet = formset_factory(GameScoreForm, extra=10, min_num=0, max_num=10)
-
-@login_required
-def ScoresheetCreateView(request, id, **kwargs):
-    match = Match.objects.get(id=id)
-    home_player_forms = ScoresetFormSet(prefix="home", initial=[{"match": match}])
-    away_player_forms = ScoresetFormSet(prefix="away", initial=[{"match": match}])
-
-    away_0_game = GameScoreFormSet(prefix="away_0_game")
-    away_1_game = GameScoreFormSet(prefix="away_1_game")
-    home_0_game = GameScoreFormSet(prefix="home_0_game")
-    home_1_game = GameScoreFormSet(prefix="home_1_game")
-
-    if request.method == "POST":
-        home_player_forms = ScoresetFormSet(
-            request.POST, prefix="home", initial=[{"match": match}]
-        )
-        away_player_forms = ScoresetFormSet(
-            request.POST, prefix="away", initial=[{"match": match}]
-        )
-
-        away_0_game = GameScoreFormSet(request.POST, prefix="away_0_game")
-        away_1_game = GameScoreFormSet(request.POST, prefix="away_1_game")
-        home_0_game = GameScoreFormSet(request.POST, prefix="home_0_game")
-        home_1_game = GameScoreFormSet(request.POST, prefix="home_1_game")
-
-        if all_valid(
-            formsets=[
-                home_player_forms,
-                away_player_forms,
-                away_0_game,
-                away_1_game,
-                home_0_game,
-                home_1_game,
-            ]
-        ):
-            game_score_forms = [away_0_game, away_1_game, home_0_game, home_1_game]
-
-            # Create list to hold new scoreset ids to apply GameScores under
-            player_scores = []
-
-            for form in away_player_forms.forms:
-                away_score = Scoreset.details.create_new(
-                    match=match, team=match.awayTeam, player=form.cleaned_data["player"]
-                )
-                away_score.save()
-                player_scores.append(away_score.id)
-
-            for form in home_player_forms.forms:
-                home_score = Scoreset.details.create_new(
-                    match=match, team=match.homeTeam, player=form.cleaned_data["player"]
-                )
-                home_score.save()
-                player_scores.append(home_score.id)
-
-            for form_set in game_score_forms:  # Loop through each player
-                for i in range(10):  # Loop through each game
-
-                    # Create singles cricket scores
-                    while i < 2:
-                        form = form_set.forms[i]
-                        scoreset = Scoreset.objects.get(
-                            id=player_scores[form_set.index]
-                        )
-                        stars = form.cleaned_data["stars"]
-                        perfects = form.cleaned_data["perfects"]
-                        game_point = form.cleaned_data["game_point"]
-                        new_score = GameScore.singles_cricket.create(
-                            scoreset=scoreset,
-                            stars=stars,
-                            perfects=perfects,
-                            game_point=game_point,
-                        )
-                        new_score.save()
-
-                    # Create doubles cricket scores
-                    while i >= 2 and i < 4:
-                        form = form_set.forms[i]
-                        scoreset = Scoreset.objects.get(
-                            id=player_scores[form_set.index]
-                        )
-                        stars = form.cleaned_data["stars"]
-                        perfects = form.cleaned_data["perfects"]
-                        game_point = form.cleaned_data["game_point"]
-                        new_score = GameScore.doubles_cricket.create(
-                            scoreset=scoreset,
-                            stars=stars,
-                            perfects=perfects,
-                            game_point=game_point,
-                        )
-                        new_score.save()
-
-                    # Create singles 501 scores
-                    while i >= 4 and i < 6:
-                        form = form_set.forms[i]
-                        scoreset = Scoreset.objects.get(
-                            id=player_scores[form_set.index]
-                        )
-                        stars = form.cleaned_data["stars"]
-                        perfects = form.cleaned_data["perfects"]
-                        game_point = form.cleaned_data["game_point"]
-                        out_thrown = form.cleaned_data["out_thrown"]
-                        darts_thrown = form.cleaned_data["darts_thrown"]
-                        score_left = form.cleaned_data["score_left"]
-                        new_score = GameScore.singles_501.create(
-                            scoreset=scoreset,
-                            stars=stars,
-                            perfects=perfects,
-                            game_point=game_point,
-                            out_thrown=out_thrown,
-                            darts_thrown=darts_thrown,
-                            score_left=score_left,
-                        )
-                        new_score.save()
-
-                    # Create doubles 301 scores
-                    while i >= 6 and i < 8:
-                        form = form_set.forms[i]
-                        scoreset = Scoreset.objects.get(
-                            id=player_scores[form_set.index]
-                        )
-                        stars = form.cleaned_data["stars"]
-                        perfects = form.cleaned_data["perfects"]
-                        game_point = form.cleaned_data["game_point"]
-                        out_thrown = form.cleaned_data["out_thrown"]
-                        in_thrown = form.cleaned_data["in_thrown"]
-                        new_score = GameScore.doubles_301.create(
-                            scoreset=scoreset,
-                            stars=stars,
-                            perfects=perfects,
-                            game_point=game_point,
-                            out_thrown=out_thrown,
-                            in_thrown=in_thrown,
-                        )
-                        new_score.save()
-
-                    # Create doubles 501 scores
-                    while i >= 8:
-                        form = form_set.forms[i]
-                        scoreset = Scoreset.objects.get(
-                            id=player_scores[form_set.index]
-                        )
-                        stars = form.cleaned_data["stars"]
-                        perfects = form.cleaned_data["perfects"]
-                        game_point = form.cleaned_data["game_point"]
-                        out_thrown = form.cleaned_data["out_thrown"]
-                        darts_thrown = form.cleaned_data["darts_thrown"]
-                        score_left = form.cleaned_data["score_left"]
-                        new_score = GameScore.doubles_501.create(
-                            scoreset=scoreset,
-                            stars=stars,
-                            perfects=perfects,
-                            game_point=game_point,
-                            out_thrown=out_thrown,
-                            darts_thrown=darts_thrown,
-                            score_left=score_left,
-                        )
-                        new_score.save()
-
-            return HttpResponseRedirect("/schedule/")
-
-        else:
-            print("home_player_forms ", home_player_forms.errors)
-            print("away_player_forms ", away_player_forms.errors)
-            print("away_0 ", away_0_game.errors)
-            print("away_1 ", away_1_game.errors)
-            print("home_0 ", home_0_game.errors)
-            print("home_1 ", home_1_game.errors)
-
-    context = {
-        "match": match,
-        "home_player_forms": home_player_forms,
-        "away_player_forms": away_player_forms,
-        "away_0_game": away_0_game,
-        "away_1_game": away_1_game,
-        "home_0_game": home_0_game,
-        "home_1_game": home_1_game,
-    }
-
-    return render(request, "scores/add_scoresheet.html", context)
+from .forms import (
+    BasePlayerScoreFormSet,
+    BaseTeamScoreFormSet,
+    PlayerScoreSummaryForm,
+    TeamScoreSummaryForm,
+)
+from .models import ScoreSummary, TeamScoreSummary
 
 
 def PlayerSearchView(request, **kwargs):
@@ -215,42 +36,85 @@ def PlayerSearchView(request, **kwargs):
         return None
 
 
-def StandingsView(request, season_number=Season.objects.latest('match_play_start_dt').season_number, division_id=None, **kwargs):
+def StandingsView(
+    request,
+    season_number=Season.objects.latest("match_play_start_dt").season_number,
+    division_id=None,
+    **kwargs
+):
+    """
+    This view handles displaying stats and standings for a given season. Default is 
+    the current season. If a division is selected, the standings will be filtered to
+    only include that division.
+    """
     template = "scores/standings.html"
     season = Season.objects.get(season_number=season_number)
-    season_list = Season.objects.all()
+    season_list = Season.objects.all()[:5]
     active_divisions = season.divisions.all()
+
     player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
-    team_stats = TeamScoreSummary.team_stats.all_stats(match__week__season=season.id)
+    team_base_stats = Team.stats.stats(match__week__season=season.id)
+    team_rating = Team.stats.rating(match__week__season=season.id)
+    team_points = Team.stats.get_points(scoresummary__match__week__season=season.id)
+    # team_stats = Team.stats.filter(teamscoresummary__match__week__season=season.id)
+    
     division_set = None
+    
     if division_id != None:
         division_id = division_id
         division_set = season.divisions.get(id=division_id)
         player_stats = player_stats.filter(match__week__division_id=division_id)
-        team_stats = TeamScoreSummary.team_stats.all_stats(Q(match__week__season=season.id) & Q(match__week__division_id=division_id))
+        # team_stats = Team.stats.filter(
+        #     Q(teamscoresummary__match__week__season=season.id) & Q(teamscoresummary__match__week__division_id=division_id)
+        # )
+        team_base_stats = team_base_stats.filter(division=division_id)
+        team_rating = team_rating.filter(division=division_id)
+        team_points = team_points.filter(division=division_id)
+
     context = {
-         "season": season,
-         "season_list": season_list,
-         "active_divisions": active_divisions,
-         "division_set": division_set,
-         "player_stats": player_stats,
-         "team_stats": team_stats,
+        "season": season,
+        "season_list": season_list,
+        "active_divisions": active_divisions,
+        "division_set": division_set,
+        "player_stats": player_stats,
+        "team_base_stats": team_base_stats,
+        "team_rating": team_rating,
+        "team_points": team_points,
     }
     return render(request, template, context)
 
 
-
-#@permission_required("scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit")
+# @permission_required("scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit")
 @login_required
 def CreateScoreSummaryView(request, id, **kwargs):
     match = Match.objects.get(id=id)
-    PlayerScoreFormSet = modelformset_factory(ScoreSummary, form=PlayerScoreSummaryForm, formset=BasePlayerScoreFormSet, extra=4, max_num=4)
-    TeamScoreFormSet = modelformset_factory(TeamScoreSummary, form=TeamScoreSummaryForm, formset=BaseTeamScoreFormSet, extra=2, max_num=2)
+    PlayerScoreFormSet = modelformset_factory(
+        ScoreSummary,
+        form=PlayerScoreSummaryForm,
+        formset=BasePlayerScoreFormSet,
+        extra=4,
+        max_num=4,
+    )
+    TeamScoreFormSet = modelformset_factory(
+        TeamScoreSummary,
+        form=TeamScoreSummaryForm,
+        formset=BaseTeamScoreFormSet,
+        extra=2,
+        max_num=2,
+    )
 
     template = "scores/add_score_summary.html"
 
-    team_scores = TeamScoreFormSet(prefix="team", form_kwargs={"match": match}, queryset=Match.objects.get(id=id).teamscoresummary_set.all())
-    player_scores = PlayerScoreFormSet(prefix="player", form_kwargs={"match": match}, queryset=Match.objects.get(id=id).scoresummary_set.all())
+    team_scores = TeamScoreFormSet(
+        prefix="team",
+        form_kwargs={"match": match},
+        queryset=Match.objects.get(id=id).teamscoresummary_set.all(),
+    )
+    player_scores = PlayerScoreFormSet(
+        prefix="player",
+        form_kwargs={"match": match},
+        queryset=Match.objects.get(id=id).scoresummary_set.all(),
+    )
 
     if request.method == "POST":
         team_scores = TeamScoreFormSet(
@@ -258,14 +122,20 @@ def CreateScoreSummaryView(request, id, **kwargs):
         )
         player_scores = PlayerScoreFormSet(
             request.POST, prefix="player", form_kwargs={"match": match}
-        )
+        )      
 
-        if all_valid([team_scores, player_scores]) and team_scores.is_valid() and player_scores.is_valid():
+        if (
+            all_valid([team_scores, player_scores])
+            and team_scores.is_valid()
+            and player_scores.is_valid()
+        ):
             for form in team_scores:
                 form.save()
             for form in player_scores:
                 form.save()
-            messages.add_message(request, messages.SUCCESS, "Scoresheet submitted successfully.")
+            messages.add_message(
+                request, messages.SUCCESS, "Scoresheet submitted successfully."
+            )
             return HttpResponseRedirect("/schedule/")
         else:
             context = {
@@ -273,7 +143,11 @@ def CreateScoreSummaryView(request, id, **kwargs):
                 "team_scores": team_scores,
                 "player_scores": player_scores,
             }
-            messages.add_message(request, messages.ERROR, "There were some issues with your submission. Please review the form and try again.")
+            messages.add_message(
+                request,
+                messages.ERROR,
+                "There were some issues with your submission. Please review the form and try again.",
+            )
 
     context = {
         "match": match,
@@ -284,7 +158,9 @@ def CreateScoreSummaryView(request, id, **kwargs):
     return render(request, template, context)
 
 
-@permission_required("scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit")
+@permission_required(
+    "scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit"
+)
 class EditScoreSummaryView(UpdateView):
     model = ScoreSummary
     template_name = "scores/score_summary.html"
@@ -296,8 +172,194 @@ class EditScoreSummaryView(UpdateView):
         return context
 
     def get_success_url(self):
-        return resolve_url("scores:view_scores", kwargs={"id": self.object.id, "success": "true"})
+        return resolve_url(
+            "scores:view_scores", kwargs={"id": self.object.id, "success": "true"}
+        )
 
     def get_object(self, **kwargs):
         return ScoreSummary.objects.get(id=self.kwargs["id"])
 
+
+# Former Scoresheet handling logic below. Keeping for reference.
+
+# ScoresetFormSet = formset_factory(ScoresetForm, extra=2, min_num=2, max_num=2)
+# GameScoreFormSet = formset_factory(GameScoreForm, extra=10, min_num=0, max_num=10)
+
+# @login_required
+# def ScoresheetCreateView(request, id, **kwargs):
+#     match = Match.objects.get(id=id)
+#     home_player_forms = ScoresetFormSet(prefix="home", initial=[{"match": match}])
+#     away_player_forms = ScoresetFormSet(prefix="away", initial=[{"match": match}])
+
+#     away_0_game = GameScoreFormSet(prefix="away_0_game")
+#     away_1_game = GameScoreFormSet(prefix="away_1_game")
+#     home_0_game = GameScoreFormSet(prefix="home_0_game")
+#     home_1_game = GameScoreFormSet(prefix="home_1_game")
+
+#     if request.method == "POST":
+#         home_player_forms = ScoresetFormSet(
+#             request.POST, prefix="home", initial=[{"match": match}]
+#         )
+#         away_player_forms = ScoresetFormSet(
+#             request.POST, prefix="away", initial=[{"match": match}]
+#         )
+
+#         away_0_game = GameScoreFormSet(request.POST, prefix="away_0_game")
+#         away_1_game = GameScoreFormSet(request.POST, prefix="away_1_game")
+#         home_0_game = GameScoreFormSet(request.POST, prefix="home_0_game")
+#         home_1_game = GameScoreFormSet(request.POST, prefix="home_1_game")
+
+#         if all_valid(
+#             formsets=[
+#                 home_player_forms,
+#                 away_player_forms,
+#                 away_0_game,
+#                 away_1_game,
+#                 home_0_game,
+#                 home_1_game,
+#             ]
+#         ):
+#             game_score_forms = [away_0_game, away_1_game, home_0_game, home_1_game]
+
+#             # Create list to hold new scoreset ids to apply GameScores under
+#             player_scores = []
+
+#             for form in away_player_forms.forms:
+#                 away_score = Scoreset.details.create_new(
+#                     match=match, team=match.awayTeam, player=form.cleaned_data["player"]
+#                 )
+#                 away_score.save()
+#                 player_scores.append(away_score.id)
+
+#             for form in home_player_forms.forms:
+#                 home_score = Scoreset.details.create_new(
+#                     match=match, team=match.homeTeam, player=form.cleaned_data["player"]
+#                 )
+#                 home_score.save()
+#                 player_scores.append(home_score.id)
+
+#             for form_set in game_score_forms:  # Loop through each player
+#                 for i in range(10):  # Loop through each game
+
+#                     # Create singles cricket scores
+#                     while i < 2:
+#                         form = form_set.forms[i]
+#                         scoreset = Scoreset.objects.get(
+#                             id=player_scores[form_set.index]
+#                         )
+#                         stars = form.cleaned_data["stars"]
+#                         perfects = form.cleaned_data["perfects"]
+#                         game_point = form.cleaned_data["game_point"]
+#                         new_score = GameScore.singles_cricket.create(
+#                             scoreset=scoreset,
+#                             stars=stars,
+#                             perfects=perfects,
+#                             game_point=game_point,
+#                         )
+#                         new_score.save()
+
+#                     # Create doubles cricket scores
+#                     while i >= 2 and i < 4:
+#                         form = form_set.forms[i]
+#                         scoreset = Scoreset.objects.get(
+#                             id=player_scores[form_set.index]
+#                         )
+#                         stars = form.cleaned_data["stars"]
+#                         perfects = form.cleaned_data["perfects"]
+#                         game_point = form.cleaned_data["game_point"]
+#                         new_score = GameScore.doubles_cricket.create(
+#                             scoreset=scoreset,
+#                             stars=stars,
+#                             perfects=perfects,
+#                             game_point=game_point,
+#                         )
+#                         new_score.save()
+
+#                     # Create singles 501 scores
+#                     while i >= 4 and i < 6:
+#                         form = form_set.forms[i]
+#                         scoreset = Scoreset.objects.get(
+#                             id=player_scores[form_set.index]
+#                         )
+#                         stars = form.cleaned_data["stars"]
+#                         perfects = form.cleaned_data["perfects"]
+#                         game_point = form.cleaned_data["game_point"]
+#                         out_thrown = form.cleaned_data["out_thrown"]
+#                         darts_thrown = form.cleaned_data["darts_thrown"]
+#                         score_left = form.cleaned_data["score_left"]
+#                         new_score = GameScore.singles_501.create(
+#                             scoreset=scoreset,
+#                             stars=stars,
+#                             perfects=perfects,
+#                             game_point=game_point,
+#                             out_thrown=out_thrown,
+#                             darts_thrown=darts_thrown,
+#                             score_left=score_left,
+#                         )
+#                         new_score.save()
+
+#                     # Create doubles 301 scores
+#                     while i >= 6 and i < 8:
+#                         form = form_set.forms[i]
+#                         scoreset = Scoreset.objects.get(
+#                             id=player_scores[form_set.index]
+#                         )
+#                         stars = form.cleaned_data["stars"]
+#                         perfects = form.cleaned_data["perfects"]
+#                         game_point = form.cleaned_data["game_point"]
+#                         out_thrown = form.cleaned_data["out_thrown"]
+#                         in_thrown = form.cleaned_data["in_thrown"]
+#                         new_score = GameScore.doubles_301.create(
+#                             scoreset=scoreset,
+#                             stars=stars,
+#                             perfects=perfects,
+#                             game_point=game_point,
+#                             out_thrown=out_thrown,
+#                             in_thrown=in_thrown,
+#                         )
+#                         new_score.save()
+
+#                     # Create doubles 501 scores
+#                     while i >= 8:
+#                         form = form_set.forms[i]
+#                         scoreset = Scoreset.objects.get(
+#                             id=player_scores[form_set.index]
+#                         )
+#                         stars = form.cleaned_data["stars"]
+#                         perfects = form.cleaned_data["perfects"]
+#                         game_point = form.cleaned_data["game_point"]
+#                         out_thrown = form.cleaned_data["out_thrown"]
+#                         darts_thrown = form.cleaned_data["darts_thrown"]
+#                         score_left = form.cleaned_data["score_left"]
+#                         new_score = GameScore.doubles_501.create(
+#                             scoreset=scoreset,
+#                             stars=stars,
+#                             perfects=perfects,
+#                             game_point=game_point,
+#                             out_thrown=out_thrown,
+#                             darts_thrown=darts_thrown,
+#                             score_left=score_left,
+#                         )
+#                         new_score.save()
+
+#             return HttpResponseRedirect("/schedule/")
+
+#         else:
+#             print("home_player_forms ", home_player_forms.errors)
+#             print("away_player_forms ", away_player_forms.errors)
+#             print("away_0 ", away_0_game.errors)
+#             print("away_1 ", away_1_game.errors)
+#             print("home_0 ", home_0_game.errors)
+#             print("home_1 ", home_1_game.errors)
+
+#     context = {
+#         "match": match,
+#         "home_player_forms": home_player_forms,
+#         "away_player_forms": away_player_forms,
+#         "away_0_game": away_0_game,
+#         "away_1_game": away_1_game,
+#         "home_0_game": home_0_game,
+#         "home_1_game": home_1_game,
+#     }
+
+#     return render(request, "scores/add_scoresheet.html", context)

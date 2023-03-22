@@ -29,5 +29,5 @@ urlpatterns = [
     path("schedule/", include("Schedule.urls"), name="Schedule"),
     path("scores/", include("Scores.urls"), name="Scores"),
     # API
-    path("api/v1/", include("API.urls")),
+    path("api/v1/", include("API.urls"), name="api"),
 ]
