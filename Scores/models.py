@@ -154,6 +154,10 @@ class Approval(TimeStampedModel, models.Model):
 
 
 class TeamScoreSummary(TimeStampedModel, models.Model):
+    """
+    Holds the summary of a team's scores for a match. Used for calculating
+    team stats.
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
@@ -167,6 +171,16 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
 
     @property
     def weekly_ppd(self):
+        if self.darts_thrown1 is None:
+            self.darts_thrown1 = 50
+        if self.darts_thrown2 is None:
+            self.darts_thrown2 = 50
+        if self.score_left1 is None:
+            self.darts_thrown1 = 50
+            self.score_left1 = 2
+        if self.score_left2 is None:
+            self.darts_thrown2 = 50
+            self.score_left2 = 2
         darts_thrown = self.darts_thrown1 + self.darts_thrown2
         scored = 1001 - (self.score_left1 + self.score_left2)
         return round(scored / darts_thrown, 4)
@@ -178,9 +192,10 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
 
 class ScoreSummary(TimeStampedModel, models.Model):
     """
-    Holds summarized scores for each :model: 'Members.Player' in a :model: 'Matches.Match'.
-    Creation of this model is limited to area managers and admins. Stats can be queried
-    by calling 'ScoreSummary.stats'
+    Holds summarized scores for each Player in a Match. Creation of this model 
+    is limited to area managers and admins.
+    Objects may also be created by the create_summary method in the ScoreDetail
+    model.
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -218,6 +233,10 @@ class ScoreSummary(TimeStampedModel, models.Model):
 
 
 class ScoreDetail(TimeStampedModel, models.Model):
+    """
+    A detailed breakdown of a player's scores for a match. Only created when
+    scores are submitted by a player and not by an area manager or admin.
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -259,3 +278,25 @@ class ScoreDetail(TimeStampedModel, models.Model):
         blank=True,
         null=True,
     )
+
+    def create_summary(self):
+        """
+        Creates a ScoreSummary object based on the data in this object.
+        """
+        summary = ScoreSummary.objects.create(
+            match=self.match,
+            player=self.player,
+            team=self.team,
+            total_stars=sum(self.stars_list),
+            total_perfects=sum(self.perfects_list),
+            singles_points=sum(self.points_list),
+            doubles_points=sum(self.points_list),
+            high_in=max(self.in_list),
+            high_out=max(self.out_list),
+            darts_thrown1=self.darts_thrown_list[0],
+            score_left1=self.score_left_list[0],
+            darts_thrown2=self.darts_thrown_list[1],
+            score_left2=self.score_left_list[1],
+        )
+        self.score_summary = summary
+        self.save()

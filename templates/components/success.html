@@ -1,9 +1,9 @@
-<div id="successBox" class="fixed backdrop-blur inset-y-auto right-2 mt-3w-fit md:w-1/3 p-2 h-fit rounded-lg ring-1 ring-emerald-300/60 shadow-emerald-800/10 shadow-lg bg-emerald-600/10">
-  <button type="button" data-hs-remove-element="#successBox" class="relative -inset-4 inline-block">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="fill-emerald-900 stroke-emerald-300/60 h-5 w-5 flex-none">
-        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
-    </svg>
+<div class="px-2 backdrop-blur h-fit w-full rounded-lg ring-1 ring-emerald-300/60 shadow-emerald-800/10 shadow-lg bg-emerald-600/10 text-emerald-300">
+  <p class="text-emerald-400 font-semibold">Success!</p>
+  <button type="button" data-hs-remove-element="{{ target_element }}" class="absolute top-0 right-0 justify-self-end">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>    
   </button>
-  <strong class="text-emerald-400 font-semibold">Success!&nbsp</strong>
-  <p class="text-emerald-200">{{ message }}</p>
+  <p class="text-emerald-300 text-sm p-1">{{ message }}</p>
 </div>

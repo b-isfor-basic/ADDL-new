@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.views.generic import CreateView
+from django.shortcuts import render, HttpResponse
+from django.views.generic import CreateView, FormView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (
@@ -10,7 +10,7 @@ from django.contrib.auth.views import (
 )
 
 from .models import Player
-from .forms import PlayerCreationForm, PlayerChangeForm
+from .forms import PlayerCreationForm
 
 
 class SuccessMessageMixin(SuccessMessageMixin):
@@ -43,4 +43,3 @@ class PasswordResetDoneView(PasswordResetDoneView):
 class PasswordResetConfirmView(PasswordResetConfirmView):
     template_name = "registration/password_reset_confirm.html"
     success_url = "members/password_reset_complete"
-    

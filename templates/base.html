@@ -20,78 +20,40 @@
 
   <body class="flex min-h-screen flex-col justify-center bg-gray-800 antialiased">
     <header class="fixed top-0 z-40 flex w-full border-b border-slate-500/30 bg-slate-900/40 backdrop-blur shadow">
-      <div class="w-full flex-wrap items-center justify-between text-center pt-4 pb-2 px-2 md:px-6 md:inline-flex ">
+      <div class="w-full flex-wrap items-end justify-between text-center pt-4 pb-2 px-2 md:px-6 md:inline-flex ">
         <p class="font-sans text-3xl font-black text-amber-400 -tracking-widest">
           <a href="{% url 'home' %}">ADDL</a>
         </p>
-        <div class="text-slate-300 -mb-2">
+        <div class="text-slate-300">
           <ul class="inline-flex justify-around uppercase">
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'home' %}" 
-                {% if request.resolver_match.url_name == 'home' %}
-                class="nav-link-active" aria-current="page"
-                {% else %}
-                class="nav-link-inactive"
-                {% endif %}
-              >Home</a>
+              <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Home</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'all_areas' %}" 
-                {% if 'locations' in request.resolver_match.route %}
-                class="nav-link-active" aria-current="page"
-                {% else %}
-                class="nav-link-inactive"
-                {% endif %}
-              >Meet</a>
+              <a href="{% url 'all_areas' %}" {% if 'locations' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Meet</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'schedule' %}" 
-                {% if 'schedule' in request.resolver_match.route %}
-                class="nav-link-active" aria-current="page"
-                {% else %}
-                class="nav-link-inactive"
-                {% endif %}
-              >Play</a>
+              <a href="{% url 'schedule' %}" {% if 'schedule' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Play</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'standings' latest_season %}" 
-                {% if 'scores' in request.resolver_match.route %}
-                class="nav-link-active" aria-current="page"
-                {% else %}
-                class="nav-link-inactive"
-                {% endif %}
-              >Win</a>
+              <a href="{% url 'standings' latest_season %}" {% if 'scores' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Win</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-              {% if user.is_authenticated %}
-                <a href="{% url 'profile' %}" 
-                  {% if 'members' in request.resolver_match.route %}
-                  class="nav-link-active" aria-current="page"
-                  {% else %}
-                  class="nav-link-inactive"
-                  {% endif %}
-                >{{ user.username }}</a>
-                {% else %}
-                <a href="{% url 'login' %}" 
-                  {% if 'members' in request.resolver_match.route %}
-                  class="nav-link-active" aria-current="page"
-                  {% else %}
-                  class="nav-link-inactive"
-                  {% endif %}
-                >Login</a>
-              {% endif %}
+                <a href={% if user.is_authenticated %}"{% url 'profile' %}"{% else %}"{% url 'login' %}"{% endif %} {% if 'members' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>{% if user.is_authenticated %}{{ user.username }}{% else %}Login{% endif %}</a>
             </li>
           </ul>
         </div>
       </div>
     </header>
     
-    <main class="relative top-20 -mt-2 md:top-14 flex w-screen mx-auto min-h-screen mb-24 px-2 md:px-6 max-w-8xl justify-around items-start">
+    <main class="relative top-20 md:top-14 flex w-screen mx-auto min-h-screen mb-24 px-2 md:px-6 max-w-8xl justify-around items-start">
         {% block messages %}
           {% if messages %}
-          <div class="pt-4 z-40">
-            {% for message in messages %}
-              {% if message.tags == 'error' %} {% include './components/error.html' %} {% elif message.tags == 'success' %} {% include './components/success.html' %} {% else %}{{ message }}{% endif %}
+          <div class="mt-10 z-30">
+            {% for message in messages %} 
+            <div id="boxMain" class="fixed m-2 right-2 w-4/5 md:w-1/3">
+              {% if message.tags == 'error' %} {% include './components/error.html' with target_element='#boxMain' message=message %} {% elif message.tags == 'success' %} {% include './components/success.html' %} {% else %}{{ message }}{% endif %}
+            </div>
             {% endfor %}
           </div>
           {% endif %}
@@ -101,6 +63,7 @@
         {% endblock content %}
     </main>
 
+    <!-- Footer -->
     <div class="z-20 static bottom-0 mt-auto w-screen justify-end bg-slate-900 p-6">
       <div class="text-center tk-rustica py-3 text-xs flex-nowrap">
         <p class="text-slate-300">&copy;2023 Atlanta Doubles Dart League</p>
@@ -114,7 +77,10 @@
         </p>
       </div>
     </div>
-  
+    <!-- End Footer -->
+    
+    {% block modal %}
+    {% endblock modal %}
   
   {% block footerScripts %}
   {% endblock footerScripts %}

@@ -1,8 +1,8 @@
 from itertools import groupby, chain
 
 from django.db import models
-from django.db.models import Case, Count, F, Max, Min, Q, Sum, Value, When
-from django.db.models.functions import Ln
+from django.db.models import Case, Count, F, Max, Min, Q, Sum, Value, When, Subquery, OuterRef
+from django.db.models.functions import Ln, Least, Concat
 from django.db.models.lookups import LessThan, LessThanOrEqual, GreaterThanOrEqual
 
 
@@ -45,7 +45,7 @@ class PlayerScoreSummaryManager(models.Manager):
                     / (F("darts_thrown1") + F("darts_thrown2"))
                 )
             ).values(
-                "player", "player__first_name", "player__last_name", "team__division"
+                "team__division", "player", "player__first_name", "player__last_name"
             ).annotate(
                 # Get total_darts_thrown, total_score_left, games_included to calculate average ppd
                 total_darts_thrown=(Sum("darts_thrown1") + Sum("darts_thrown2")),
@@ -74,23 +74,11 @@ class PlayerScoreSummaryManager(models.Manager):
                     ((501.0 * F("games_included")) - F("total_score_left"))
                     / F("total_darts_thrown")
                 ),
-                best_501_game=Case(
-                    When(
-                        LessThanOrEqual(
+                best_501_game=Least(
                             Min("darts_thrown1", filter=Q(score_left1=0)),
                             Min("darts_thrown2", filter=Q(score_left2=0)),
+                            Value(1000)
                         ),
-                        then=Min("darts_thrown1", filter=Q(score_left1=0)),
-                    ),
-                    When(
-                        LessThan(
-                            Min("darts_thrown2", filter=Q(score_left2=0)),
-                            Min("darts_thrown1", filter=Q(score_left1=0)),
-                        ),
-                        then=Min("darts_thrown2", filter=Q(score_left2=0)),
-                    ),
-                    default=1000,
-                ),
                 best_week_singles_ppd=F("max_weekly_ppd"),
 
                 # Rating stats
@@ -131,7 +119,7 @@ class PlayerScoreSummaryManager(models.Manager):
 
 class TeamScoreSummaryManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset().select_related("team", "match", "match__week", "team__division")
+        qs = super().get_queryset().filter(*args, **kwargs).select_related("match", "match__week", "team", "team__division", 'team__players')
         return (
             qs.annotate(
                 weekly_doubles_ppd=(
@@ -139,7 +127,7 @@ class TeamScoreSummaryManager(models.Manager):
                     / (F("darts_thrown1") + F("darts_thrown2"))
                 )
             )
-            .values("team", "team__division")
+            .values("team__division", "team")
             .annotate(
                 total_darts_thrown=(Sum("darts_thrown1") + Sum("darts_thrown2")),
                 total_score_left=(Sum("score_left1") + Sum("score_left2")),
@@ -148,80 +136,15 @@ class TeamScoreSummaryManager(models.Manager):
                     ((501.0 * F("games_included")) - F("total_score_left"))
                     / F("total_darts_thrown")
                 ),
-                best_501_game=Case(
-                    When(
-                        LessThanOrEqual(
+                best_501_game=Least(
                             Min("darts_thrown1", filter=Q(score_left1=0)),
                             Min("darts_thrown2", filter=Q(score_left2=0)),
+                            Value(1000)
                         ),
-                        then=Min("darts_thrown1", filter=Q(score_left1=0)),
-                    ),
-                    When(
-                        LessThan(
-                            Min("darts_thrown2", filter=Q(score_left2=0)),
-                            Min("darts_thrown1", filter=Q(score_left1=0)),
-                        ),
-                        then=Min("darts_thrown2", filter=Q(score_left2=0)),
-                    ),
-                    default=1000,
-                ),
-                best_week_doubles_ppd=Max(F("weekly_doubles_ppd")),
+                best_week_doubles_ppd=Max(F("weekly_doubles_ppd"))
             )
         )
-
-
-    def with_names(self, *args, **kwargs):
-        
-        from Members.models import Team
-        
-        qs = self.get_queryset().filter(*args, **kwargs)
-        for team in qs:
-            team_name = [player.last_name for player in Team.objects.get(id=team['team']).players.all()]
-            team_name = '/'.join(team_name)
-            team['name'] = team_name
-        return qs
-
-
-    def all_stats(self, *args, **kwargs):
-
-        from .models import ScoreSummary
-        additional = ScoreSummary.stats.filter(*args, **kwargs
-            ).values('team', 'rating_score').annotate(
-                total_points=Sum('singles_points') + Sum('doubles_points'),
-                team_rating=Case(
-                    When(
-                        LessThanOrEqual(F("rating_score"), 10.50),
-                        then=Value("E")
-                    ),
-                    When(
-                        LessThan(F("rating_score"), 12.20),
-                        then=Value("D")
-                    ),
-                    When(
-                        LessThan(F("rating_score"), 15.40),
-                        then=Value("C")
-                    ),
-                    When(
-                        LessThan(F("rating_score"), 18.80),
-                        then=Value("B")
-                    ),
-                    When(
-                        LessThan(F("rating_score"), 22.50),
-                        then=Value("A")
-                    ),
-                    When(
-                        GreaterThanOrEqual(F("rating_score"), 22.50),
-                        then=Value('AA')
-                    )
-                ),
-            )
-        original = self.with_names(*args, **kwargs)
-        for team in original:
-            # add the extra stats to the original queryset
-            team.update(additional.get(team=team['team']).items())
-        return original
-
-
+    
 
 
 
