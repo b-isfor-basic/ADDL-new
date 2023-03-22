@@ -42,7 +42,7 @@ class TeamStatsManager(models.Manager):
                     "teamscoresummary__darts_thrown2",
                     filter=Q(teamscoresummary__score_left2=0),
                 ),
-                default=1000,
+                Value(1000)
             ),
             avg_ppd=(
                 ((501.0 * F("games_included")) - F("total_score_left"))
