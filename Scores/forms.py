@@ -1,51 +1,9 @@
 from django import forms
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from Members.models import Player
 
-from .models import GameScore, Scoreset, ScoreSummary, TeamScoreSummary, Forfeit
-
-
-class ScoresetForm(forms.ModelForm):
-    class Meta:
-        model = Scoreset
-        fields = ["player"]
-        widgets = {"player": forms.widgets.Input()}
-
-
-class GameScoreForm(forms.ModelForm):
-    class Meta:
-        model = GameScore
-        fields = [
-            "stars",
-            "perfects",
-            "game_point",
-            "in_thrown",
-            "out_thrown",
-            "darts_thrown",
-            "score_left",
-        ]
-        widgets = {
-            "stars": forms.widgets.NumberInput(
-                attrs={"class": "ss-left", "placeholder": "stars"}
-            ),
-            "perfects": forms.widgets.NumberInput(
-                attrs={"class": "ss-center", "placeholder": "perfects"}
-            ),
-            "in_thrown": forms.widgets.NumberInput(
-                attrs={"class": "ss-center", "placeholder": "in"}
-            ),
-            "out_thrown": forms.widgets.NumberInput(
-                attrs={"class": "ss-center", "placeholder": "out"}
-            ),
-            "darts_thrown": forms.widgets.NumberInput(
-                attrs={"class": "ss-center", "placeholder": "thrown"}
-            ),
-            "score_left": forms.widgets.NumberInput(
-                attrs={"class": "ss-right", "placeholder": "left"}
-            ),
-            "game_point": forms.widgets.NumberInput(),
-        }
+from .models import Forfeit, ScoreSummary, TeamScoreSummary
 
 
 class BasePlayerScoreFormSet(forms.BaseModelFormSet):
@@ -190,22 +148,22 @@ class TeamScoreSummaryForm(forms.ModelForm):
             "team": forms.widgets.HiddenInput(),
             "darts_thrown1": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "score_left1": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "darts_thrown2": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "score_left2": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
         }
@@ -241,7 +199,7 @@ class PlayerScoreSummaryForm(forms.ModelForm):
         required=False,
         widget=forms.widgets.TextInput(
             attrs={
-                "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent",
+                "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent",
                 "x-ref": "firstName",
             }
         ),
@@ -250,7 +208,7 @@ class PlayerScoreSummaryForm(forms.ModelForm):
         required=False,
         widget=forms.widgets.TextInput(
             attrs={
-                "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent",
+                "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent",
                 "x-ref": "lastName",
             }
         ),
@@ -279,57 +237,57 @@ class PlayerScoreSummaryForm(forms.ModelForm):
             "team": forms.HiddenInput(),
             "darts_thrown1": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "score_left1": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "darts_thrown2": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "score_left2": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "high_in": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "high_out": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "total_stars": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "total_perfects": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "singles_points": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "doubles_points": forms.widgets.NumberInput(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
                 }
             ),
             "player": forms.widgets.Select(
                 attrs={
-                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent",
+                    "class": "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent",
                     ":disabled": "isOpen()",
                     ":class": " isOpen() ? 'cursor-not-allowed' : '' ",
                     "x-ref": "select",
@@ -412,3 +370,47 @@ class PlayerScoreSummaryForm(forms.ModelForm):
             return
 
         return cleaned_data
+
+
+# Old score entry forms. Kept for reference.
+# 
+#  class ScoresetForm(forms.ModelForm):
+#     class Meta:
+#         model = Scoreset
+#         fields = ["player"]
+#         widgets = {"player": forms.widgets.Input()}
+
+
+# class GameScoreForm(forms.ModelForm):
+#     class Meta:
+#         model = GameScore
+#         fields = [
+#             "stars",
+#             "perfects",
+#             "game_point",
+#             "in_thrown",
+#             "out_thrown",
+#             "darts_thrown",
+#             "score_left",
+#         ]
+#         widgets = {
+#             "stars": forms.widgets.NumberInput(
+#                 attrs={"class": "ss-left", "placeholder": "stars"}
+#             ),
+#             "perfects": forms.widgets.NumberInput(
+#                 attrs={"class": "ss-center", "placeholder": "perfects"}
+#             ),
+#             "in_thrown": forms.widgets.NumberInput(
+#                 attrs={"class": "ss-center", "placeholder": "in"}
+#             ),
+#             "out_thrown": forms.widgets.NumberInput(
+#                 attrs={"class": "ss-center", "placeholder": "out"}
+#             ),
+#             "darts_thrown": forms.widgets.NumberInput(
+#                 attrs={"class": "ss-center", "placeholder": "thrown"}
+#             ),
+#             "score_left": forms.widgets.NumberInput(
+#                 attrs={"class": "ss-right", "placeholder": "left"}
+#             ),
+#             "game_point": forms.widgets.NumberInput(),
+#         }

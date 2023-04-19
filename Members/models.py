@@ -58,3 +58,62 @@ class Team(models.Model):
         if len(names) < 2:
             return "Invalid Name"
         return f"{names[0]}/{names[1]}"
+    
+    def weekly_points(self, *args, **kwargs):
+        """
+        Returns the points per match for the given season.
+        """
+        from Schedule.models import Season
+
+        if 'season' in kwargs:
+            search = models.Q(match__week__season=kwargs['season'])
+        else:
+            search = models.Q(match__week__season=Season.details.get_active())
+
+        return (self.scoresummary_set
+                .filter(search)
+                .values('match')
+                .annotate(
+                    week=models.F('match__week'),
+                    match_points=(
+                        models.Sum('singles_points') 
+                        + models.Sum('doubles_points')
+                    )
+                )
+            )
+    
+    def season_points(self, *args, **kwargs):
+        """
+        Returns the points for the given season.
+        """
+        from Schedule.models import Season
+
+        if 'season' in kwargs:
+            search = models.Q(match__week__season=kwargs['season'])
+        else:
+            search = models.Q(match__week__season=Season.details.get_active())
+            
+            
+        return sum(self.scoresummary_set
+                    .filter(search)
+                    .values_list('singles_points', 'doubles_points')
+                    .aggregate(
+                        sngl=models.Sum('singles_points'), 
+                        dbls=models.Sum('doubles_points')
+                    ).values()
+                )
+
+    def get_matches(self, *args, **kwargs):
+        """
+        Returns the matches for the team for the given season.
+        """
+        from Schedule.models import Season
+
+        if 'season' in kwargs:
+            search = models.Q(week__season=kwargs['season'])
+        else:
+            search = models.Q(week__season=Season.details.get_active())
+            
+        matches = self.awayMatches.filter(search)
+        return matches.union(self.homeMatches.filter(search).order_by('week__week_number'))
+  

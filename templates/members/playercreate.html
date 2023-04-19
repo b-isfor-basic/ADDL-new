@@ -11,7 +11,7 @@
     <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">New Player Registration</h2>
     <p class="pt-4 text-slate-200 text-sm">Complete the form below to create an account. Fields marked with <span class="text-rose-400">*</span> are required.</p>
   </div>
-  <form class="justify-evenly items-center pt-4" id="{{ form.id }}" method="post" action="{% url 'register' %}">
+  <form class="justify-evenly items-center pt-4" id="new-player-form" method="post" action="{% url 'register' %}">
         {% csrf_token %}
   {% if form.non_field_errors %}
     <div id="errorBox" class="m-4 relative flex justify-center items-center ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-600/10">
@@ -29,12 +29,12 @@
           <div class="md:col-span-2 items-center space-y-2 md:space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="col-span-1">
-                <label for="id_username">Username<span class="text-rose-400">*</span></label>
+                <label for="{{ form.username.id_for_label }}">Username<span class="text-rose-400">*</span></label>
                 <input type="text" name="username" id="id_username" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="username" required="">
                 <span class="text-sm text-rose-400 leading-5">{{ form.username.errors }}</span>
               </div>
               <div class="col-span-1">
-                <label for="id_email" class="text-slate-200">Email<span class="text-rose-400">*</span></label>
+                <label for="{{ form.email.id_for_label }}" class="text-slate-200">Email<span class="text-rose-400">*</span></label>
                 <input type="email" name="email" id="id_email" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="example@email.com" required="">
                 <span class="text-sm text-rose-400 leading-5">{{ form.email.errors }}</span>
               </div>

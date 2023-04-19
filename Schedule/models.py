@@ -1,16 +1,14 @@
 import uuid
 
-from django.db import models
-from django.db.models import Sum, F, Q, Count
-from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
-
+from django.db import models
+from django.db.models import F, Sum
 from recurrence.fields import RecurrenceField
 
 from Locations.models import Division, Establishment
-from Members.models import Team, Player
+from Members.models import Player, Team
 
-from .managers import SeasonManager, MatchManager, ScheduleManager
+from .managers import MatchManager, ScheduleManager, SeasonManager
 
 
 class Scheduler(models.Model):
@@ -49,6 +47,14 @@ class Season(models.Model):
 
     def __str__(self):
         return f"Season {self.season_number}"
+    
+    @property
+    def num_weeks_regular_season(self):
+        """
+        Returns the number of weeks in the season.
+        """
+        return list(range(1, ((self.match_play_end_dt - self.match_play_start_dt).days // 7) - 1))
+        
 
 
 class ScheduleWeek(models.Model):
@@ -70,7 +76,7 @@ class ScheduleWeek(models.Model):
         unique_together = ["season", "week_number", "division"]
 
     def __str__(self):
-        return f"S{self.season.season_number} - Area {self.division.area.number} - W{self.week_number}"
+        return f"S{self.season.season_number} - W{self.week_number} - Area {self.division.area.number}"
 
 
 class Match(models.Model):

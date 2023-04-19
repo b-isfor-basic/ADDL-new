@@ -1,6 +1,5 @@
 {% extends 'base_tabs.html' %}
-
-{% debug %}
+{% load static %}
 
 {% block title %}Statistics{% endblock title %}
 
@@ -32,6 +31,12 @@
         <li class="text-slate-200 hover:underline hover:text-blue-400"><a href="{% url 'standings' season.season_number %}">View All</a></li>
     </ul> 
 </div> 
+<div class="mb-4">
+    <h1 class="font-bold text-amber-500 text-lg mb-2">
+        Search
+    </h1>
+    <input type="search" id="search" name="search" class="flex rounded-full shadow-sm bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1 text-slate-400 text-sm" placeholder="Search by name" maxlength="20">
+</div>
 {% endblock sidebar %}
 
 
@@ -286,17 +291,20 @@
 {% endblock tab_2_body %}
 
 {% block tab_3_body %}
-Under Development
-{% comment %}
 <div class="grid grid-flow-row px-1 w-full gap-1 md:gap-6 justify-items-center content-center">
     {% if division_set %}
-        {% include './partials/standings_table.html' with division=division_set %}
+        {% include './partials/standings_table.html' with division=division_set teams=team_points%}
     {% else %}
-        {% include './partials/standings_table.html' with division="Leaguewide" %}
+        {% for division in active_divisions %}
+            {% include './partials/standings_table.html' with division=division teams=team_points %}
+        {% endfor %}
     {% endif %}
 </div>
-{% endcomment %}
+{% endblock tab_3_body %}
+
+
+{% block footerScripts %}
+{{ block.super }}
+<script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static '/js/scores/standings.js' %}"></script>
 {% endblock %}
-
-
-

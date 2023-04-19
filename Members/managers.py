@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Avg, Case, Count, F, Max, Min, OuterRef, Q, Sum, When, Value
+from django.db.models import Avg, Case, Count, F, Max, Min, OuterRef, Q, Sum, When, Value, FilteredRelation
 from django.db.models.functions import Least
 from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqual
 
@@ -22,7 +22,7 @@ class TeamStatsManager(models.Manager):
     """
 
     def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset().prefetch_related("teamscoresummary_set")
+        qs = super().get_queryset().select_related('division', 'season').prefetch_related("teamscoresummary_set", "scoresummary_set", "awayMatches", "homeMatches", "players")
         return qs.filter(*args, **kwargs).annotate(
             total_darts_thrown=(
                 Sum("teamscoresummary__darts_thrown1", distinct=True)
@@ -77,6 +77,16 @@ class TeamStatsManager(models.Manager):
             total_points=Sum("scoresummary__singles_points")
             + Sum("scoresummary__doubles_points")
         ).filter(total_points__isnull=False)
+    
+    def get_weekly_points(self, *args, **kwargs):
+        # Return the total number of points scored by the team in all games. Can be filtered.
+        qs = super().get_queryset().prefetch_related("scoresummary_set", "players", )
+        return (qs.filter(*args, **kwargs)
+                    .values('scoresummary__match')
+                    .annotate(total_points=(Sum("scoresummary__singles_points")
+                        + Sum("scoresummary__doubles_points"))
+                ).filter(total_points__isnull=False)
+            )
     
     def stats(self, *args, **kwargs):
         from Scores.models import TeamScoreSummary

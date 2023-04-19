@@ -7,6 +7,7 @@ from Locations.models import Division
 
 
 class ScheduleManager(Manager):
+    # TODO: This is not functional yet. Needs to be revised.
     def create(self, season):
         
         from .models import Season, Match
@@ -18,22 +19,23 @@ class ScheduleManager(Manager):
         
         def get_weeks(start_dt, end_dt, season, division):
             match_night = dt.strptime(division.matchNight, '%A').weekday()
-            start_dt = start_dt + timedelta(days=match_night.weekday() - start_dt.weekday())
+            start_dt = dt.date(start_dt) + timedelta(days=match_night.weekday() - start_dt.weekday())
             weeks = []
             week_number = 1
-            while start_dt <= end_dt:
-                weeks.append(Match.objects.create(week=week_number, date=start_dt, season=season, division=division))
-                start_dt += timedelta(days=7)
+            current_dt = dt.date(start_dt)
+            print(match_night, start_dt, end_dt, weeks)
+            while dt.date(current_dt) <= dt.date(end_dt):
+                weeks.append(super().create(week=week_number, date=dt.date(current_dt), season=season, division=division))
+                current_dt += timedelta(days=7)
                 week_number += 1
             return weeks
         
         for division in divisions:
             if division.scheduleweek_set.filter(season=season).exists():
-                continue
+                return print(f"Schedule for {season} and {division} already exists.")
             weeks = get_weeks(start_dt, end_dt, season, division)
             for week in weeks:
                 week.save()
-
 
 
 class MatchManager(Manager):
@@ -65,3 +67,4 @@ class SeasonManager(Manager):
        
         return self.get_queryset().latest("match_play_start_dt")
 
+        

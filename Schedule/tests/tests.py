@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.test import TestCase
 
-from .models import *
+from ..models import *
 
 
 class SeasonTestCase(TestCase):

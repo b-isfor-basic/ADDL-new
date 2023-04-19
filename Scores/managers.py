@@ -1,8 +1,8 @@
 from itertools import groupby, chain
 
 from django.db import models
-from django.db.models import Case, Count, F, Max, Min, Q, Sum, Value, When, Subquery, OuterRef
-from django.db.models.functions import Ln, Least, Concat
+from django.db.models import Case, Count, F, Max, Min, Q, Sum, Value, When
+from django.db.models.functions import Ln, Least
 from django.db.models.lookups import LessThan, LessThanOrEqual, GreaterThanOrEqual
 
 
@@ -147,76 +147,14 @@ class TeamScoreSummaryManager(models.Manager):
     
 
 
-
-class SinglesCricketGameManager(models.Manager):
-    def sngl_ckt_create(self, **kwargs):
-        format = "SN"
-        game = "CKT"
-        return super().create(format=format, game=game, **kwargs)
-
-
-class DoublesCricketGameManager(models.Manager):
-    def dbls_ckt_create(self, **kwargs):
-        format = "DB"
-        game = "CKT"
-        return super().create(format=format, game=game, **kwargs)
-
-
-class Singles501GameManager(models.Manager):
-    def sngl_501_create(self, **kwargs):
-        format = "SN"
-        game = "501"
-        return super().create(format=format, game=game, **kwargs)
-
-
-class Doubles501GameManager(models.Manager):
-    def dbls_501_create(self, **kwargs):
-        format = "DB"
-        game = "501"
-        return super().create(format=format, game=game, **kwargs)
-
-
-class Doubles301GameManager(models.Manager):
-    def dbls_301_create(self, **kwargs):
-        format = "DB"
-        game = "301"
-        return super().create(format=format, game=game, **kwargs)
-
-
-class GameQuerySet(models.QuerySet):
-    def doubles(self, **kwargs):
-        return super(GameQuerySet, self).filter(format="DB", **kwargs)
-
-    def singles(self, **kwargs):
-        return super(GameQuerySet, self).filter(format="SN", **kwargs)
-
-    def five01_singles(self, **kwargs):
-        return super(GameQuerySet, self).filter(format="SN", game="501", **kwargs)
-
-    def five01_doubles(self, **kwargs):
-        return super(GameQuerySet, self).filter(format="DB", game="501", **kwargs)
-
-    def wins(self, **kwargs):
-        return super(GameQuerySet, self).filter(game_point=1, **kwargs)
-
-
-class GamesManager(
-    SinglesCricketGameManager,
-    DoublesCricketGameManager,
-    Singles501GameManager,
-    Doubles501GameManager,
-    Doubles301GameManager,
-    models.Manager,
-):
-    pass
-
-
-class ScoresetManager(models.Manager):
-    def create_new(self, match, team, player):
-        if player in match.week.season.team_set.filter(id=team.id).players.all():
-            sub = False
-        else:
-            sub = True
-        scoreset = self.create(match=match, team=team, player=player, is_sub=sub)
-        return scoreset
+# Old Scoreset Manager. Kept for reference.
+# 
+#  class ScoresetManager(models.Manager):
+#     def create_new(self, match, team, player):
+#         if player in match.week.season.team_set.filter(id=team.id).players.all():
+#             sub = False
+#         else:
+#             sub = True
+#         scoreset = self.create(match=match, team=team, player=player, is_sub=sub)
+#         return scoreset
 

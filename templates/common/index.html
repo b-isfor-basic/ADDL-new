@@ -12,14 +12,14 @@
   </div>
 
   <div class="">
-    {% if announcement_list %}
-    <div class="inline-flex flex-row w-full{% if announcement_list|length > 1 %}justify-start gap-8 overflow-x-scroll {% else %} justify-center{% endif %}">
+    {% if announcement_list|length > 0 %}
+    <div class="inline-flex flex-row w-full {% if announcement_list|length > 1 %}justify-start gap-8 overflow-x-scroll {% else %}justify-center{% endif %}">
     {% for item in announcement_list %}
-      <div class="inline {% if announcement_list|length > 1 %}w-11/12 md:w-2/3 {% else %}w-full {% endif %} flex-none px-2 md:px-4 py-2 bg-slate-700 min-h-full shadow-inner shadow-slate-900 ring-1 ring-slate-900/30 rounded-lg content-between">
+      <div class="inline {% if announcement_list|length > 1 %}w-11/12 md:w-2/3 {% else %}w-full {% endif %}flex-none px-2 md:px-4 py-2 bg-slate-700 min-h-full shadow-inner shadow-slate-900 ring-1 ring-slate-900/30 rounded-lg content-between">
         <div class="w-fit min-h-fit">
           <div class="my-2 mx-auto p-3 border-l border-amber-400">
             <p class="font-semibold text-left text-amber-400">{{ item.title|title }}</p>
-            <p class="text-xs text-blue-400">{{ item.date_created|date:"m d y" }}</p>
+            <p class="text-xs text-blue-400 italic">{{ item.active_date|date:"m d y" }}</p>
             <p class="py-4 flex-none font-normal text-left text-sm text-slate-200 pl-3">{{ item.body }}</p>
             <p class="text-xs text-right text-blue-400 italic">{{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }}</p>
           </div>
@@ -36,8 +36,5 @@
     </div>
   </div>
 </div>
-
-    
-
 
 {% endblock %}

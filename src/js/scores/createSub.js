@@ -3,7 +3,6 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 function addSub() {
   return {
     show: false,
-    selectID: null,
     firstName: null,
     lastName: null,
     inputData: null,

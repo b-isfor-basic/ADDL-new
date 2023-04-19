@@ -9,13 +9,13 @@ from django.views.generic import UpdateView
 from Members.models import Player, Team
 from Schedule.models import Match, Season
 
-from .forms import (
+from Scores.forms import (
     BasePlayerScoreFormSet,
     BaseTeamScoreFormSet,
     PlayerScoreSummaryForm,
     TeamScoreSummaryForm,
 )
-from .models import ScoreSummary, TeamScoreSummary
+from Scores.models import ScoreSummary, TeamScoreSummary
 
 
 def PlayerSearchView(request, **kwargs):
@@ -56,7 +56,6 @@ def StandingsView(
     team_base_stats = Team.stats.stats(match__week__season=season.id)
     team_rating = Team.stats.rating(match__week__season=season.id)
     team_points = Team.stats.get_points(scoresummary__match__week__season=season.id)
-    # team_stats = Team.stats.filter(teamscoresummary__match__week__season=season.id)
     
     division_set = None
     
@@ -64,9 +63,6 @@ def StandingsView(
         division_id = division_id
         division_set = season.divisions.get(id=division_id)
         player_stats = player_stats.filter(match__week__division_id=division_id)
-        # team_stats = Team.stats.filter(
-        #     Q(teamscoresummary__match__week__season=season.id) & Q(teamscoresummary__match__week__division_id=division_id)
-        # )
         team_base_stats = team_base_stats.filter(division=division_id)
         team_rating = team_rating.filter(division=division_id)
         team_points = team_points.filter(division=division_id)
