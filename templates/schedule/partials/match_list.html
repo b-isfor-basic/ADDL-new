@@ -5,36 +5,30 @@
         <table class="p-1 w-full">
             <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
                 <tr>
-                    <th scope="col" class="p-2 font-light">Week</th>
-                    <th scope="col" class="p-2 font-light">Match Date</th>
-                    <th scope="col" class="p-2 font-light">Away Team</th>
-                    <th scope="col" class="p-2 font-light">Home Team</th>
-                    <th scope="col" class="p-2 font-light">Results</th>
+                    <th id="week" class="p-2 font-light">Week</th>
+                    <th id="date" class="p-2 font-light">Match Date</th>
+                    <th id="away" class="p-2 font-light">Away Team</th>
+                    <th id="home" class="p-2 font-light">Home Team</th>
+                    <th id="results" class="p-2 font-light">Status</th>
                 </tr>
             </thead>
             <tbody>
-                {% for week in match_list %}
-                <tr class="bg-slate-700 text-slate-200 border-b border-b-slate-800 hover:bg-slate-700/50 border-t border-t-amber-800">
-                    <th rowspan={{ week.match_set.all|length }} scope="rowgroup" class="p-2 text-sm text-center border-t border-t-amber-800">{{ week.week_number }}</th>      
-                    <th rowspan={{ week.match_set.all|length }} scope="rowgroup" class="p-2 text-sm text-center border-t border-t-amber-800">{{ week.match_date }}</th>      
+                {% for week in division.scheduleweek.all %}
+                <tr class="bg-slate-700 text-slate-200 border-b border-b-slate-800 border-t border-t-amber-800 hover:bg-slate-700/50">
+                    {% with num_rows as week.match_set.all|length %}
+                    <th id="trWeek{{ forloop.counter }}" rowspan="{{ num_rows }}" class="p-1 text-sm text-center border-t border-t-amber-800">{{ week.week_number }}</th>      
+                    <th id="trDate{{ forloop.counter }}" rowspan="{{ num_rows }}" class="p-1 text-sm text-center border-t border-t-amber-800">{{ week.match_date }}</th>
+                    {% endwith %}      
                     {% for match in week.match_set.all %}
                         {% if not forloop.first %}
                             <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
                             {% endif %}
-                            <td class="p-2 text-sm text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{% if match.awayScore > 10 %}<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="rgb(245 158 11)" class="inline-block align-text-bottom items-center w-5 h-5 -p-1">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
-                              </svg> {% endif %}{{ match.awayTeam }} {% if match.awayScore %}({{ match.awayScore }}){% endif %}</td>
-                            <td class="p-2 text-sm text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{% if match.homeScore > 10 %}<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="rgb(245 158 11)" class="inline-block align-text-bottom items-center w-5 h-5 -p-1">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
-                              </svg> {% endif %}{{ match.homeTeam }} {% if match.homeScore %}({{ match.homeScore }}){% endif %}</td>
-                            <td class="p-2 text-sm text-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">
-                                {% if match.awayScore %}
-                                <a href="{% url 'standings' latest_season %}" class="inline-flex items-center font-medium text-blue-400 hover:underline hover:text-amber-400 after:content-['_↗']">
-                                    View&nbsp;
-                                </a>
-                                {% else %}
-                                <a href="{% url 'add_scoresheet' match.id %}" class="inline-flex items-center font-medium text-blue-400 hover:underline hover:text-amber-400 after:content-['_↗']">
-                                    Enter Scores&nbsp;
+                            <td headers="away trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}" class="p-1 text-sm text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.awayTeam }}</td>
+                            <td headers="home trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}" class="p-1 text-sm text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.homeTeam }}</td>
+                            <td headers="results trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}" class="p-1 text-sm text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">
+                                {% if match.winner %}
+                                <a href="{% url 'add_scoresheet' match.id %}" class="group mx-1 py-1 px-2 inline-flex items-center bg-slate-800 shadow-inner rounded-full tk-rustica uppercase border {% if match.winner == "Home" %}shadow-emerald-900/80 border-emerald-400 hover:bg-emerald-900/60{% elif match.winner == "Away" %}shadow-blue-900/80 border-blue-400 hover:bg-blue-900/60{% elif match.winner == "Draw" %}shadow-amber-900/80 border-amber-400 hover:bg-amber-900/60{% elif match.winner == "Missing" %}shadow-rose-900/80 border-rose-400 hover:bg-rose-900/60{% endif %} hover:ease-in-out hover:duration-150">
+                                    <span class="text-xs {% if match.winner == "Home" %}text-emerald-400 group-hover:text-emerald-200 group-hover:border-emerald-200 {% elif match.winner == "Away" %}text-blue-400 group-hover:text-blue-200 group-hover:border-blue-200 {% elif match.winner == "Draw" %}text-amber-400 group-hover:text-amber-200 group-hover:border-amber-200 {% elif match.winner == "Missing" %}text-rose-400 group-hover:text-rose-200 group-hover:border-rose-200 {% endif %}">{{ match.winner }}</span>
                                 </a>
                                 {% endif %}
                             </td>

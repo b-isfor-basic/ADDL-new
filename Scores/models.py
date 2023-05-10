@@ -26,8 +26,8 @@ class Forfeit(TimeStampedModel, models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    match = models.ForeignKey(Match, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, db_index=True)
 
 
 class TeamScoreSummary(TimeStampedModel, models.Model):
@@ -36,8 +36,8 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
     team stats.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    match = models.ForeignKey(Match, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, db_index=True)
     darts_thrown1 = models.IntegerField(blank=True, null=True)
     score_left1 = models.IntegerField(blank=True, null=True)
     darts_thrown2 = models.IntegerField(blank=True, null=True)
@@ -76,10 +76,10 @@ class ScoreSummary(TimeStampedModel, models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    match = models.ForeignKey(Match, on_delete=models.CASCADE)
-    player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
+    player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_index=True)
     is_sub = models.BooleanField(default=False)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, db_index=True)
     total_stars = models.IntegerField(blank=True, null=True)
     total_perfects = models.IntegerField(blank=True, null=True)
     singles_points = models.IntegerField(default=0)
@@ -94,6 +94,11 @@ class ScoreSummary(TimeStampedModel, models.Model):
     objects = models.Manager()
     stats = PlayerScoreSummaryManager()
 
+    class Meta:
+        unique_together = ["match", "player"]
+        verbose_name = "Player Score Summary"
+        verbose_name_plural = "Player Score Summaries"
+
     @property
     def total_points(self):
         return self.singles_points + self.doubles_points
@@ -107,10 +112,6 @@ class ScoreSummary(TimeStampedModel, models.Model):
     @receiver(post_save, sender="Scores.ScoreDetail")
     def create(self, *args, **kwargs):
         return super().create(**kwargs)
-
-    class Meta:
-        unique_together = ["match", "player"]
-        verbose_name_plural = "Player Score Summaries"
 
 
 class ScoreDetail(TimeStampedModel, models.Model):

@@ -1,13 +1,11 @@
 {
   "devDependencies": {
-    "@tailwindcss/forms": "^0.5.3",
     "prettier": "^2.8.6",
-    "prettier-plugin-tailwindcss": "^0.2.5",
-    "tailwindcss": "^3.2.7"
+    "prettier-plugin-tailwindcss": "^0.2.5"
   },
   "scripts": {
-    "dev": "tailwindcss -i ./src/src/input.css -o ./src/src/output.css --mode development --watch",
-    "build": "tailwindcss -i ./src/src/input.css -o ./src/src/output.css --mode production"
+    "dev": "tailwindcss -m -i ./src/src/input.css -o ./src/src/output.css --mode development --watch",
+    "build": "tailwindcss -m -i ./src/src/input.css -o ./src/src/output.css --mode production"
   },
   "dependencies": {
     "@preline/overlay": "^1.4.0",
@@ -19,17 +17,7 @@
     "jquery-mask-plugin": "^1.14.16",
     "js-cookie": "^3.0.1",
     "preline": "^1.7.0",
-    "tailwindcss": "^3.2.7"
+    "tailwindcss": "^3.3.2"
   },
-  "name": "addl",
-  "version": "1.0.1",
-  "main": "tailwind.config.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/b-isfor-basic/ADDL-new.git"
-  },
-  "author": "Brittney Smith",
-  "bugs": {
-    "url": "https://github.com/b-isfor-basic/ADDL-new/issues"
-  }
+  "main": "tailwind.config.js"
 }

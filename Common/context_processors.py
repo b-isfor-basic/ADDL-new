@@ -1,11 +1,9 @@
-from Locations.models import Division
-from Schedule.models import Season
-
 
 def latest_season(request):
-    return {"latest_season": Season.objects.latest("match_play_start_dt").season_number}
+    '''Returns the latest season number.'''
+    from Schedule.models import Season
 
-
-def active_divisions(request):
-    season = Season.objects.latest("match_play_start_dt")
-    return {"active_divisions": Division.objects.filter(season=season)}
+    season = Season.details.latest('match_play_start_dt')
+    latest_season = season.season_number
+    active_divisions = season.divisions.all()
+    return {"latest_season": latest_season, "season": season, "active_divisions": active_divisions}

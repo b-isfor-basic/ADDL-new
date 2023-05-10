@@ -1,4 +1,5 @@
 import uuid
+from datetime import timedelta as td
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -15,6 +16,7 @@ class Scheduler(models.Model):
     title = models.CharField(max_length=48)
     description = models.TextField(null=True, blank=True)
     frequency = RecurrenceField()
+   
 
 
 class Season(models.Model):
@@ -29,14 +31,14 @@ class Season(models.Model):
     Saturday following the in-house playoffs.
     """
 
-    season_number = models.PositiveIntegerField("Season Number")
-    match_play_start_dt = models.DateField()
-    match_play_end_dt = models.DateField()
+    season_number = models.PositiveIntegerField("Season Number", db_index=True)
+    match_play_start_dt = models.DateField(db_index=True)
+    match_play_end_dt = models.DateField(db_index=True)
     playoff_finals_dt = models.DateTimeField("Playoff Finals")
     playoffFinalsLocation = models.ForeignKey(
         to=Establishment, blank=True, null=True, on_delete=models.SET_NULL
     )
-    divisions = models.ManyToManyField(Division)
+    divisions = models.ManyToManyField(Division, db_index=True)
 
     objects = models.Manager()
     details = SeasonManager()
@@ -53,27 +55,27 @@ class Season(models.Model):
         """
         Returns the number of weeks in the season.
         """
-        return list(range(1, ((self.match_play_end_dt - self.match_play_start_dt).days // 7) - 1))
+        num_weeks = ((self.match_play_end_dt - self.match_play_start_dt).days // 7) - 1
+        return list(range(1, num_weeks, 1))
         
-
 
 class ScheduleWeek(models.Model):
     """
     ScheduleWeeks are used to track the progress of the season.
     """
 
-    season = models.ForeignKey(Season, models.CASCADE)
-    week_number = models.PositiveIntegerField()
+    season = models.ForeignKey(Season, models.CASCADE, db_index=True)
+    week_number = models.PositiveIntegerField(db_index=True)
     match_date = models.DateField()
-    division = models.ForeignKey(Division, models.CASCADE)
+    division = models.ForeignKey(Division, models.CASCADE, db_index=True)
     playoff_week = models.BooleanField(default=False)
 
     objects = models.Manager()
     details = ScheduleManager()
 
     class Meta:
-        ordering = ["season", "division", "week_number"]
         unique_together = ["season", "week_number", "division"]
+
 
     def __str__(self):
         return f"S{self.season.season_number} - W{self.week_number} - Area {self.division.area.number}"
@@ -85,7 +87,7 @@ class Match(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    week = models.ForeignKey(ScheduleWeek, models.CASCADE, null=True)
+    week = models.ForeignKey(ScheduleWeek, models.CASCADE, null=True, db_index=True)
     boards = ArrayField(
         models.PositiveIntegerField(blank=True, null=True),
         size=2,
@@ -96,15 +98,17 @@ class Match(models.Model):
         Team,
         on_delete=models.CASCADE,
         related_name="awayMatches",
+        db_index=True,
     )
     homeTeam = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
         related_name="homeMatches",
+        db_index=True,
     )
 
     objects = models.Manager()
-    details = MatchManager()
+    details = MatchManager()    
 
     class Meta:
         verbose_name_plural = "Matches"
@@ -125,18 +129,6 @@ class Match(models.Model):
             away_pts=Sum(F("singles_points") + F("doubles_points"), default=0)
         )
         return awayScore["away_pts"]
-
-    @property
-    def winner(self):
-        if (self.homeScore == 0) and (self.awayScore == 0):
-            return None
-        else:
-            if self.homeScore == self.awayScore:
-                return "Draw"
-            elif self.homeScore > self.awayScore:
-                return "Home"
-            else:
-                return "Away"
 
 
 class Announcement(models.Model):

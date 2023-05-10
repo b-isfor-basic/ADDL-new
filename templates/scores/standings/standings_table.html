@@ -1,7 +1,7 @@
 <div class="w-full mb-10 justify-center items-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
     <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">{{ division }} Standings</h3>
-    <div class="">
-        <table class="p-1 w-full">
+    <div>
+        <table id="area{{ division.area.number }}Standings" class="p-1 w-full">
             <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
                 <tr>
                     <th scope="col" class="p-2 font-light">Team</th>
@@ -15,11 +15,11 @@
             {% for team in teams %}
             {% if team.division == division %}
                 <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
-                    <td class="p-2 text-sm text-center">{{ team }}</td>
+                    <td class="p-2 text-sm text-center">{{ team.name }}</td>
                     {% for week in season.num_weeks_regular_season %}
-                        <td class="p-2 text-sm text-center">{% for match in team.weekly_points %}{% if week == match.week %}{{ match.match_points }}{% endif %}{% endfor %}</td>
+                        <td class="p-2 text-sm text-center">{% if week == team.week %}{{ team.weekly_points }}{% endif %}</td>
                     {% endfor %}
-                    <td class="p-2 text-sm text-center">{{ team.season_points }}</td>
+                    <td class="p-2 text-sm text-center">{{ team.total_points }}</td>
                 </tr>
                 {% endif %}
             {% endfor %}

@@ -103,7 +103,7 @@ class Establishment(models.Model):
     generalManager = models.CharField(max_length=100, blank=True, null=True)
     managerEmail = models.EmailField(blank=True, null=True)
     managerPhone = PhoneNumberField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
 
     class Meta:
         ordering = ["number"]
@@ -132,25 +132,29 @@ class Establishment(models.Model):
         return reverse("area", kwargs={"pk": self.id})
 
     def get_area_divisions(self):
-        return Establishment.division_set.all(self)
+        return self.division_set.all()
 
 
 class DivisionManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('area').prefetch_related('season_set', 'team_set', 'scheduleweek_set', 'scheduleweek_set__match_set')
+
     def num_active_teams(self):
         return self.get_queryset().annotate(
             num_teams=Coalesce(models.Count("team_set"))
         )
 
-    def matches(self):
-        from Schedule.models import Season
-
-        season = Season.details.get_active()
-        return self.get_queryset().filter(match_set__season=season)
+    def matches(self, season=None):
+        qs = self.get_queryset()
+        return qs.annotate(
+            num_matches=Coalesce(models.Count("scheduleweek__match_set")),
+            
+        ).order_by('week_number')
+        
 
 
 class Division(models.Model):
-    class Meta:
-        ordering = ["area__number", "matchNight"]
 
     WEEKDAY_CHOICES = [
         ("Monday", "Monday"),
@@ -163,10 +167,10 @@ class Division(models.Model):
     ]
 
     area = models.ForeignKey(
-        to=Establishment, on_delete=models.SET_NULL, null=True, blank=True
+        to=Establishment, on_delete=models.SET_NULL, null=True, blank=True, db_index=True
     )
     matchNight = models.CharField(
-        "Match Night", choices=WEEKDAY_CHOICES, max_length=9, null=True, blank=True
+        "Match Night", choices=WEEKDAY_CHOICES, max_length=9, null=True, blank=True, db_index=True
     )
     playerFee = models.IntegerField(
         "Player Fee",
@@ -186,19 +190,18 @@ class Division(models.Model):
         null=True,
     )
 
+    details = DivisionManager()
     objects = models.Manager()
-    active = DivisionManager()
+
+    class Meta:
+        ordering = ["area__number", "matchNight"]
 
     def __str__(self):
+        area_nm = self.area.shortName
         night = self.matchNight
         night_abbr = re.sub(r"(nesday|urday|day)", '', night)
-        return f"{self.area} ({night_abbr})"
+        return f"{area_nm} - {night_abbr}"
 
     def get_absolute_url(self):
         return reverse("division_detail", kwargs={"pk": self.id})
 
-    def get_matches(self):
-        from Schedule.models import Season
-
-        season = Season.details.get_active()
-        return self.scheduleweek_set.filter(season=season).matches.all()

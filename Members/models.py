@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .managers import TeamStatsManager
+from .managers import TeamStatsManager, TeamDetailsManager
 
 class Player(AbstractUser):
     """
@@ -39,69 +39,63 @@ class Team(models.Model):
         season: The season the team is registered for.
     """
 
-    players = models.ManyToManyField("Player", related_name="teams", max_length=2)
-    division = models.ForeignKey("Locations.Division", models.CASCADE)
-    season = models.ForeignKey("Schedule.Season", models.CASCADE)
+    players = models.ManyToManyField("Player", related_name="teams", max_length=2, db_index=True)
+    division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
+    season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
 
-    objects = models.Manager()
+    details = TeamDetailsManager()
     stats = TeamStatsManager()
+    objects = models.Manager()
 
-    def __str__(self):
-        names = [player.last_name for player in self.players.all()]
-        if len(names) < 2:
-            return "Invalid Name"
-        return f"{names[0]}/{names[1]}"
+    # def name(self):
+    #     if self.players.count() < 2:
+    #         return "Invalid Team"
+    #     players = self.players.all().values_list('last_name', flat=True)
+    #     return f"{players[0]}/{players[1]}"
 
-    @property
-    def name(self):
-        names = [player.last_name for player in self.players.all()]
-        if len(names) < 2:
-            return "Invalid Name"
-        return f"{names[0]}/{names[1]}"
     
-    def weekly_points(self, *args, **kwargs):
-        """
-        Returns the points per match for the given season.
-        """
-        from Schedule.models import Season
+    # def weekly_points(self, *args, **kwargs):
+    #     """
+    #     Returns the points per match for the given season.
+    #     """
+    #     from Schedule.models import Season
 
-        if 'season' in kwargs:
-            search = models.Q(match__week__season=kwargs['season'])
-        else:
-            search = models.Q(match__week__season=Season.details.get_active())
+    #     if 'season' in kwargs:
+    #         search = models.Q(match__week__season=kwargs['season'])
+    #     else:
+    #         search = models.Q(match__week__season=Season.details.get_active())
 
-        return (self.scoresummary_set
-                .filter(search)
-                .values('match')
-                .annotate(
-                    week=models.F('match__week'),
-                    match_points=(
-                        models.Sum('singles_points') 
-                        + models.Sum('doubles_points')
-                    )
-                )
-            )
+    #     return (self.scoresummary_set
+    #             .filter(search)
+    #             .values('match')
+    #             .annotate(
+    #                 week=models.F('match__week'),
+    #                 match_points=(
+    #                     models.Sum('singles_points') 
+    #                     + models.Sum('doubles_points')
+    #                 )
+    #             )
+    #         )
     
-    def season_points(self, *args, **kwargs):
-        """
-        Returns the points for the given season.
-        """
-        from Schedule.models import Season
+    # def season_points(self, *args, **kwargs):
+    #     """
+    #     Returns the points for the given season.
+    #     """
+    #     from Schedule.models import Season
 
-        if 'season' in kwargs:
-            search = models.Q(match__week__season=kwargs['season'])
-        else:
-            search = models.Q(match__week__season=Season.details.get_active())
+    #     if 'season' in kwargs:
+    #         search = models.Q(match__week__season=kwargs.get('season'))
+    #     else:
+    #         search = models.Q(match__week__season=Season.details.get_active())
             
-            
-        return sum(self.scoresummary_set
-                    .filter(search)
-                    .values_list('singles_points', 'doubles_points')
-                    .aggregate(
-                        sngl=models.Sum('singles_points'), 
-                        dbls=models.Sum('doubles_points')
-                    ).values()
-                )
+    #     return sum(self.scoresummary_set
+    #                 .filter(search)
+    #                 .values_list('singles_points', 'doubles_points')
+    #                 .aggregate(
+    #                     sngl=models.Sum('singles_points', distinct=True, default=0), 
+    #                     dbls=models.Sum('doubles_points', distinct=True, default=0)
+    #                 ).values()
+    #             )
 
     def get_matches(self, *args, **kwargs):
         """
@@ -110,10 +104,9 @@ class Team(models.Model):
         from Schedule.models import Season
 
         if 'season' in kwargs:
-            search = models.Q(week__season=kwargs['season'])
+            season = kwargs.get('season')
         else:
-            search = models.Q(week__season=Season.details.get_active())
-            
-        matches = self.awayMatches.filter(search)
-        return matches.union(self.homeMatches.filter(search).order_by('week__week_number'))
-  
+            season = Season.details.get_active()
+               
+        matches = self.awayMatches.filter(week__season=season)
+        return matches.union(self.homeMatches.filter(week__season=season).order_by('week__week_number'))
