@@ -1,7 +1,9 @@
 {
   "devDependencies": {
-    "prettier": "^2.8.6",
-    "prettier-plugin-tailwindcss": "^0.2.5"
+    "@tailwindcss/forms": "^0.5.3",
+    "prettier": "^2.8.8",
+    "prettier-plugin-tailwindcss": "^0.2.8",
+    "tailwindcss": "^3.3.2"
   },
   "scripts": {
     "dev": "tailwindcss -m -i ./src/src/input.css -o ./src/src/output.css --mode development --watch",
@@ -15,9 +17,16 @@
     "alpinejs": "^3.12.0",
     "jquery": "^3.6.4",
     "jquery-mask-plugin": "^1.14.16",
-    "js-cookie": "^3.0.1",
-    "preline": "^1.7.0",
+    "js-cookie": "^3.0.5",
+    "preline": "^1.8.0",
     "tailwindcss": "^3.3.2"
+  },
+  "name": "addl",
+  "version": "1.0.1",
+  "main": "tailwind.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/b-isfor-basic/ADDL-new.git"
   },
   "main": "tailwind.config.js"
 }
