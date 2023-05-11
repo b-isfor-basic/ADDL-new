@@ -116,7 +116,7 @@ class PlayerScoreSummaryManager(models.Manager):
             )
         )
 
-
+    
 class TeamScoreSummaryManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset().filter(*args, **kwargs).select_related("match", "match__week", "team", "team__division", 'team__players')

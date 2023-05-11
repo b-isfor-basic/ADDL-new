@@ -12,14 +12,16 @@
                 </tr>
             </thead>
             <tbody>
-            {% for team in teams %}
-            {% if team.division == division %}
+            {% for team in team_standings|dictsortreversed:'total_points' %}
+            {% if team.division_id == division.id %}
                 <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
-                    <td class="p-2 text-sm text-center">{{ team.name }}</td>
-                    {% for week in season.num_weeks_regular_season %}
-                        <td class="p-2 text-sm text-center">{% if week == team.week %}{{ team.weekly_points }}{% endif %}</td>
+                    <td class="p-2 text-sm text-center">{{ team.team_name }}</td>
+                    {% for season_week in season.num_weeks_regular_season %}
+                        
+                        <td class="p-2 text-sm text-center">{% for week in team.scores %}{% if season_week == week.week %}{{ week.points }}{% endif %}{% endfor %}</td>
+                        
                     {% endfor %}
-                    <td class="p-2 text-sm text-center">{{ team.total_points }}</td>
+                        <td class="p-2 text-sm text-center">{{ team.total_points }}</td>
                 </tr>
                 {% endif %}
             {% endfor %}

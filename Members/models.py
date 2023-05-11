@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .managers import TeamStatsManager, TeamDetailsManager
+from .managers import TeamStatsManager
 
 class Player(AbstractUser):
     """
@@ -43,59 +43,9 @@ class Team(models.Model):
     division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
     season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
 
-    details = TeamDetailsManager()
-    stats = TeamStatsManager()
     objects = models.Manager()
+    stats = TeamStatsManager()
 
-    # def name(self):
-    #     if self.players.count() < 2:
-    #         return "Invalid Team"
-    #     players = self.players.all().values_list('last_name', flat=True)
-    #     return f"{players[0]}/{players[1]}"
-
-    
-    # def weekly_points(self, *args, **kwargs):
-    #     """
-    #     Returns the points per match for the given season.
-    #     """
-    #     from Schedule.models import Season
-
-    #     if 'season' in kwargs:
-    #         search = models.Q(match__week__season=kwargs['season'])
-    #     else:
-    #         search = models.Q(match__week__season=Season.details.get_active())
-
-    #     return (self.scoresummary_set
-    #             .filter(search)
-    #             .values('match')
-    #             .annotate(
-    #                 week=models.F('match__week'),
-    #                 match_points=(
-    #                     models.Sum('singles_points') 
-    #                     + models.Sum('doubles_points')
-    #                 )
-    #             )
-    #         )
-    
-    # def season_points(self, *args, **kwargs):
-    #     """
-    #     Returns the points for the given season.
-    #     """
-    #     from Schedule.models import Season
-
-    #     if 'season' in kwargs:
-    #         search = models.Q(match__week__season=kwargs.get('season'))
-    #     else:
-    #         search = models.Q(match__week__season=Season.details.get_active())
-            
-    #     return sum(self.scoresummary_set
-    #                 .filter(search)
-    #                 .values_list('singles_points', 'doubles_points')
-    #                 .aggregate(
-    #                     sngl=models.Sum('singles_points', distinct=True, default=0), 
-    #                     dbls=models.Sum('doubles_points', distinct=True, default=0)
-    #                 ).values()
-    #             )
 
     def get_matches(self, *args, **kwargs):
         """
