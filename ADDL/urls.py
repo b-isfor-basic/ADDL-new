@@ -15,12 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .settings import DEBUG
 
 
 urlpatterns = [
     # Flatpages
-    path("__debug__/", include("debug_toolbar.urls")),
     path("", include("Common.urls"), name="Common"),
     # Django Pages
     path("admin/", admin.site.urls),
