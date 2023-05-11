@@ -190,8 +190,8 @@ class Division(models.Model):
         null=True,
     )
 
-    details = DivisionManager()
     objects = models.Manager()
+    details = DivisionManager()
 
     class Meta:
         ordering = ["area__number", "matchNight"]
