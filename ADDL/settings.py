@@ -57,10 +57,10 @@ INSTALLED_APPS = [
     "recurrence",
     "widget_tweaks",
     # Created packages
+    "Members.apps.MembersConfig",
     "Scores.apps.ScoresConfig",
     "Locations.apps.LocationsConfig",
     "Schedule.apps.ScheduleConfig",
-    "Members.apps.MembersConfig",
 ]
 
 MIDDLEWARE = [
@@ -229,7 +229,6 @@ sentry_sdk.init(
     integrations=[
         DjangoIntegration(
             transaction_style="url",
-            middleware_spans=False,
         ),
     ],
     _experiments={
