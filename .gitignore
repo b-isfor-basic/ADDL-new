@@ -27,5 +27,4 @@ node_modules/
 # Local .env files
 *.env
 
-# Fixture files
-*/fixtures/
+
