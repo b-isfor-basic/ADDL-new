@@ -40,7 +40,6 @@ if not IS_HEROKU:
 # Application definition
 INSTALLED_APPS = [
     # Third party packages
-    "debug_toolbar",
     'scout_apm.django',
     # Django included packages
     "django.contrib.admin",
@@ -248,8 +247,3 @@ sentry_sdk.init(
     environment=os.environ.get("ENVIRONMENT"),
     release=os.environ.get("GIT_SHA"),
 )
-
-
-# Debug Toolbar Settings
-if 'INTERNAL_IPS' in os.environ:
-    INTERNAL_IPS = os.environ['INTERNAL_IPS']
