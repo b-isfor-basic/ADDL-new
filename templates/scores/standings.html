@@ -1,6 +1,5 @@
 {% extends 'base_tabs.html' %}
-
-{% debug %}
+{% load static %}
 
 {% block title %}Statistics{% endblock title %}
 
@@ -32,6 +31,12 @@
         <li class="text-slate-200 hover:underline hover:text-blue-400"><a href="{% url 'standings' season.season_number %}">View All</a></li>
     </ul> 
 </div> 
+<div class="mb-4">
+    <h1 class="font-bold text-amber-500 text-lg mb-2">
+        Search
+    </h1>
+    <input type="search" id="search" name="search" class="flex rounded-full shadow-sm bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1 text-slate-400 text-sm" placeholder="Search by name" maxlength="20">
+</div>
 {% endblock sidebar %}
 
 
@@ -52,10 +57,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Singles Points</h3>
         <div class="">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Points' %}
+                {% include './stats/table_head.html' with stat_title='Points' %}
                 <tbody>   
                     {% for record in player_stats|dictsortreversed:"singles_wins" %}
-                            {% include './partials/table_body.html' with stat=record.singles_wins %}
+                            {% include './stats/table_body.html' with stat=record.singles_wins %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -65,10 +70,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Doubles Points</h3>
         <div class="w-full">
             <table class="p-1 w-full text-slate-400">
-                {% include './partials/table_head.html' with stat_title='Points' %}
+                {% include './stats/table_head.html' with stat_title='Points' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"doubles_wins" %}
-                            {% include './partials/table_body.html' with stat=record.doubles_wins %}
+                            {% include './stats/table_body.html' with stat=record.doubles_wins %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -78,10 +83,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Total Points</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Points' %}
+                {% include './stats/table_head.html' with stat_title='Points' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"total_wins" %}
-                            {% include './partials/table_body.html' with stat=record.total_wins|default:'N/A' %}
+                            {% include './stats/table_body.html' with stat=record.total_wins|default:'N/A' %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -93,10 +98,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Total Stars</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Stars' %}
+                {% include './stats/table_head.html' with stat_title='Stars' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"stars" %}
-                            {% include './partials/table_body.html' with stat=record.stars %}
+                            {% include './stats/table_body.html' with stat=record.stars %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -106,10 +111,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Avg Stars Per Game</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='SPG' %}
+                {% include './stats/table_head.html' with stat_title='SPG' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"avg_stars_per_game" %}
-                            {% include './partials/table_body.html' with stat=record.avg_stars_per_game|floatformat:"2" %}
+                            {% include './stats/table_body.html' with stat=record.avg_stars_per_game|floatformat:"2" %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -119,10 +124,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Total Perfects</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Perfects' %}
+                {% include './stats/table_head.html' with stat_title='Perfects' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"perfects" %}
-                            {% include './partials/table_body.html' with stat=record.perfects %}
+                            {% include './stats/table_body.html' with stat=record.perfects %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -134,10 +139,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Best Singles 501 Game</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Best 501' %}
+                {% include './stats/table_head.html' with stat_title='Best 501' %}
                 <tbody>
                     {% for record in player_stats|dictsort:"best_501_game" %}
-                            {% include './partials/table_body.html' with stat=record.best_501_game %}
+                            {% include './stats/table_body.html' with stat=record.best_501_game %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -147,10 +152,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Best Week Singles PPD</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Best PPD' %}
+                {% include './stats/table_head.html' with stat_title='Best PPD' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"best_week_singles_ppd" %}
-                            {% include './partials/table_body.html' with stat=record.best_week_singles_ppd|floatformat:"4" %}
+                            {% include './stats/table_body.html' with stat=record.best_week_singles_ppd|floatformat:"4" %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -160,10 +165,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Avg Singles PPD</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='PPD' %}
+                {% include './stats/table_head.html' with stat_title='PPD' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"avg_ppd" %}
-                            {% include './partials/table_body.html' with stat=record.avg_ppd|floatformat:"4" %}
+                            {% include './stats/table_body.html' with stat=record.avg_ppd|floatformat:"4" %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -175,10 +180,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">High In</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='High In' %}
+                {% include './stats/table_head.html' with stat_title='High In' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"max_high_in" %}
-                            {% include './partials/table_body.html' with stat=record.max_high_in %}
+                            {% include './stats/table_body.html' with stat=record.max_high_in %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -188,23 +193,23 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">High Out</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='High Out' %}
+                {% include './stats/table_head.html' with stat_title='High Out' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"max_high_out" %}
-                            {% include './partials/table_body.html' with stat=record.max_high_out %}
+                            {% include './stats/table_body.html' with stat=record.max_high_out %}
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
     <div class="w-full col-span-1 md:col-start-3 mb-10 justify-center items-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
-        <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Player Rating Score</h3>
+        <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Player Rating</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Rating' %}
+                {% include './stats/table_head.html' with stat_title='Rating' %}
                 <tbody>
                     {% for record in player_stats|dictsortreversed:"rating_score" %}
-                            {% include './partials/table_body.html' with stat=record.rating stat2=record.rating_score %}
+                            {% include './stats/table_body.html' with stat=record.rating stat2=record.rating_score %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -219,10 +224,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Doubles PPD</h3>
         <div class="">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='PPD' %}
+                {% include './stats/table_head.html' with stat_title='PPD' %}
                 <tbody> 
-                {% for record in team_base_stats|dictsortreversed:"avg_ppd" %}
-                    {% include './partials/table_body.html' with stat=record.avg_ppd|floatformat:'4' name=record %}
+                {% for record in team_stats|dictsortreversed:"avg_ppd" %}
+                    {% include './stats/table_body.html' with stat=record.avg_ppd|floatformat:'4' name=record.team_name %}
                 {% endfor %}
                 </tbody>
             </table>
@@ -232,10 +237,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Best Week Doubles PPD</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Best PPD' %}
+                {% include './stats/table_head.html' with stat_title='Best PPD' %}
                 <tbody>
-                    {% for record in team_base_stats|dictsortreversed:"best_week_ppd" %}
-                            {% include './partials/table_body.html' with stat=record.best_week_ppd|floatformat:"4" name=record%}
+                    {% for record in team_stats|dictsortreversed:"best_week_ppd" %}
+                            {% include './stats/table_body.html' with stat=record.best_week_ppd|floatformat:"4" name=record.team_name %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -245,10 +250,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Best Doubles 501 Game</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Best 501' %}
+                {% include './stats/table_head.html' with stat_title='Best 501' %}
                 <tbody>
-                    {% for record in team_base_stats|dictsort:"best_501_game" %}
-                            {% include './partials/table_body.html' with stat=record.best_501_game name=record %}
+                    {% for record in team_stats|dictsort:"best_501_game" %}
+                            {% include './stats/table_body.html' with stat=record.best_501_game name=record.team_name %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -260,10 +265,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Total Points</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Points' %}
+                {% include './stats/table_head.html' with stat_title='Points' %}
                 <tbody>
-                    {% for record in team_points|dictsortreversed:"total_points" %}
-                            {% include './partials/table_body.html' with stat=record.total_points name=record %}
+                    {% for record in team_stats|dictsortreversed:"total_points" %}
+                            {% include './stats/table_body.html' with stat=record.total_points name=record.team_name %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -273,10 +278,10 @@
         <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Team Rating</h3>
         <div class="w-full">
             <table class="p-1 w-full">
-                {% include './partials/table_head.html' with stat_title='Rating' %}
+                {% include './stats/table_head.html' with stat_title='Rating' %}
                 <tbody>
-                    {% for record in team_rating|dictsortreversed:"team_rating_score" %}
-                            {% include './partials/table_body.html' with stat=record.team_rating stat2=record.team_rating_score name=record %}
+                    {% for record in team_stats|dictsortreversed:"team_rating_score" %}
+                            {% include './stats/table_body.html' with stat=record.team_rating stat2=record.team_rating_score name=record.team_name %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -286,17 +291,20 @@
 {% endblock tab_2_body %}
 
 {% block tab_3_body %}
-Under Development
-{% comment %}
 <div class="grid grid-flow-row px-1 w-full gap-1 md:gap-6 justify-items-center content-center">
     {% if division_set %}
-        {% include './partials/standings_table.html' with division=division_set %}
+        {% include './standings/standings_table.html' with division=division_set teams=team_standings|dictsortreversed:"total_points" %}
     {% else %}
-        {% include './partials/standings_table.html' with division="Leaguewide" %}
+        {% for division in active_divisions %}
+            {% include './standings/standings_table.html' with division=division teams=team_standings|dictsortreversed:"total_points" %}
+        {% endfor %}
     {% endif %}
 </div>
-{% endcomment %}
+{% endblock tab_3_body %}
+
+
+{% block footerScripts %}
+{{ block.super }}
+<script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static '/js/scores/standings.js' %}"></script>
 {% endblock %}
-
-
-

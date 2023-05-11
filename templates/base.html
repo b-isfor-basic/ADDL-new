@@ -49,10 +49,16 @@
     <main class="relative top-20 md:top-14 flex w-screen mx-auto min-h-screen mb-24 px-2 md:px-6 max-w-8xl justify-around items-start">
         {% block messages %}
           {% if messages %}
-          <div class="mt-10 z-30">
+          <div class="absolute right-2 top-2 z-30">
             {% for message in messages %} 
-            <div id="boxMain" class="fixed m-2 right-2 w-4/5 md:w-1/3">
-              {% if message.tags == 'error' %} {% include './components/error.html' with target_element='#boxMain' message=message %} {% elif message.tags == 'success' %} {% include './components/success.html' %} {% else %}{{ message }}{% endif %}
+            <div id="boxMain" class="m-2 w-4/5 md:w-1/3">
+              {% if message.tags == 'error' %} 
+                {% include './components/error.html' with target_element='#boxMain' message=message %} 
+              {% elif message.tags == 'success' %} 
+                {% include './components/success.html' with target_element='#boxMain' message=message %} 
+              {% else %}
+                {{ message }}
+              {% endif %}
             </div>
             {% endfor %}
           </div>

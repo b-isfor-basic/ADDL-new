@@ -8,7 +8,7 @@
     <h1 class="font-black text-amber-400 text-xl mb-2">
         Active Divisions
     </h1>
-    <ul class="">
+    <ul class="text-sm space-y-1">
         {% for division in active_divisions %}
         <li class="text-slate-200 hover:underline hover:text-blue-400"><a href="{% url 'schedule' %}?division={{ division.id }}">{{ division }}</a></li>
         {% endfor %}
@@ -19,20 +19,16 @@
    
 {% block main %}
 <div class="pl-5">
-{% if divisions|length > 1 %}
-{% regroup matches by division as matches_list %}
-    {% for group in matches_list %}
+{% if matches|length > 1 %}
+{% for division in matches %}
         <div id="matchtable" class="m-3">
-            {% include './partials/match_list.html' with division=group.grouper match_list=group.list %}
+            {% include './partials/match_list.html' with division=division match_list=division.scheduleweek_set.all %}
         </div>
     </div>
         {% endfor %}
-
-
-
 {% else %}
         <div id="matchtable" class="m-3">
-            {% include './partials/match_list.html' with division=divisions match_list=matches %}
+            {% include './partials/match_list.html' with division=matches match_list=matches.scheduleweek_set.all %}
         </div>
 {% endif %}
 </div>

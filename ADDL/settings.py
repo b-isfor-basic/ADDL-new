@@ -39,6 +39,8 @@ if not IS_HEROKU:
 
 # Application definition
 INSTALLED_APPS = [
+    # Third party packages
+    "debug_toolbar",
     'scout_apm.django',
     # Django included packages
     "django.contrib.admin",
@@ -65,6 +67,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -78,8 +81,8 @@ ROOT_URLCONF = "ADDL.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
+        "DIRS": [BASE_DIR / "templates"],
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -101,10 +104,10 @@ MAX_CONN_AGE = 600
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "ADDL",
-        "USER": "brittney",
+        "NAME": "addl",
+        "USER": "postgres",
         "PASSWORD": "",
-        "HOST": "",
+        "HOST": "localhost",
         "PORT": "5432",
     }
 }
@@ -205,29 +208,31 @@ if IS_HEROKU:
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
     EMAIL_USE_SSL = True
-    DEFAULT_FROM_EMAIL = "ADDL Support <support@addl.app>"
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "ADDL Support <support@addl.app>"
+EMAIL_PREFIX = "[ADDL] "
 
 
 # Login Redirects
 
 LOGIN_URL = "/members/login"
-LOGIN_REDIRECT_URL = "/members/profile"
 LOGOUT_REDIRECT_URL = "/"
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-if not IS_HEROKU:
-    os.environ['ENVIRONMENT'] = 'development'
-else:
+if IS_HEROKU:
     os.environ['ENVIRONMENT'] = 'production'
-
+else:
+    os.environ['ENVIRONMENT'] = 'development'
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
     integrations=[
-        DjangoIntegration(),
+        DjangoIntegration(
+            transaction_style="url",
+            middleware_spans=False,
+        ),
     ],
     _experiments={
         "profiles_sample_rate": 0.5,
@@ -236,8 +241,7 @@ sentry_sdk.init(
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
-    traces_sample_rate=0.5,
-
+    traces_sample_rate=0.2,
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True,
@@ -245,3 +249,7 @@ sentry_sdk.init(
     release=os.environ.get("GIT_SHA"),
 )
 
+
+# Debug Toolbar Settings
+if 'INTERNAL_IPS' in os.environ:
+    INTERNAL_IPS = os.environ['INTERNAL_IPS']

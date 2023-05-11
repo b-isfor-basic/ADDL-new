@@ -39,22 +39,24 @@ class Team(models.Model):
         season: The season the team is registered for.
     """
 
-    players = models.ManyToManyField("Player", related_name="teams", max_length=2)
-    division = models.ForeignKey("Locations.Division", models.CASCADE)
-    season = models.ForeignKey("Schedule.Season", models.CASCADE)
+    players = models.ManyToManyField("Player", related_name="teams", max_length=2, db_index=True)
+    division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
+    season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
 
     objects = models.Manager()
     stats = TeamStatsManager()
 
-    def __str__(self):
-        names = [player.last_name for player in self.players.all()]
-        if len(names) < 2:
-            return "Invalid Name"
-        return f"{names[0]}/{names[1]}"
 
-    @property
-    def name(self):
-        names = [player.last_name for player in self.players.all()]
-        if len(names) < 2:
-            return "Invalid Name"
-        return f"{names[0]}/{names[1]}"
+    def get_matches(self, *args, **kwargs):
+        """
+        Returns the matches for the team for the given season.
+        """
+        from Schedule.models import Season
+
+        if 'season' in kwargs:
+            season = kwargs.get('season')
+        else:
+            season = Season.details.get_active()
+               
+        matches = self.awayMatches.filter(week__season=season)
+        return matches.union(self.homeMatches.filter(week__season=season).order_by('week__week_number'))
