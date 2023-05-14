@@ -1,5 +1,6 @@
-from django.urls import path, include
-from .views import PlayerProfileView, PlayerCreateView, LoginView
+from django.urls import include, path
+
+from .views import PlayerCreateView, PlayerProfileView
 
 urlpatterns = [
     path("profile", PlayerProfileView, name="profile"),

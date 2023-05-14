@@ -5,15 +5,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('Members', '0002_initial'),
+        ("Members", "0002_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='team',
-            name='players',
-            field=models.ManyToManyField(db_index=True, max_length=2, related_name='teams', to=settings.AUTH_USER_MODEL),
+            model_name="team",
+            name="players",
+            field=models.ManyToManyField(
+                db_index=True,
+                max_length=2,
+                related_name="teams",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

@@ -1,6 +1,5 @@
-from django import forms
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.forms import widgets
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 from .models import Player
 

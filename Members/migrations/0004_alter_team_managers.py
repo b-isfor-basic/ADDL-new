@@ -5,16 +5,15 @@ import django.db.models.manager
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('Members', '0003_alter_team_players'),
+        ("Members", "0003_alter_team_players"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='team',
+            name="team",
             managers=[
-                ('details', django.db.models.manager.Manager()),
+                ("details", django.db.models.manager.Manager()),
             ],
         ),
     ]
