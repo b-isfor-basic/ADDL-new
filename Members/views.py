@@ -1,21 +1,21 @@
-from django.shortcuts import render, HttpResponse
-from django.views.generic import CreateView, FormView
-from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (
     LoginView,
-    LogoutView,
     PasswordResetConfirmView,
     PasswordResetDoneView,
     PasswordResetView,
 )
+from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import render
+from django.views.generic import CreateView
 
-from .models import Player
 from .forms import PlayerCreationForm
+from .models import Player
 
 
 class SuccessMessageMixin(SuccessMessageMixin):
     success_message_template = "components/success.html"
+
 
 # TODO: #25 This should be limited to only the user who is logged in and not all users.
 @login_required

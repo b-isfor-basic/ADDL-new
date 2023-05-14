@@ -184,7 +184,8 @@ class TeamStatsManager(models.Manager):
 class TeamDetailsManager(models.Manager):
     def get_queryset(self):
         return (
-            super().get_queryset()
+            super()
+            .get_queryset()
             .annotate(
                 players_names=ArrayAgg("players__last_name"),
                 team_name=Concat(
