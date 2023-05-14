@@ -3,6 +3,7 @@ from django.views.generic import CreateView, FormView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (
+    LoginView,
     LogoutView,
     PasswordResetConfirmView,
     PasswordResetDoneView,
@@ -43,3 +44,9 @@ class PasswordResetDoneView(PasswordResetDoneView):
 class PasswordResetConfirmView(PasswordResetConfirmView):
     template_name = "registration/password_reset_confirm.html"
     success_url = "members/password_reset_complete"
+
+
+class LoginView(SuccessMessageMixin, LoginView):
+    template_name = "registration/login.html"
+    success_url = "members/profile"
+    success_message = "Login successful!"

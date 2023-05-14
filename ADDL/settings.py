@@ -215,6 +215,7 @@ EMAIL_PREFIX = "[ADDL] "
 # Login Redirects
 
 LOGIN_URL = "/members/login"
+LOGIN_REDIRECT_URL = "/members/profile"
 LOGOUT_REDIRECT_URL = "/"
 
 import sentry_sdk

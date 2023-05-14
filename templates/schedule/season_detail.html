@@ -22,13 +22,13 @@
 {% if matches|length > 1 %}
 {% for division in matches %}
         <div id="matchtable" class="m-3">
-            {% include './partials/match_list.html' with division=division match_list=division.scheduleweek_set.all %}
+            {% include './partials/match_list.html' with division=division %}
         </div>
     </div>
         {% endfor %}
 {% else %}
         <div id="matchtable" class="m-3">
-            {% include './partials/match_list.html' with division=matches match_list=matches.scheduleweek_set.all %}
+            {% include './partials/match_list.html' with division=divisions %}
         </div>
 {% endif %}
 </div>

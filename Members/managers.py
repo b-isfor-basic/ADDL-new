@@ -18,6 +18,7 @@ from django.db.models.functions import Least, Concat, JSONObject
 from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqual
 from django.contrib.postgres.expressions import ArraySubquery
 
+
 class PlayerStatsManager(models.Manager):
     def get_queryset(self):
         return (
@@ -113,9 +114,7 @@ class TeamStatsManager(models.Manager):
         names_qs = self.names()
         pts_qs = self.total_points().values("id", "total_points")
         best_ppd_qs = self.best_ppd(q).values("id", "best_week_ppd")
-        rating_qs = self.rating(q).values(
-            "id", "team_rating_score", "team_rating"
-        )
+        rating_qs = self.rating(q).values("id", "team_rating_score", "team_rating")
 
         return qs.annotate(
             team_name=Subquery(names_qs.filter(id=OuterRef("id")).values("team_name")),
@@ -159,22 +158,41 @@ class TeamStatsManager(models.Manager):
 
     def weekly_points(self):
         from Scores.models import ScoreSummary
+
         # Return the total number of points scored by the team in all games. Can be filtered.
         qs = self.get_queryset()
         names_qs = self.names()
         pts_qs = self.total_points().values("id", "total_points")
 
-        scores = ScoreSummary.stats.filter(team=OuterRef("id")).values(
-            week=F('match__week__week_number')).annotate(
-                total_pts=Sum('singles_points') + Sum('doubles_points')
-        ).values(
-            json=JSONObject(week=F("week"), points=F("total_pts"))
+        scores = (
+            ScoreSummary.stats.filter(team=OuterRef("id"))
+            .values(week=F("match__week__week_number"))
+            .annotate(total_pts=Sum("singles_points") + Sum("doubles_points"))
+            .values(json=JSONObject(week=F("week"), points=F("total_pts")))
         )
 
         return qs.annotate(
             team_name=Subquery(names_qs.filter(id=OuterRef("id")).values("team_name")),
-            total_points=Subquery(pts_qs.filter(id=OuterRef("id")).values("total_points")),
+            total_points=Subquery(
+                pts_qs.filter(id=OuterRef("id")).values("total_points")
+            ),
         ).annotate(
-            scores = ArraySubquery(scores),
+            scores=ArraySubquery(scores),
         )
 
+
+class TeamDetailsManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super().get_queryset()
+            .annotate(
+                players_names=ArrayAgg("players__last_name"),
+                team_name=Concat(
+                    F("players_names__0"),
+                    Value("/"),
+                    F("players_names__1"),
+                    output_field=models.CharField(),
+                ),
+            )
+            .values("id", "team_name")
+        )

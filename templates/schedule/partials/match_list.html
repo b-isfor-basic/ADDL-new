@@ -1,42 +1,37 @@
 <div class="w-full mb-10 justify-center align-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
-    <h2 class="text-slate-400 text-xl md:text-2xl font-black p-2 leading-6">{% if division %}{{ division }}{% endif %}</h2>
+    <h2 class="text-slate-400 text-xl md:text-2xl font-black p-2 leading-6">{% if division %}{{ division.div_name }}{% endif %}</h2>
     <div class="w-full overflow-x-scroll">
-        {% if match_list|length > 0 %}
+        {% if division.weeks|length > 0 %}
         <table class="p-1 w-full">
-            <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
+            <thead class="text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
                 <tr>
                     <th id="week" class="p-2 font-light">Week</th>
                     <th id="date" class="p-2 font-light">Match Date</th>
                     <th id="away" class="p-2 font-light">Away Team</th>
                     <th id="home" class="p-2 font-light">Home Team</th>
-                    <th id="results" class="p-2 font-light">Status</th>
+                    <th id="results" class="p-2 font-light">Results</th>
                 </tr>
             </thead>
             <tbody>
-                {% for week in division.scheduleweek.all %}
-                <tr class="bg-slate-700 text-slate-200 border-b border-b-slate-800 border-t border-t-amber-800 hover:bg-slate-700/50">
-                    {% with num_rows as week.match_set.all|length %}
-                    <th id="trWeek{{ forloop.counter }}" rowspan="{{ num_rows }}" class="p-1 text-sm text-center border-t border-t-amber-800">{{ week.week_number }}</th>      
-                    <th id="trDate{{ forloop.counter }}" rowspan="{{ num_rows }}" class="p-1 text-sm text-center border-t border-t-amber-800">{{ week.match_date }}</th>
-                    {% endwith %}      
-                    {% for match in week.match_set.all %}
+            {% for week in division.weeks %}
+            <tr class="text-sm bg-slate-700 text-slate-300 border-b border-b-slate-500 border-t border-t-amber-800 hover:bg-slate-700/50">
+                <th id="trWeek{{ forloop.counter }}" rowspan="{{ week.matches|length }}" class="p-1 text-center border-t border-t-amber-800">{{ week.week_num }}</th>      
+                <th id="trDate{{ forloop.counter }}" rowspan="{{ week.matches|length }}" class="p-1 text-center border-t border-t-amber-800">{{ week.date }}</th>
+                {% for match in week.matches %}
                         {% if not forloop.first %}
-                            <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
+                            <tr class="text-sm bg-slate-700 text-slate-300 border-b border-slate-500 hover:bg-slate-700/50">
                             {% endif %}
-                            <td headers="away trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}" class="p-1 text-sm text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.awayTeam }}</td>
-                            <td headers="home trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}" class="p-1 text-sm text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.homeTeam }}</td>
-                            <td headers="results trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}" class="p-1 text-sm text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">
-                                {% if match.winner %}
-                                <a href="{% url 'add_scoresheet' match.id %}" class="group mx-1 py-1 px-2 inline-flex items-center bg-slate-800 shadow-inner rounded-full tk-rustica uppercase border {% if match.winner == "Home" %}shadow-emerald-900/80 border-emerald-400 hover:bg-emerald-900/60{% elif match.winner == "Away" %}shadow-blue-900/80 border-blue-400 hover:bg-blue-900/60{% elif match.winner == "Draw" %}shadow-amber-900/80 border-amber-400 hover:bg-amber-900/60{% elif match.winner == "Missing" %}shadow-rose-900/80 border-rose-400 hover:bg-rose-900/60{% endif %} hover:ease-in-out hover:duration-150">
-                                    <span class="text-xs {% if match.winner == "Home" %}text-emerald-400 group-hover:text-emerald-200 group-hover:border-emerald-200 {% elif match.winner == "Away" %}text-blue-400 group-hover:text-blue-200 group-hover:border-blue-200 {% elif match.winner == "Draw" %}text-amber-400 group-hover:text-amber-200 group-hover:border-amber-200 {% elif match.winner == "Missing" %}text-rose-400 group-hover:text-rose-200 group-hover:border-rose-200 {% endif %}">{{ match.winner }}</span>
+                            <td headers="away trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}" class="p-1 text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.away_team }}</td>
+                            <td headers="home trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}" class="p-1 text-center align-center items-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.home_team }}</td>
+                            <td headers="results trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}" class="p-1 text-center align-center items-center content-center {% if forloop.first %}border-t border-t-amber-800{% endif %}">
+                                <a href="{% url 'add_scoresheet' match.id %}" class="group mx-1 px-2 content-center align-center inline-flex items-center shadow-inner rounded-full tk-rustica uppercase border {% if match.status == "Home" %}shadow-emerald-950/80 bg-emerald-950/40 border-emerald-400 hover:bg-emerald-800/60{% elif match.status == "Away" %}shadow-blue-950/80 bg-blue-950/40 border-blue-400 hover:bg-blue-800/60{% elif match.status == "Draw" %}shadow-amber-950/80 bg-amber-950/40 border-amber-400 hover:bg-amber-800/60{% elif match.status == "Missing" %}shadow-rose-950/80 bg-rose-950/40 border-rose-400 hover:bg-rose-800/60{% endif %} hover:ease-in-out hover:duration-150">
+                                    <span class="text-sm {% if match.status == "Home" %}text-emerald-300 group-hover:text-emerald-200 group-hover:border-emerald-200 {% elif match.status == "Away" %}text-blue-300 group-hover:text-blue-200 group-hover:border-blue-200 {% elif match.status == "Draw" %}text-amber-400 group-hover:text-amber-200 group-hover:border-amber-200 {% elif match.status == "Missing" %}text-rose-300 group-hover:text-rose-200 group-hover:border-rose-200 {% endif %}">{{ match.status }}</span>
                                 </a>
-                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
+                    {% endfor %}
                 </tr>
-                
-            {% endfor %}
             </tbody>
         </table>
     </div>

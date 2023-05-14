@@ -15,6 +15,7 @@
     "@preline/tooltip": "^1.4.0",
     "@tailwindcss/forms": "^0.5.3",
     "alpinejs": "^3.12.0",
+    "htmx": "^0.0.2",
     "jquery": "^3.6.4",
     "jquery-mask-plugin": "^1.14.16",
     "js-cookie": "^3.0.5",
@@ -27,6 +28,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/b-isfor-basic/ADDL-new.git"
-  },
-  "main": "tailwind.config.js"
+  }
 }

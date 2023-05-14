@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import PlayerProfileView, PlayerCreateView
+from .views import PlayerProfileView, PlayerCreateView, LoginView
 
 urlpatterns = [
     path("profile", PlayerProfileView, name="profile"),

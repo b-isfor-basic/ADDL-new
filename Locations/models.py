@@ -2,7 +2,9 @@ import re
 
 from django.conf import settings
 from django.db import models
-from django.db.models.functions import Coalesce
+from django.db.models import F, Case, When, Value
+from django.db.models.functions import Coalesce, Concat
+from django.db.models.lookups import Contains
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
@@ -138,7 +140,7 @@ class Establishment(models.Model):
 class DivisionManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().select_related('area').prefetch_related('season_set', 'team_set', 'scheduleweek_set', 'scheduleweek_set__match_set')
+        return super().get_queryset()
 
     def num_active_teams(self):
         return self.get_queryset().annotate(
@@ -147,23 +149,28 @@ class DivisionManager(models.Manager):
 
     def matches(self, season=None):
         qs = self.get_queryset()
-        return qs.annotate(
-            num_matches=Coalesce(models.Count("scheduleweek__match_set")),
-            
+        return qs.values(week_number='scheduleweek__week_number').annotate(
+            num_matches=models.Count("scheduleweek__match_set"),
         ).order_by('week_number')
         
+    def named(self):
+        qs = self.get_queryset()
 
+        return qs.annotate(
+            area_nm=F('area__shortName'),
+            name=Concat(F('area_nm'), Value(' - '), F('matchNight'), output_field=models.CharField(max_length=40))
+        )
 
 class Division(models.Model):
 
     WEEKDAY_CHOICES = [
-        ("Monday", "Monday"),
-        ("Tuesday", "Tuesday"),
-        ("Wednesday", "Wednesday"),
-        ("Thursday", "Thursday"),
-        ("Friday", "Friday"),
-        ("Saturday", "Saturday"),
-        ("Sunday", "Sunday"),
+        ("Mon", "Mon"),
+        ("Tues", "Tues"),
+        ("Wed", "Wed"),
+        ("Thurs", "Thurs"),
+        ("Fri", "Fri"),
+        ("Sat", "Sat"),
+        ("Sun", "Sun"),
     ]
 
     area = models.ForeignKey(
@@ -199,7 +206,7 @@ class Division(models.Model):
     def __str__(self):
         area_nm = self.area.shortName
         night = self.matchNight
-        night_abbr = re.sub(r"(nesday|urday|day)", '', night)
+        night_abbr = re.sub(r"(nesday|ursday|day)", '', night)
         return f"{area_nm} - {night_abbr}"
 
     def get_absolute_url(self):

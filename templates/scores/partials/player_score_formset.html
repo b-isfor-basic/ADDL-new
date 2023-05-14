@@ -1,7 +1,7 @@
 <div class="grid grid-flow-row gap-2 mb-10">
     <div class="row-span-1 inline-flex">
       <h3 class="text-amber-400 text-lg font-black mr-4">{% if team == "away" %}Away{%else%}Home{% endif %} Player {{ forloop.counter }}</h3>
-      <h4 class="text-slate-400 text-lg">{% if team == "away" %}{{ match.awayTeam }}{%else%}{{ match.homeTeam }}{% endif %}</h4>
+      <h4 class="text-slate-400 text-lg">{% if team == "away" %}{{ match.awayTeam.name }}{%else%}{{ match.homeTeam.name }}{% endif %}</h4>
     </div>
     {{ form.match }}
     {{ form.team }}

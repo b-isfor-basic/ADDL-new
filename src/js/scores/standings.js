@@ -22,5 +22,6 @@ document.getElementById('search').addEventListener('input', e => {
             } 
         });
     }
+
 });
 

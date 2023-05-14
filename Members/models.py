@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .managers import TeamStatsManager
+from .managers import TeamStatsManager, TeamDetailsManager
 
 class Player(AbstractUser):
     """
@@ -43,9 +43,14 @@ class Team(models.Model):
     division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
     season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
 
+    details = TeamDetailsManager()
     objects = models.Manager()
     stats = TeamStatsManager()
 
+    @property
+    def name(self):
+        player_names = self.players.values_list('last_name')
+        return f'{player_names[0][0]}/{player_names[1][0]}'
 
     def get_matches(self, *args, **kwargs):
         """

@@ -58,7 +58,7 @@
         <div class="grid grid-flow-row grid-rows-8">
           <div class="row-span-1 inline-flex">
             <h3 class="text-amber-400 text-lg font-black mr-4">{% if forloop.first %}Away Team{%else%}Home Team{% endif %}</h3>
-            <h4 class="text-slate-400 text-lg">{% if forloop.first %}{{ match.awayTeam }}{%else%}{{ match.homeTeam }}{% endif %}</h4>
+            <h4 class="text-slate-400 text-lg">{% if forloop.first %}{{ match.awayTeam.name }}{%else%}{{ match.homeTeam.name }}{% endif %}</h4>
           </div>
           {{ form.match }}
           {{ form.team }}
