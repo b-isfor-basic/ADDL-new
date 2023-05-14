@@ -4,6 +4,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from .managers import TeamStatsManager, TeamDetailsManager
 
+
 class Player(AbstractUser):
     """
     All users are current, past, or potential players in the league. Created
@@ -14,12 +15,12 @@ class Player(AbstractUser):
     operation.
     """
 
-    phoneNumber = PhoneNumberField('Phone Number', blank=True)
+    phoneNumber = PhoneNumberField("Phone Number", blank=True)
 
     class Meta:
         verbose_name = "player"
         verbose_name_plural = "players"
-        ordering = ['first_name', 'last_name']
+        ordering = ["first_name", "last_name"]
 
     def __str__(self):
         return str(self.get_full_name())
@@ -39,18 +40,20 @@ class Team(models.Model):
         season: The season the team is registered for.
     """
 
-    players = models.ManyToManyField("Player", related_name="teams", max_length=2, db_index=True)
+    players = models.ManyToManyField(
+        "Player", related_name="teams", max_length=2, db_index=True
+    )
     division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
     season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
 
-    details = TeamDetailsManager()
     objects = models.Manager()
+    details = TeamDetailsManager()
     stats = TeamStatsManager()
 
     @property
     def name(self):
-        player_names = self.players.values_list('last_name')
-        return f'{player_names[0][0]}/{player_names[1][0]}'
+        plyrs = self.players.all()
+        return f"{plyrs[0].last_name}/{plyrs[1].last_name}"
 
     def get_matches(self, *args, **kwargs):
         """
@@ -58,10 +61,12 @@ class Team(models.Model):
         """
         from Schedule.models import Season
 
-        if 'season' in kwargs:
-            season = kwargs.get('season')
+        if "season" in kwargs:
+            season = kwargs.get("season")
         else:
             season = Season.details.get_active()
-               
+
         matches = self.awayMatches.filter(week__season=season)
-        return matches.union(self.homeMatches.filter(week__season=season).order_by('week__week_number'))
+        return matches.union(
+            self.homeMatches.filter(week__season=season).order_by("week__week_number")
+        )
