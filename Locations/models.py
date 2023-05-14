@@ -2,9 +2,8 @@ import re
 
 from django.conf import settings
 from django.db import models
-from django.db.models import F, Case, When, Value
+from django.db.models import F, Value
 from django.db.models.functions import Coalesce, Concat
-from django.db.models.lookups import Contains
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
@@ -138,7 +137,6 @@ class Establishment(models.Model):
 
 
 class DivisionManager(models.Manager):
-
     def get_queryset(self):
         return super().get_queryset()
 
@@ -149,20 +147,29 @@ class DivisionManager(models.Manager):
 
     def matches(self, season=None):
         qs = self.get_queryset()
-        return qs.values(week_number='scheduleweek__week_number').annotate(
-            num_matches=models.Count("scheduleweek__match_set"),
-        ).order_by('week_number')
-        
+        return (
+            qs.values(week_number="scheduleweek__week_number")
+            .annotate(
+                num_matches=models.Count("scheduleweek__match_set"),
+            )
+            .order_by("week_number")
+        )
+
     def named(self):
         qs = self.get_queryset()
 
         return qs.annotate(
-            area_nm=F('area__shortName'),
-            name=Concat(F('area_nm'), Value(' - '), F('matchNight'), output_field=models.CharField(max_length=40))
+            area_nm=F("area__shortName"),
+            name=Concat(
+                F("area_nm"),
+                Value(" - "),
+                F("matchNight"),
+                output_field=models.CharField(),
+            ),
         )
 
-class Division(models.Model):
 
+class Division(models.Model):
     WEEKDAY_CHOICES = [
         ("Mon", "Mon"),
         ("Tues", "Tues"),
@@ -174,10 +181,19 @@ class Division(models.Model):
     ]
 
     area = models.ForeignKey(
-        to=Establishment, on_delete=models.SET_NULL, null=True, blank=True, db_index=True
+        to=Establishment,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_index=True,
     )
     matchNight = models.CharField(
-        "Match Night", choices=WEEKDAY_CHOICES, max_length=9, null=True, blank=True, db_index=True
+        "Match Night",
+        choices=WEEKDAY_CHOICES,
+        max_length=9,
+        null=True,
+        blank=True,
+        db_index=True,
     )
     playerFee = models.IntegerField(
         "Player Fee",
@@ -206,9 +222,8 @@ class Division(models.Model):
     def __str__(self):
         area_nm = self.area.shortName
         night = self.matchNight
-        night_abbr = re.sub(r"(nesday|ursday|day)", '', night)
+        night_abbr = re.sub(r"(nesday|urday|day)", "", night)
         return f"{area_nm} - {night_abbr}"
 
     def get_absolute_url(self):
         return reverse("division_detail", kwargs={"pk": self.id})
-
