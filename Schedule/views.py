@@ -22,20 +22,19 @@ def SeasonDetailView(request, *args, **kwargs):
     if "season_number" in request.GET.keys():
         # If the season number is in the URL, use that season
         season = season_qs.filter(season=request.GET.get("season"))
-        matches = Season.details.filter(season=request.GET.get('season'))
+        matches = Season.details.filter(season=request.GET.get("season"))
     else:
         season = Season.objects.latest("match_play_start_dt")
         matches = Season.details.schedule().filter(id=season.id)
 
     active_div_list = season.divisions.all()  # Get all divisions for the season
-    divisions = season.divisions.all()  # Get all divisions for the season
-    
+    divisions = None  # Get all divisions for the season
 
     if "division" in request.GET.keys():
         # If the division is in the URL, filter the matches by that division
         division = request.GET.get("division")
         matches = matches.filter(division=division)
-        divisions = active_div_list.filter(id=division)
+        divisions = active_div_list.get(id=division)
 
     context = {
         "season": season,

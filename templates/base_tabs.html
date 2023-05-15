@@ -2,30 +2,11 @@
 
 {% block title %}{% endblock title %}
 
-{% block headerScripts %}
-<svg xmlns="http://www.w3.org/2000/svg" class="hidden">
-  <symbol id="chevron-r" viewBox="0 0 20 20">
-    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-  </symbol>
-</svg>
-{% endblock headerScripts %}
-
 
 {% block sidebar %}
 {% endblock sidebar %}
 
 {% block main %}
-<div class="w-full p-5">
-  <div class="justify-items-start flex-auto">
-    <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">{% block main_heading %}{% endblock main_heading %}</h2>
-    <h3 class="text-slate-200 text-sm md:text-base font-semibold tracking-wider">
-      {% block breadcrumb_1 %}{% endblock breadcrumb_1 %}
-      {% block breadcrumb_2 %}<svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5"><use href="#chevron-r" /></svg>{% endblock breadcrumb_2 %}
-      {% block breadcrumb_3 %}<svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5"><use href="#chevron-r" /></svg>{% endblock breadcrumb_3 %}
-    </h3>
-  </div>
-</div>
-
 <div class="border-b border-gray-700 pl-5">
   <nav class="flex space-x-2" aria-label="Tabs" role="tablist">
     <button type="button" class="hs-tab-active:font-semibold hs-tab-active:border-amber-500 hs-tab-active:text-amber-500 py-4 px-1 inline-flex items-center gap-2 border-b-[3px] border-transparent text-sm whitespace-nowrap text-slate-400 hover:text-amber-500 active" id="tab-item-1" data-hs-tab="#tab-1" aria-controls="tab-1" role="tab">

@@ -5,7 +5,7 @@
 
 {% block sidebar %}
 <div class="">
-    <h1 class="font-black text-amber-400 text-xl mb-2">
+    <h1 class="font-black text-amber-500 text-xl mb-2">
         Active Divisions
     </h1>
     <ul class="text-sm space-y-1">
@@ -16,10 +16,16 @@
     </ul> 
 </div>  
 {% endblock sidebar %}
+
+{% block main_heading %}Season Schedule{% endblock main_heading %}
+
+{% block breadcrumb_1 %}Season {{ season.season_number }}{% endblock breadcrumb_1 %}
+{% block breadcrumb_2 %}{{ block.super }} {% if divisions %}{{ divisions }}{% else %}All Divisions{% endif %}{% endblock breadcrumb_2 %}
+{% block breadcrumb_3 %}{% endblock breadcrumb_3 %}
    
 {% block main %}
 <div class="pl-5">
-{% if matches|length > 1 %}
+{% if matches|length > 0 %}
 {% for division in matches %}
         <div id="matchtable" class="m-3">
             {% include './partials/match_list.html' with division=division %}
@@ -28,7 +34,7 @@
         {% endfor %}
 {% else %}
         <div id="matchtable" class="m-3">
-            {% include './partials/match_list.html' with division=divisions %}
+            {% include './partials/match_list.html' with division=matches %}
         </div>
 {% endif %}
 </div>
