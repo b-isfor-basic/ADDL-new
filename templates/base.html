@@ -18,8 +18,8 @@
  
   </head>
 
-  <body class="flex min-h-screen flex-col justify-center bg-gray-800 antialiased">
-    <header class="fixed top-0 z-40 flex w-full border-b border-slate-500/30 bg-slate-900/40 backdrop-blur shadow">
+  <body class="flex absolute min-h-full flex-col justify-center bg-gray-900 antialiased">
+    <header class="sticky top-0 z-40 flex w-full border-b bg-gray-900/40 border-slate-700 backdrop-blur shadow">
       <div class="w-full flex-wrap items-end justify-between text-center pt-4 pb-2 px-2 md:px-6 md:inline-flex ">
         <p class="font-sans text-3xl font-black text-amber-400 -tracking-widest">
           <a href="{% url 'home' %}">ADDL</a>
@@ -27,16 +27,13 @@
         <div class="text-slate-300">
           <ul class="inline-flex justify-around uppercase">
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Home</a>
+              <a href="{% url 'all_areas' %}" {% if 'locations' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Areas</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'all_areas' %}" {% if 'locations' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Meet</a>
+              <a href="{% url 'schedule' %}" {% if 'schedule' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Schedules</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'schedule' %}" {% if 'schedule' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Play</a>
-            </li>
-            <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'standings' latest_season %}" {% if 'scores' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Win</a>
+              <a href="{% url 'standings' latest_season %}" {% if 'scores' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Standings</a>
             </li>
             <li class="hover:text-amber-300 px-1">
                 <a href={% if user.is_authenticated %}"{% url 'profile' %}"{% else %}"{% url 'login' %}"{% endif %} {% if 'members' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>{% if user.is_authenticated %}{{ user.username }}{% else %}Login{% endif %}</a>
@@ -46,7 +43,7 @@
       </div>
     </header>
     
-    <main class="relative top-20 md:top-14 flex w-screen mx-auto min-h-screen mb-24 px-2 md:px-6 max-w-8xl justify-around items-start">
+    <main class="relative flex bg-gradient-to-b from-gray-800 to-gray-900 w-full mx-auto min-h-screen pb-24 md:px-6 max-w-8xl justify-around items-start">
         {% block messages %}
           {% if messages %}
           <div class="absolute right-2 top-2 z-30">
@@ -70,7 +67,7 @@
     </main>
 
     <!-- Footer -->
-    <div class="z-20 static bottom-0 mt-auto w-screen justify-end bg-slate-900 p-6">
+    <div class="z-20 static bottom-0 mt-auto w-screen justify-end bg-slate-950 p-6">
       <div class="text-center tk-rustica py-3 text-xs flex-nowrap">
         <p class="text-slate-300">&copy;2023 Atlanta Doubles Dart League</p>
         <p class="text-slate-300">All Rights Reserved</p>

@@ -1,48 +1,27 @@
-from django.shortcuts import get_object_or_404, render, HttpResponse
-from django.views.generic import ListView
+from django.shortcuts import render
+from django.views.generic import ListView, DetailView
 
-from .models import Establishment, Division
-from .forms import EstablishmentForm, DivisionForm
-
-
-def establishment_list(request):
-    all_areas = Establishment.objects.all()
-    if "is_active" in request.GET.keys():
-        is_active = request.GET["is_active"]
-        all_active = Establishment.objects.filter(is_active=is_active)
-        context = {
-            "all_areas": all_active,
-        }
-    else:
-        context = {
-            "all_areas": all_areas,
-        }
-    return render(request, "locations/establishment_list.html", context)
+from .models import Establishment
 
 
-def establishment_detail(request, pk):
-    area = get_object_or_404(Establishment, pk=pk)
-    divisions = Division.objects.filter(area=area)
-    form = DivisionForm(request.POST or None)
+class EstablishmentListView(ListView):
+    model = Establishment
+    template_name = "locations/establishment_list.html"
+    context_object_name = "all_areas"
 
-    if request.method == "POST":
-        if form.is_valid():
-            division = form.save(commit=False)
-            division.area = area
-            division.is_active = False
-            division.save()
-            return HttpResponse("success")
-        else:
-            return render(
-                request, "locations/partials/division_form.html", context={"form": form}
-            )
-
-    context = {"form": form, "area": area, "divisions": divisions}
-
-    return render(request, "locations/establishment_detail.html", context)
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if "is_active" in self.request.GET.keys():
+            is_active = self.request.GET.get("is_active")
+            qs = qs.filter(is_active=is_active)
+        return qs
 
 
-def create_division_form(request):
-    form = DivisionForm()
-    context = {"form": form}
-    return render(request, "locations/partials/division_form.html", context)
+class EstablishmentDetailView(DetailView):
+    model = Establishment
+    template_name = "locations/establishment_detail.html"
+    context_object_name = "area_detail"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.prefetch_related("division_set__scheduleweek_set__match_set")

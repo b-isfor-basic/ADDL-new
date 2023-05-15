@@ -1,5 +1,4 @@
 import uuid
-from datetime import timedelta as td
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -12,11 +11,14 @@ from Members.models import Player, Team
 from .managers import MatchManager, ScheduleManager, SeasonManager
 
 
-class Scheduler(models.Model):
+class ScheduleRule(models.Model):
+    class Meta:
+        verbose_name_plural = "Schedule Rules"
+        verbose_name = "Schedule Rule"
+
     title = models.CharField(max_length=48)
     description = models.TextField(null=True, blank=True)
     frequency = RecurrenceField()
-   
 
 
 class Season(models.Model):
@@ -31,6 +33,10 @@ class Season(models.Model):
     Saturday following the in-house playoffs.
     """
 
+    class Meta:
+        ordering = ["-season_number"]
+        get_latest_by = ["match_play_start_dt"]
+
     season_number = models.PositiveIntegerField("Season Number", db_index=True)
     match_play_start_dt = models.DateField(db_index=True)
     match_play_end_dt = models.DateField(db_index=True)
@@ -43,13 +49,9 @@ class Season(models.Model):
     objects = models.Manager()
     details = SeasonManager()
 
-    class Meta:
-        ordering = ["-season_number"]
-        get_latest_by = ["match_play_start_dt"]
-
     def __str__(self):
         return f"Season {self.season_number}"
-    
+
     @property
     def num_weeks_regular_season(self):
         """
@@ -57,7 +59,7 @@ class Season(models.Model):
         """
         num_weeks = ((self.match_play_end_dt - self.match_play_start_dt).days // 7) - 1
         return list(range(1, num_weeks, 1))
-        
+
 
 class ScheduleWeek(models.Model):
     """
@@ -75,7 +77,6 @@ class ScheduleWeek(models.Model):
 
     class Meta:
         unique_together = ["season", "week_number", "division"]
-
 
     def __str__(self):
         return f"S{self.season.season_number} - W{self.week_number} - Area {self.division.area.number}"
@@ -108,7 +109,7 @@ class Match(models.Model):
     )
 
     objects = models.Manager()
-    details = MatchManager()    
+    details = MatchManager()
 
     class Meta:
         verbose_name_plural = "Matches"
