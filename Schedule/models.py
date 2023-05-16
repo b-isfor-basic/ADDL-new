@@ -57,7 +57,7 @@ class Season(models.Model):
         """
         Returns the number of weeks in the season.
         """
-        num_weeks = ((self.match_play_end_dt - self.match_play_start_dt).days // 7) - 1
+        num_weeks = (self.match_play_end_dt - self.match_play_start_dt).days // 7
         return list(range(1, num_weeks, 1))
 
 
