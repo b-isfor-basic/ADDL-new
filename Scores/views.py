@@ -43,7 +43,7 @@ def StandingsView(
     **kwargs
 ):
     """
-    This view handles displaying stats and standings for a given season. Default is 
+    This view handles displaying stats and standings for a given season. Default is
     the current season. If a division is selected, the standings will be filtered to
     only include that division.
     """
@@ -53,11 +53,13 @@ def StandingsView(
     active_divisions = season.divisions.all()
 
     player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
-    team_stats = Team.stats.stats(q=Q(match__week__season=season.id)).filter(season=season.id)
-    team_standings = Team.stats.weekly_points()
-    
+    team_stats = Team.stats.stats(q=Q(match__week__season=season.id)).filter(
+        season=season.id
+    )
+    team_standings = Team.stats.weekly_points().filter(season=season.id)
+
     division_set = None
-    
+
     if division_id != None:
         division_id = division_id
         if season.divisions.filter(id=division_id).exists():
@@ -118,7 +120,7 @@ def CreateScoreSummaryView(request, id, **kwargs):
         )
         player_scores = PlayerScoreFormSet(
             request.POST, prefix="player", form_kwargs={"match": match}
-        )      
+        )
 
         if (
             all_valid([team_scores, player_scores])
