@@ -14,7 +14,7 @@
        
         <!-- Sidebar -->
         
-        <aside class="z-10 md:z-0 p-2 md:p-1 fixed top-20 -left-4 w-fit h-full md:flow-root md:w-auto backdrop-blur bg-slate-900/50 md:bg-transparent md:col-start-1 md:col-span-1 border-r border-r-slate-700 md:justify-content-end"> 
+        <aside class="z-10 md:z-0 pt-6 pr-2 fixed w-fit h-full md:flow-root md:w-auto backdrop-blur bg-slate-900/50 md:bg-transparent md:col-start-1 md:col-span-1 border-r border-r-slate-700 md:justify-content-end"> 
             <button id="show-sidebar" type="button" class="text-amber-400 md:hidden">
                 <svg id="show-sidebar-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -33,18 +33,18 @@
         
         <!-- Main Content -->
 
-        <div class="ml-6 md:ml-2 pl-2 md:pl-0 pt-6 md:col-start-2 col-span-2 h-fit overflow-y-scroll mt-10">
+        <div class="ml-6 md:ml-2 pl-2 md:pl-0 pt-6 md:col-start-2 col-span-2 h-fit overflow-y-scroll">
                 <!-- Page Heading -->
-          <div class="w-full p-5">
-            <div class="justify-items-start flex-auto">
-              <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">{% block main_heading %}{% endblock main_heading %}</h2>
-              <h3 class="text-slate-200 text-sm md:text-base font-semibold tracking-wider">
-                {% block breadcrumb_1 %}{% endblock breadcrumb_1 %}
-                {% block breadcrumb_2 %}<svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5"><use href="#chevron-r" /></svg>{% endblock breadcrumb_2 %}
-                {% block breadcrumb_3 %}<svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5"><use href="#chevron-r" /></svg>{% endblock breadcrumb_3 %}
-              </h3>
-            </div>
-          </div>
+  <div class="w-full p-5">
+    <div class="justify-items-start flex-auto">
+      <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">{% block main_heading %}{% endblock main_heading %}</h2>
+      <h3 class="text-slate-200 text-sm md:text-base font-semibold tracking-wider">
+        {% block breadcrumb_1 %}{% endblock breadcrumb_1 %}
+        {% block breadcrumb_2 %}<svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5"><use href="#chevron-r" /></svg>{% endblock breadcrumb_2 %}
+        {% block breadcrumb_3 %}<svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5"><use href="#chevron-r" /></svg>{% endblock breadcrumb_3 %}
+      </h3>
+    </div>
+  </div>
             {% block main %}
             {% endblock main %}
         </div>
