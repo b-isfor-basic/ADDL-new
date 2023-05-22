@@ -50,6 +50,8 @@ function LoadRunningTotals(sel, tar) {
 const playerData = fetch('/api/v1/players')
     .then(response => {
         return response.json()
+    }).catch(error => {
+        return console.log('Error: ', error);
     });
 
 
@@ -64,7 +66,7 @@ function selectConfigs() {
         selectedOptionID: null,
         open() {
             this.show = true;
-            this.filter='';
+            this.filter = '';
         },
         close() {
             this.show = false;
@@ -82,10 +84,12 @@ function selectConfigs() {
         isOpen() {
             return this.show === true;
         },
-        selectedName() { 
-            return this.selected ? this.selected.first_name + ' ' + this.selected.last_name : this.filter; },
-        selectedID() { 
-            return this.selectedOptionID ? this.selected.id : this.filter; },
+        selectedName() {
+            return this.selected ? this.selected.first_name + ' ' + this.selected.last_name : this.filter;
+        },
+        selectedID() {
+            return this.selectedOptionID ? this.selected.id : this.filter;
+        },
         fetchOptions() {
             playerData.then(data => {
                 this.options = data;
@@ -95,11 +99,11 @@ function selectConfigs() {
         filteredOptions() {
             return this.options
                 ? this.options.filter(option => {
-                return (option.first_name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1) 
-                || (option.last_name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
-                || (option.email.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
-            })
-            : {}
+                    return (option.first_name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
+                        || (option.last_name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
+                        || (option.email.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
+                })
+                : {}
         },
         onOptionClick(index) {
             this.focusedOptionIndex = index;
@@ -110,7 +114,7 @@ function selectConfigs() {
                 return;
             }
             this.focusedOptionIndex = this.focusedOptionIndex ?? 0;
-            
+
             const selected = this.filteredOptions()[this.focusedOptionIndex]
 
             this.selected = selected;
@@ -150,4 +154,3 @@ function setNames(id, name) {
     id = Number.parseInt(id.slice(-1), 10) - 1;
     $(`span[name=${listAbbrPlayer[id]}Player]`).text(name);
 }
-        

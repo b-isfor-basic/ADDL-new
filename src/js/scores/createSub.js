@@ -39,6 +39,8 @@ function addSub() {
     selectedPlayer() {
       if (this.newPlayer) {
         return this.newPlayer.id
+      } else {
+        return this.$refs.select.value
       }
     }
   }
