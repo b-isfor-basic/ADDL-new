@@ -117,15 +117,15 @@ class Establishment(models.Model):
 
     def get_address(self):
         address = ""
-        if self.streetLine1 is not None:
+        if self.streetLine1 != None:
             address += f"{self.streetLine1}\n".title()
-        if self.streetLine2 is not None:
+        if self.streetLine2 != None:
             address += f"{self.streetLine2}\n".title()
-        if self.city is not None:
+        if self.city != None:
             address += f"{self.city}, ".title()
-        if self.state is not None:
+        if self.state != None:
             address += f"{self.state} ".upper()
-        if self.zipCode is not None:
+        if self.zipCode != None:
             address += str(self.zipCode)
         return "".join(address)
 

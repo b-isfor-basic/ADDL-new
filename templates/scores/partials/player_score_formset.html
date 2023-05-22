@@ -5,11 +5,8 @@
     </div>
     {{ form.match }}
     {{ form.team }}
-    {{ form.pk }}
     {% if form.non_field_errors %}
-    <div id="playerErrorBox{% if team == "away" %}Away{%else%}Home{% endif %}{{ forloop.counter }}" class="relative flex justify-center items-center">
-      {% include '../../components/error.html' with target_element=target_tag message=form.non_field_errors %}
-    </div>
+    {% include './components/error.html' with message=form.non_field_errors %}
     {% endif %} 
     <div class="row-span-4 my-2" x-data="addSub()">
       <div class="row-span-2 w-full items-center inline-flex">
@@ -33,7 +30,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
           </svg>          
           <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-600 text-xs font-medium text-white rounded-md shadow-sm" role="tooltip">
-             Cancel
+             Remove Player
           </span>
         </button>
       </div>   
@@ -56,7 +53,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
           </svg>
           <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-600 text-xs font-medium text-white rounded-md shadow-sm" role="tooltip">
-            Save Player
+            Save
          </span>
         </button>
       </div>
@@ -69,12 +66,12 @@
         <div class="col-span-1">
           <label for="{{ form.darts_thrown1.id_for_label }}" class="text-sm font-medium text-slate-400">Darts Thrown<span class="text-rose-400">*</span></label>
           <div class="mt-1">{{ form.darts_thrown1 }}</div>
-          <p class="text-sm !text-rose-400">{{ form.darts_thrown1.errors }}</p>
+          <p class="text-sm text-rose-400">{{ form.darts_thrown1.errors }}</p>
         </div>
         <div class="col-span-1">
           <label for="{{ form.score_left1.id_for_label }}" class="text-sm font-medium text-slate-400">Score Left<span class="text-rose-400">*</span></label>
           <div class="mt-1">{{ form.score_left1 }}</div>
-          <div class="text-sm !text-rose-400">{{ form.score_left1.errors }}</div>
+          <div class="text-sm text-rose-400">{{ form.score_left1.errors }}</div>
         </div>
       </fieldset>    
       <div class="row-span-1 mb-6">
@@ -83,12 +80,12 @@
         <div class="col-span-1">
           <label for="{{ form.darts_thrown2.id_for_label }}" class="text-sm font-medium text-slate-400">Darts Thrown<span class="text-rose-400">*</span></label>
           <div class="mt-1">{{ form.darts_thrown2 }}</div>
-          <div class="text-sm !text-rose-400">{{ form.darts_thrown2.errors }}</div>
+          <div class="text-sm text-rose-400">{{ form.darts_thrown2.errors }}</div>
         </div>
         <div class="col-span-1">
           <label for="{{ form.score_left2.id_for_label }}" class="text-sm font-medium text-slate-400">Score Left<span class="text-rose-400">*</span></label>
           <div class="mt-1">{{ form.score_left2 }}</div>
-          <div class="text-sm !text-rose-400">{{ form.score_left2.errors }}</div>
+          <div class="text-sm text-rose-400">{{ form.score_left2.errors }}</div>
         </div>
       </fieldset>
     </div>
@@ -98,36 +95,36 @@
         <div class="col-span-1">
           <label for="{{ form.high_in.id_for_label }}" class="text-sm font-medium text-slate-400">Player's Highest In</label>
           <div class="mt-1">{{ form.high_in }}</div>
-          <div class="text-sm !text-rose-400">{{ form.high_in.errors }}</div>
+          <div class="text-sm text-rose-400">{{ form.high_in.errors }}</div>
         </div>
         <div class="col-span-1">
           <label for="{{ form.high_out.id_for_label }}" class="text-sm font-medium text-slate-400">Player's Highest Out</label>
           <div class="mt-1">{{ form.high_out }}</div>
-          <div class="text-sm !text-rose-400">{{ form.high_out.errors }}</div>
+          <div class="text-sm text-rose-400">{{ form.high_out.errors }}</div>
         </div>
       </fieldset>
       <fieldset class="row-span-2 mx-2 grid grid-flow-col grid-cols-2 gap-2 md:gap-5">
         <div class="col-span-1">
           <label for="{{ form.total_stars.id_for_label }}" class="text-sm font-medium text-slate-400">Total Stars</label>
           <div class="mt-1">{{ form.total_stars }}</div>
-          <div class="text-sm !text-rose-400">{{ form.total_stars.errors }}</div>
+          <div class="text-sm text-rose-400">{{ form.total_stars.errors }}</div>
         </div>
         <div class="col-span-1">
           <label for="{{ form.total_perfects.id_for_label }}" class="text-sm font-medium text-slate-400">Total Perfects</label>
           <div class="mt-1">{{ form.total_perfects }}</div>
-          <div class="text-sm !text-rose-400">{{ form.total_perfects.errors }}</div>
+          <div class="text-sm text-rose-400">{{ form.total_perfects.errors }}</div>
         </div>
       </fieldset>
       <fieldset class="row-span-2 mx-2 grid grid-flow-col grid-cols-2 gap-2 md:gap-5">
         <div class="col-span-1">
           <label for="{{ form.singles_points.id_for_label }}" class="text-sm font-medium text-slate-400">Singles Game Points<span class="text-rose-400">*</span></label>
           <div class="mt-1">{{ form.singles_points }}</div>
-          <div class="text-sm !text-rose-400">{{ form.singles_points.errors }}</div>
+          <div class="text-sm text-rose-400">{{ form.singles_points.errors }}</div>
         </div>
         <div class="col-span-1">
           <label for="{{ form.doubles_points.id_for_label }}" class="text-sm font-medium text-slate-400">Doubles Game Points<span class="text-rose-400">*</span></label>
           <div class="mt-1">{{ form.doubles_points }}</div>
-          <div class="text-sm !text-rose-400">{{ form.doubles_points.errors }}</div>
+          <div class="text-sm text-rose-400">{{ form.doubles_points.errors }}</div>
       </fieldset>
     </div>
   </div>

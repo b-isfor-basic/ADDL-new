@@ -1,5 +1,3 @@
-const { error } = require("jquery");
-
 function selectConfigs() {
     return {
         filter: '',
@@ -10,7 +8,7 @@ function selectConfigs() {
         selectedOptionID: null,
         open() {
             this.show = true;
-            this.filter = '';
+            this.filter='';
         },
         close() {
             this.show = false;
@@ -33,17 +31,16 @@ function selectConfigs() {
         fetchOptions() {
             fetch('/api/v1/players')
                 .then(response => response.json())
-                .then(data => this.options = data)
-                .catch(error => console.log('Error: ', error));
+                .then(data => this.options = data);
         },
         filteredOptions() {
             return this.options
                 ? this.options.filter(option => {
-                    return (option.first_name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
-                        || (option.last_name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
-                        || (option.email.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
-                })
-                : {}
+                return (option.first_name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1) 
+                || (option.last_name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
+                || (option.email.toLowerCase().indexOf(this.filter.toLowerCase()) > -1)
+            })
+            : {}
         },
         onOptionClick(index) {
             this.focusedOptionIndex = index;
