@@ -60,7 +60,8 @@ def StandingsView(
 
     division_set = None
 
-    if division_id is not None:
+    if division_id != None:
+        division_id = division_id
         if season.divisions.filter(id=division_id).exists():
             division_set = season.divisions.get(id=division_id)
         else:
@@ -172,6 +173,9 @@ class EditScoreSummaryView(UpdateView):
         return resolve_url(
             "scores:view_scores", kwargs={"id": self.object.id, "success": "true"}
         )
+
+    def get_object(self, **kwargs):
+        return ScoreSummary.objects.get(id=self.kwargs["id"])
 
 
 # Former Scoresheet handling logic below. Keeping for reference.

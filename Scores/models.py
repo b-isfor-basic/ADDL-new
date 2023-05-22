@@ -5,7 +5,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from Members.models import Team
@@ -64,7 +64,6 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
 
     class Meta:
         unique_together = ["match", "team"]
-        verbose_name = "Team Score Summary"
         verbose_name_plural = "Team Score Summaries"
 
 
@@ -75,10 +74,6 @@ class ScoreSummary(TimeStampedModel, models.Model):
     Objects may also be created by the create_summary method in the ScoreDetail
     model.
     """
-    class Meta:
-        unique_together = ["match", "player"]
-        verbose_name = "Score Summary"
-        verbose_name_plural = "Score Summaries"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
@@ -114,22 +109,21 @@ class ScoreSummary(TimeStampedModel, models.Model):
         scored = 1001 - (self.score_left1 + self.score_left2)
         return round(scored / darts_thrown, 4)
 
+    @receiver(post_save, sender="Scores.ScoreDetail")
+    def create(self, *args, **kwargs):
+        return super().create(**kwargs)
+
 
 class ScoreDetail(TimeStampedModel, models.Model):
     """
     A detailed breakdown of a player's scores for a match. Only created when
     scores are submitted by a player and not by an area manager or admin.
     """
-    class Meta:
-        unique_together = ["match", "player"]
-        verbose_name = "Score Detail"
-        verbose_name_plural = "Score Details"
-    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    score_summary = models.OneToOneField(ScoreSummary, on_delete=models.CASCADE, blank=True, null=True)
+    score_summary = models.OneToOneField(ScoreSummary, on_delete=models.CASCADE)
     stars_list = ArrayField(
         models.PositiveIntegerField(), max_length=10, blank=True, null=True
     )
@@ -166,6 +160,28 @@ class ScoreDetail(TimeStampedModel, models.Model):
         blank=True,
         null=True,
     )
+
+    def create_summary(self):
+        """
+        Creates a ScoreSummary object based on the data in this object.
+        """
+        summary = ScoreSummary.objects.create(
+            match=self.match,
+            player=self.player,
+            team=self.team,
+            total_stars=sum(self.stars_list),
+            total_perfects=sum(self.perfects_list),
+            singles_points=sum(self.points_list),
+            doubles_points=sum(self.points_list),
+            high_in=max(self.in_list),
+            high_out=max(self.out_list),
+            darts_thrown1=self.darts_thrown_list[0],
+            score_left1=self.score_left_list[0],
+            darts_thrown2=self.darts_thrown_list[1],
+            score_left2=self.score_left_list[1],
+        )
+        self.score_summary = summary
+        self.save()
 
 
 # Old score management models. Kept for reference.

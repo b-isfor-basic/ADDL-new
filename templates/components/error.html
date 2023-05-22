@@ -1,13 +1,9 @@
-  <div x-data="{ open : true }" x-show="open" class="px-2 pb-2 backdrop-blur h-fit w-full rounded-lg ring-1 ring-rose-300/60 shadow-rose-800/10 shadow-lg bg-rose-900/40 text-rose-300">
-    <div class="inline-flex justify-between w-full my-2">
-      <p class="text-rose-400 font-semibold">Error!</p>
-      <button type="button" @click="open = ! open">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>    
-      </button>
-    </div>
-    <div class="w-full mb-2">
-      <p class="text-rose-300 !text-sm">{{ message }}</p>
-    </div>
-  </div>
+  <div class="px-2 backdrop-blur h-fit w-full rounded-lg ring-1 ring-rose-300/60 shadow-rose-800/10 shadow-lg bg-rose-900/40 text-rose-300">
+    <p class="text-rose-400 font-semibold">Error!</p>
+    <button type="button" data-hs-remove-element="{{ target_element }}" class="absolute top-0 right-0 justify-self-end">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>    
+    </button>
+    <p class="text-rose-300 text-sm p-1">{{ message }}</p>
+ </div>
