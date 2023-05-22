@@ -22,8 +22,8 @@ else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if IS_HEROKU:
-    DEBUG = False
+if not IS_HEROKU:
+    DEBUG = True
 
 # Application definition
 INSTALLED_APPS = [
