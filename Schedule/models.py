@@ -38,11 +38,15 @@ class Season(models.Model):
         get_latest_by = ["match_play_start_dt"]
 
     season_number = models.PositiveIntegerField("Season Number", db_index=True)
-    match_play_start_dt = models.DateField(db_index=True)
-    match_play_end_dt = models.DateField(db_index=True)
-    playoff_finals_dt = models.DateTimeField("Playoff Finals")
+    match_play_start_dt = models.DateField("Match Play Start Date", db_index=True)
+    match_play_end_dt = models.DateField("Match Play End Date", db_index=True)
+    playoff_finals_dt = models.DateTimeField("Playoff Finals Date")
     playoffFinalsLocation = models.ForeignKey(
-        to=Establishment, blank=True, null=True, on_delete=models.SET_NULL
+        verbose_name="Playoff Finals Location",
+        to=Establishment,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     divisions = models.ManyToManyField(Division, db_index=True)
 
@@ -57,7 +61,7 @@ class Season(models.Model):
         """
         Returns the number of weeks in the season.
         """
-        num_weeks = ((self.match_play_end_dt - self.match_play_start_dt).days // 7) - 1
+        num_weeks = (self.match_play_end_dt - self.match_play_start_dt).days // 7
         return list(range(1, num_weeks, 1))
 
 
@@ -89,12 +93,6 @@ class Match(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     week = models.ForeignKey(ScheduleWeek, models.CASCADE, null=True, db_index=True)
-    boards = ArrayField(
-        models.PositiveIntegerField(blank=True, null=True),
-        size=2,
-        null=True,
-        blank=True,
-    )
     awayTeam = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
@@ -115,7 +113,7 @@ class Match(models.Model):
         verbose_name_plural = "Matches"
 
     def __str__(self):
-        return f"{self.awayTeam} vs. {self.homeTeam}"
+        return f"{self.awayTeam} v. {self.homeTeam}"
 
     @property
     def homeScore(self):
