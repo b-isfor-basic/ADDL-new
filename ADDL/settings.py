@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "django_extensions",
     "phonenumber_field",
     "recurrence",
-    "widget_tweaks",
     # Created packages
     "Members.apps.MembersConfig",
     "Scores.apps.ScoresConfig",
