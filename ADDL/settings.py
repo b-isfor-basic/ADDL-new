@@ -1,5 +1,4 @@
 import os
-import secrets
 from pathlib import Path
 
 import dj_database_url
@@ -14,10 +13,7 @@ IS_HEROKU = "DYNO" in os.environ
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if 'SECRET_KEY' in os.environ:
-    SECRET_KEY = os.environ.get(
-        "SECRET_KEY",
-        default=secrets.token_urlsafe(nbytes=64),
-    )
+    SECRET_KEY = os.environ['SECRET_KEY']
 
 # Generally avoid wildcards(*). However since Heroku router provides hostname validation it is ok
 if IS_HEROKU:
@@ -26,8 +22,8 @@ else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if not IS_HEROKU:
-    DEBUG = True
+if IS_HEROKU:
+    DEBUG = False
 
 # Application definition
 INSTALLED_APPS = [
@@ -45,6 +41,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "phonenumber_field",
     "recurrence",
+    "widget_tweaks",
     # Created packages
     "Members.apps.MembersConfig",
     "Scores.apps.ScoresConfig",
@@ -84,6 +81,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ADDL.wsgi.application"
 
+MAX_CONN_AGE = 600
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -99,7 +97,6 @@ DATABASES = {
 }
 
 
-MAX_CONN_AGE = 600
 if "DATABASE_URL" in os.environ:
     # Configure Django for DATABASE_URL environment variable.
     DATABASES["default"] = dj_database_url.config(
@@ -143,27 +140,16 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-
 if IS_HEROKU:
     STATIC_URL = "static/"
 else:
     STATIC_URL = "src/"
 STATICFILES_DIRS = [BASE_DIR / "src/",
                     BASE_DIR / "node_modules/",]
-STATIC_ROOT = BASE_DIR / "staticfiles/"
+STATIC_ROOT = BASE_DIR / "static/"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 
-STORAGES = {
-    # Enable WhiteNoise's GZip and Brotli compression of static assets:
-    # https://whitenoise.readthedocs.io/en/latest/django.html#add-compression-and-caching-support
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-# Don't store the original (un-hashed filename) version of static files, to reduce slug size:
-# https://whitenoise.readthedocs.io/en/latest/django.html#WHITENOISE_KEEP_ONLY_HASHED_FILES
-WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -232,15 +218,17 @@ sentry_sdk.init(
             transaction_style="url",
         ),
     ],
+    _experiments={
+        "profiles_sample_rate": 0.5,
+    },
     max_breadcrumbs=50,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
-    traces_sample_rate=0.5,
-    profiles_sample_rate=0.5,
+    traces_sample_rate=0.2,
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True,
     environment=os.environ.get("ENVIRONMENT"),
-    release=os.environ.get("HEROKU_SLUG_COMMIT"),
+    release=os.environ.get("GIT_SHA"),
 )
