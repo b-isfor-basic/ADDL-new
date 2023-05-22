@@ -31,7 +31,6 @@ if not IS_HEROKU:
 
 # Application definition
 INSTALLED_APPS = [
-    "whitenoise.runserver_nostatic",
     # Django included packages
     "django.contrib.admin",
     "django.contrib.auth",
@@ -145,10 +144,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+if IS_HEROKU:
+    STATIC_URL = "static/"
+else:
+    STATIC_URL = "src/"
 STATICFILES_DIRS = [BASE_DIR / "src/",
                     BASE_DIR / "node_modules/",]
-STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles/"
+
 
 STORAGES = {
     # Enable WhiteNoise's GZip and Brotli compression of static assets:
