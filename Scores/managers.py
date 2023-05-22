@@ -1,4 +1,5 @@
 from itertools import groupby, chain
+from typing import Any
 
 from django.db import models
 from django.db.models import Case, Count, F, Max, Min, Q, Sum, Value, When
@@ -65,7 +66,7 @@ class PlayerScoreSummaryManager(models.Manager):
                 # Stars stats
                 stars=Sum("total_stars", default=0),
                 perfects=Sum("total_perfects", default=0),
-                avg_stars_per_game=(Sum("total_stars") / (Count("id", distinct=True) * 10.0)),
+                avg_stars_per_game=(Sum("total_stars", default=0) / (Count("id", distinct=True) * 10.0)),
                 
                 # '01 stats
                 max_high_in=Max("high_in", default=0),
@@ -115,6 +116,30 @@ class PlayerScoreSummaryManager(models.Manager):
                 ),   
             )
         )
+    
+    def get_player_stats(self, player_id):
+        return self.get_queryset().filter(player_id=player_id).first()
+    
+    def get_player_stats_by_division(self, division_id):
+        return self.get_queryset().filter(team__division_id=division_id)
+    
+    def get_player_stats_by_week(self, week_id):
+        return self.get_queryset().filter(match__week_id=week_id)
+    
+    def get_player_stats_by_team(self, team_id):
+        return self.get_queryset().filter(team_id=team_id)
+    
+    def get_player_stats_by_season(self, season_id):
+        return self.get_queryset().filter(team__division__season_id=season_id)
+    
+    def get_player_stats_by_season_and_division(self, season_id, division_id):
+        return self.get_queryset().filter(team__division__season_id=season_id, team__division_id=division_id)
+    
+    
+    def update_or_create(self, *args, **kwargs):
+        return super().update_or_create(*args, **kwargs)
+
+
 
     
 class TeamScoreSummaryManager(models.Manager):
