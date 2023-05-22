@@ -50,11 +50,6 @@ class Team(models.Model):
     details = TeamDetailsManager()
     stats = TeamStatsManager()
 
-    @property
-    def name(self):
-        plyrs = self.players.all()
-        return f"{plyrs[0].last_name}/{plyrs[1].last_name}"
-
     def get_matches(self, *args, **kwargs):
         """
         Returns the matches for the team for the given season.
@@ -70,3 +65,10 @@ class Team(models.Model):
         return matches.union(
             self.homeMatches.filter(week__season=season).order_by("week__week_number")
         )
+
+    def name(self):
+        plyrs = self.players.all()
+        return plyrs[0].last_name + "/" + plyrs[1].last_name
+
+    def __str__(self):
+        return self.name()

@@ -24,7 +24,7 @@
       <svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5"><use href="#chevron-r" /></svg>
       {{ match.week.division }}
     </h3>
-    <p class="pt-4 text-slate-400 text-sm">Complete the form below to record scores. Fields marked with <span class="text-rose-400">*</span> are required.</p>
+    <p class="pt-4 text-slate-400">Complete the form below to record scores. Fields marked with <span class="text-rose-400">*</span> are required.</p>
   </div>
 
 <form method="post" class="justify-evenly items-center pt-4">
@@ -34,6 +34,11 @@
   {% if team_scores.non_form_errors %}
   <div id="errorBox" class="m-4 relative flex justify-center items-center ml-auto w-full h-fit" id="errorBox">
     {% include '../components/error.html' with target_element='#errorBox' message=team_scores.non_form_errors %}
+  </div>
+  {% endif %}
+  {% if player_scores.non_form_errors %}
+  <div id="errorBox" class="m-4 relative flex justify-center items-center ml-auto w-full h-fit" id="errorBox">
+    {% include '../components/error.html' with target_element='#errorBox' message=player_scores.non_form_errors %}
   </div>
   {% endif %}
 
@@ -62,6 +67,7 @@
           </div>
           {{ form.match }}
           {{ form.team }}
+          {{ form.id }}
           {% if form.non_field_errors %}
           <div id="errorBox" class="relative flex justify-center items-center" id="errorBox">
             {% include '../components/error.html' with target_element='#errorBox' message=form.non_field_errors %}
@@ -119,9 +125,14 @@
             <h3 class="text-amber-500 text-2xl font-black place-self-start justify-start pb-2">Away Team Scores</h3>
             <div class="text-slate-400 text-sm space-y-3 p-1">
               <p>All scores are required<span class="text-rose-400">*</span> unless the team forfeit their match.</p>
-              <p>If any game is missing a value for darts thrown or score left, the game should be recorded as 50-0 for the winning player and/or 50-2
+              <p>
+                If any game is missing a value for darts thrown or score left, the game should be recorded as 50-0 for the winning player and/or 50-2
                 for the losing player.
               </p>
+              <p>
+                If the team used a <span class="font-bold">substitute player</span>, check for the player's name in the dropdown list. If the player is not listed, click the
+                <span class="text-sky-400 font-bold">Add Sub</span> button to add the right of the player field and enter the player's first and last name. Click the 
+                <span class="text-emerald-400 font-bold">Save Player</span> button to update the dropdown menu. 
             </div>
 
 
@@ -142,11 +153,16 @@
         <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 md:gap-3 w-full text-slate-200">
           <div class="md:col-span-1 border-b md:border-r md:border-b-0 border-slate-600">
             <h3 class="text-amber-500 text-2xl font-black place-self-start justify-start pb-2">Home Team Scores</h3>
-            <div class="text-slate-400 text-sm space-y-6 p-1">
+            <div class="text-slate-400 text-sm space-y-3 p-1">
               <p>All scores are required<span class="text-rose-400">*</span> unless the team forfeit their match.</p>
-              <p>If any game is missing a value for darts thrown or score left, the game should be recorded as 50-0 for the winning player and/or 50-2
+              <p>
+                If any game is missing a value for darts thrown or score left, the game should be recorded as 50-0 for the winning player and/or 50-2
                 for the losing player.
               </p>
+              <p>
+                If the team used a <span class="font-bold">substitute player</span>, check for the player's name in the dropdown list. If the player is not listed, click the
+                <span class="text-sky-400 font-bold">Add Sub</span> button to add the right of the player field and enter the player's first and last name. Click the 
+                <span class="text-emerald-400 font-bold">Save Player</span> button to update the dropdown menu. 
             </div>
           </div>
           <div class="md:col-span-2 md:col-start-2 items-center space-y-2 md:space-y-4 py-5 md:m-2">
