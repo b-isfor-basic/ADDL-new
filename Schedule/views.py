@@ -1,14 +1,10 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import Case, F, OuterRef, Q, Sum, Value, When
-from django.db.models.functions import JSONObject
-from django.db.models.lookups import GreaterThan, Exact
 from django.shortcuts import render
 
 from Schedule.forms import AnnouncementForm
-from Schedule.models import Match, ScheduleWeek, Season
+from Schedule.models import Season
 
 
 def SeasonDetailView(request, *args, **kwargs):
@@ -34,7 +30,7 @@ def SeasonDetailView(request, *args, **kwargs):
     if "division" in request.GET.keys():
         # If the division is in the URL, filter the matches by that division
         division = request.GET.get("division")
-        matches = matches.filter(division=division)
+        matches = matches.filter(division=division).order_by("division_id", "week_number")
         divisions = active_div_list.get(id=division)
 
     context = {
