@@ -1,0 +1,17 @@
+# Ignore artifacts:
+build
+coverage
+
+# Ignore all dotfiles
+**/.git
+**/.svn
+**/.hg
+**/.venv
+**/node_modules
+
+# Ignore python
+**/*.pyc
+**/*.py
+
+# ignore html
+**/*.html
