@@ -135,7 +135,7 @@ class SeasonManager(Manager):
         from Locations.models import Division
 
         qs = self.get_queryset()
-        season_weeks = ScheduleWeek.objects.filter(season=OuterRef('id'))
+        season_weeks = ScheduleWeek.objects.filter(season=OuterRef('id')).order_by('division', 'week_number')
         matches = Match.details.status().values(json=JSONObject(id=F('id'), home_team=F('home_team'), away_team=F('away_team'), status=F('status')))
 
         return qs.annotate(
