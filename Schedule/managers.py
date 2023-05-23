@@ -131,8 +131,8 @@ class SeasonManager(Manager):
         return self.get_queryset().latest("match_play_start_dt")
 
     def schedule(self):
-        from .models import ScheduleWeek, Match
         from Locations.models import Division
+        from Schedule.models import ScheduleWeek, Match
 
         qs = self.get_queryset()
         season_weeks = ScheduleWeek.objects.filter(season=OuterRef('id')).order_by('division', 'week_number')
