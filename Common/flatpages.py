@@ -14,6 +14,6 @@ class TermsOfServiceView(TemplateView):
 
 class IndexView(ListView):
     model = Announcement
-    queryset = Announcement.objects.filter(inactive_date__gte=timezone.now())
+    queryset = Announcement.objects.filter(inactive_date__gte=timezone.now()).order_by("-active_date")
     template_name = "common/index.html"
     context_object_name = "announcement_list"

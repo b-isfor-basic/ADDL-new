@@ -1,40 +1,40 @@
-{% extends 'base.html' %} 
-
+{% extends "base.html" %}
 {% block content %}
-<div class="relative flex flex-col min-h-screen justify-between content-start mt-10">
-  <div class="justify-around mb-10">
-    <div class="text-center space-y-4">
-      <h1 class="text-slate-500 text-5xl md:text-9xl tk-rustica my-2 font-black">ATLANTA</h1>
-      <h1 class="text-slate-500 text-5xl md:text-9xl tk-rustica my-2 font-black">DOUBLES</h1>
-      <h1 class="text-slate-500 text-5xl md:text-9xl tk-rustica my-2 font-black">DART</h1>
-      <h1 class="text-slate-500 text-5xl md:text-9xl tk-rustica my-2 font-black">LEAGUE</h1>
+  <div class="relative mt-10 flex min-h-screen flex-col content-start justify-between">
+    <div class="mb-10 justify-around">
+      <div class="space-y-4 text-center">
+        <h1 class="tk-rustica my-2 text-5xl font-black text-slate-500 md:text-9xl">ATLANTA</h1>
+        <h1 class="tk-rustica my-2 text-5xl font-black text-slate-500 md:text-9xl">DOUBLES</h1>
+        <h1 class="tk-rustica my-2 text-5xl font-black text-slate-500 md:text-9xl">DART</h1>
+        <h1 class="tk-rustica my-2 text-5xl font-black text-slate-500 md:text-9xl">LEAGUE</h1>
+      </div>
+    </div>
+    <div>
+      {% if announcement_list|length > 0 %}
+        <div class="{% if announcement_list|length > 1 %}justify-start {% else %}justify-center {% endif %}inline-flex w-full flex-row gap-8 overflow-x-scroll">
+          {% for item in announcement_list %}
+            <div class="{% if announcement_list|length > 1 %}w-11/12 {% else %}w-full {% endif %}flex-none inline min-h-full content-between rounded-lg bg-slate-700 px-2 py-2 shadow-inner shadow-slate-900 ring-1 ring-slate-900/30 md:w-2/3 md:px-4">
+              <div class="min-h-fit w-fit">
+                <div class="mx-auto my-2 border-l border-amber-400 p-3">
+                  <div class="justify-between">
+                    <div class="w-full flex-grow">
+                      <p class="text-left font-semibold text-amber-400">{{ item.title|title }}</p>
+                      <p class="text-sm italic text-blue-400">{{ item.active_date|date:"m d y" }}</p>
+                      <p class="flex-none py-4 pl-3 text-left text-sm font-normal text-slate-200">{{ item.body }}</p>
+                    </div>
+                    <div class="w-full flex-shrink">
+                      <p class="text-right text-sm italic text-blue-400">
+                        {{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+        {% endif %}
+      </div>
     </div>
   </div>
-
-  <div class="">
-    {% if announcement_list|length > 0 %}
-    <div class="inline-flex flex-row w-full {% if announcement_list|length > 1 %}justify-start gap-8 overflow-x-scroll {% else %}justify-center{% endif %}">
-    {% for item in announcement_list %}
-      <div class="inline {% if announcement_list|length > 1 %}w-11/12 md:w-2/3 {% else %}w-full {% endif %}flex-none px-2 md:px-4 py-2 bg-slate-700 min-h-full shadow-inner shadow-slate-900 ring-1 ring-slate-900/30 rounded-lg content-between">
-        <div class="w-fit min-h-fit">
-          <div class="my-2 mx-auto p-3 border-l border-amber-400">
-            <p class="font-semibold text-left text-amber-400">{{ item.title|title }}</p>
-            <p class="text-xs text-blue-400 italic">{{ item.active_date|date:"m d y" }}</p>
-            <p class="py-4 flex-none font-normal text-left text-sm text-slate-200 pl-3">{{ item.body }}</p>
-            <p class="text-xs text-right text-blue-400 italic">{{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }}</p>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-      {% else %}
-      <div class="flex-wrap my-2 p-3 border-l-2 border-amber-400">
-        <p class="font-normal text-left text-slate-300">
-          Currently No Announcements
-        </p>
-      </div>
-      {% endif %}
-    </div>
-  </div>
-</div>
-
-{% endblock %}
+{% endblock content %}
