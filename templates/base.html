@@ -1,93 +1,118 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en">
   <head>
+    <meta name="keywords" content="darts" />
     <meta charset="UTF-8" />
+    <meta name="description"
+          content="Atlanta Doubles Dart League is a player-run league based in the metro-Atlanta area." />
+    <meta name="author" content="Atlanta Doubles Dart League" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />        
-    
-    <title>ADDL | {% block title %}Portal{% endblock title %}</title>
-    
-    <script src='https://js.sentry-cdn.com/029ebd70cdbb4da78e1db1f5712cb6c1.min.js' crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width" />
+    <title>ADDL |
+      {% block title %}
+        Portal
+      {% endblock title %}
+    </title>
     <link rel="stylesheet" href="https://use.typekit.net/ptc0kya.css">
-    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link rel="icon"
+          href="{% static 'images/favicon.ico' %}"
+          type="image/x-icon">
     <link rel="stylesheet" href="{% static 'src/output.css' %}">
-    
     {% block headerScripts %}
     {% endblock headerScripts %}
- 
   </head>
-
-  <body class="flex absolute min-h-full flex-col justify-center bg-gray-900 antialiased">
+  <body class="flex flex-col min-h-screen min-w-screen max-h-full justify-center bg-gray-900">
+    <!-- Header -->
     <header class="sticky top-0 z-40 flex w-full border-b bg-gray-900/40 border-slate-700 backdrop-blur shadow">
       <div class="w-full flex-wrap items-end justify-between text-center pt-4 pb-2 px-2 md:px-6 md:inline-flex ">
-        <p class="font-sans text-3xl font-black text-amber-400 -tracking-widest">
-          <a href="{% url 'home' %}">ADDL</a>
-        </p>
+        <a href="{% url 'home' %}" class="inline-flex">
+          <img src="{% static 'images/icon.svg' %}"
+               alt="ADDL Logo"
+               class="h-[2em] w-[2em] bg-transparent mr-2"
+               width="2em"
+               height="2em" />
+          <p class="align-bottom font-sans justify-end text-4xl font-black text-amber-400 -tracking-widest">ADDL</p>
+        </a>
         <div class="text-slate-300">
           <ul class="inline-flex justify-around uppercase">
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'all_areas' %}" {% if 'locations' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Areas</a>
+              <a href="{% url 'all_areas' %}"
+                 {% if 'locations' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Areas</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'schedule' %}" {% if 'schedule' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Schedules</a>
+              <a href="{% url 'schedule' %}"
+                 {% if 'schedule' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Schedules</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-              <a href="{% url 'standings' latest_season %}" {% if 'scores' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Standings</a>
+              <a href="{% url 'standings' latest_season %}"
+                 {% if 'scores' in request.resolver_match.route %} class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>Standings</a>
             </li>
             <li class="hover:text-amber-300 px-1">
-                <a href={% if user.is_authenticated %}"{% url 'profile' %}"{% else %}"{% url 'login' %}"{% endif %} {% if 'members' in request.resolver_match.route %}class="nav-link-active" aria-current="page"{% else %}class="nav-link-inactive"{% endif %}>{% if user.is_authenticated %}{{ user.username }}{% else %}Login{% endif %}</a>
+              <a {% if user.is_authenticated %}href="{% url 'profile' %}" {% else %}href="{% url 'login' %}" {% endif %}
+                 {% if 'members' in request.resolver_match.route %}class="nav-link-active" aria-current="page" {% else %} class="nav-link-inactive" {% endif %}>
+                {% if user.is_authenticated %}
+                  {{ user.username }}
+                {% else %}
+                  Login
+                {% endif %}
+              </a>
             </li>
           </ul>
         </div>
       </div>
     </header>
-    
+    <!-- End Header -->
+    <!-- Main -->
     <main class="relative bg-fixed flex bg-gradient-to-b from-gray-800 to-gray-900 w-full mx-auto min-h-screen pb-24 md:px-6 max-w-8xl justify-around items-start">
+      <!-- Messages -->
       <div class="absolute right-2 top-2 z-30 max-w-3/5 md:max-w-1/5">
         {% block messages %}
           {% if messages %}
-            {% for message in messages %} 
+            {% for message in messages %}
               <div id="boxMain">
-              {% if message.tags == 'error' %} 
-                {% include './components/error.html' with target_element='#boxMain' message=message %} 
-              {% elif message.tags == 'success' %} 
-                {% include './components/success.html' with target_element='#boxMain' message=message %} 
-              {% else %}
-                {{ message }}
-              {% endif %}
+                {% if message.tags == 'error' %}
+                  {% include "./components/error.html" with target_element="#boxMain" message=message %}
+                {% elif message.tags == 'success' %}
+                  {% include "./components/success.html" with target_element="#boxMain" message=message %}
+                {% else %}
+                  {{ message }}
+                {% endif %}
               </div>
-              {% endfor %}
-            {% endif %}
-          {% endblock messages %}
-        </div>
-
-        {% block content %}
-        {% endblock content %}
+            {% endfor %}
+          {% endif %}
+        {% endblock messages %}
+      </div>
+      <!-- End Messages -->
+      <!-- Content -->
+      {% block content %}
+      {% endblock content %}
+      <!-- End Content -->
     </main>
-
+    <!-- End Main -->
     <!-- Footer -->
-    <div class="z-20 static bottom-0 mt-auto w-screen justify-end bg-slate-950 p-6">
-      <div class="text-center tk-rustica py-3 text-xs flex-nowrap">
-        <p class="text-slate-300">&copy;2023 Atlanta Doubles Dart League</p>
+    <div class="z-20 static bottom-0 mt-auto w-full justify-end bg-slate-950 p-6">
+      <div class="text-center tk-rustica py-3 text-xs">
+        <p class="text-slate-300">©2023 Atlanta Doubles Dart League</p>
         <p class="text-slate-300">All Rights Reserved</p>
         <p>
-          <a href="{% url 'privacy' %}" class="text-blue-400 hover:text-amber-300 hover:underline">Privacy Policy</a>
-          <span class="text-slate-300"> | </span>
-          <a href="{% url 'terms' %}" class="text-blue-400 hover:text-amber-300 hover:underline">Terms of Service</a>
-          <span class="text-slate-300"> | </span>
-          <a href="#" class="text-blue-400 hover:text-amber-300 hover:underline">Contact Us</a>
+          <a href="{% url 'privacy' %}"
+             class="text-sky-400 hover:text-amber-400 hover:underline">Privacy Policy</a>
+          <span class="text-slate-300">|</span>
+          <a href="{% url 'terms' %}"
+             class="text-sky-400 hover:text-amber-400 hover:underline">Terms of Service</a>
+          <span class="text-slate-300">|</span>
+          <a href="mailto:support@addl.app"
+             class="text-sky-400 hover:text-amber-400 hover:underline">Contact Us</a>
         </p>
       </div>
     </div>
     <!-- End Footer -->
-    
     {% block modal %}
     {% endblock modal %}
-  
-  {% block footerScripts %}
-  {% endblock footerScripts %}
-  <script type="module" src="{% static '/preline/dist/preline.js' %}"></script>
-  <script defer src="{% static '/alpinejs/dist/cdn.min.js' %}"
+    {% block footerScripts %}
+    {% endblock footerScripts %}
+    <script type="module" src="{% static '/preline/dist/preline.js' %}"></script>
+    <script defer src="{% static '/alpinejs/dist/cdn.min.js' %}"></script>
   </body>
 </html>
