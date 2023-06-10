@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
   <img class="fixed -right-[33%] top-24 align-middle opacity-10 w-[90%] h-[90%]"
        src="{% static 'images/icon.svg' %}"
@@ -9,38 +10,41 @@
   <div class="z-[1] my-10 mx-10 h-full flex flex-col justify-around md:inline-flex md:flex-row md:overflow-y-scroll">
     <div class="basis-2/3 content-around justify-around md:ml-auto md:mr-0 md:pr-8 border-b-2 border-b-amber-500 md:border-b-0 md:border-r-2 md:border-r-amber-500">
       <div class="text-center md:text-right tracking-[.2em]">
-        <h1 class="tk-rustica leading-loose py-2 text-7xl font-black align-middle text-slate-400 md:text-9xl whitespace-pre-line uppercase">
-          Atlanta
-          Doubles
-          Dart
-          League
-        </h1>
-      </div>
+        <!-- djlint:off -->
+                                  <h1 class="tk-rustica leading-relaxed py-2 text-7xl font-black align-middle text-slate-400 lg:text-9xl whitespace-pre-line uppercase">
+                                    Atlanta
+                                    Doubles
+                                    Dart
+                                    League
+
+                            </h1>
+      <!-- djlint:on -->
     </div>
-    <div class="inline max-h-min justify-center md:mr-auto md:ml-0 md:pl-8 md:overflow-y-scroll">
-      <h2 class="my-6 text-center md:text-left text-slate-400 tk-rustica font-bold text-3xl uppercase tracking-widest">
-        Announcements
-      </h2>
-      {% if announcement_list|length > 0 %}
-        <div class="items-center space-y-6">
-          {% for item in announcement_list %}
-            <div class="w-full rounded-lg bg-slate-700 shadow-inner shadow-slate-900 ring-1 ring-slate-900/30">
-              <div class="h-fit py-2 px-4">
-                <div class="mx-4 my-2">
-                  <p class="text-left font-semibold text-amber-400">{{ item.title|title }}</p>
-                  <p class="text-sm italic text-sky-400">{{ item.active_date|date:"m d y" }}</p>
-                  <div class="flex-grow my-auto justify-start items-start text-left text-slate-200">{{ item.body|linebreaksbr }}</div>
-                  <div class="w-full flex-shrink items-end justify-end">
-                    <p class="text-right italic text-sky-400">
-                      {{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }}
-                    </p>
-                  </div>
+  </div>
+  <div class="inline my-10 justify-center items-center content-center md:mr-auto md:ml-0 md:pl-8">
+    <h2 class="my-6 text-center md:text-left text-slate-400 tk-rustica font-bold text-3xl uppercase tracking-widest">
+      Announcements
+    </h2>
+    {% if announcement_list|length > 0 %}
+      <div class="content-center space-y-6">
+        {% for item in announcement_list %}
+          <div class="w-full rounded-lg bg-slate-700 shadow-inner shadow-slate-900 ring-1 ring-slate-900/30">
+            <div class="h-fit py-2 px-4">
+              <div class="mx-4 my-2">
+                <p class="text-left font-semibold text-amber-400">{{ item.title|title }}</p>
+                <p class="text-sm italic text-sky-400">{{ item.active_date|date:"m d y" }}</p>
+                <div class="flex-grow my-auto justify-start items-start text-left text-slate-200">{{ item.body|linebreaksbr }}</div>
+                <div class="w-full flex-shrink items-end justify-end">
+                  <p class="text-right italic text-sky-400">
+                    {{ item.created_by.first_name|title }} {{ item.created_by.last_name|title }}
+                  </p>
                 </div>
               </div>
             </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
   </div>
+</div>
 {% endblock content %}

@@ -62,7 +62,7 @@ class TeamStatsManager(models.Manager):
             .values("id", "team_name")
         )
 
-    def best_ppd(self, q):
+    def best_ppd(self, q=None):
         # Return the best week's points per dart for the team.
         from Scores.models import TeamScoreSummary
 
@@ -75,7 +75,7 @@ class TeamStatsManager(models.Manager):
             )
         )
 
-    def rating(self, q):
+    def rating(self, q=None):
         # Return the average rating score of the team's players.
         from Scores.models import ScoreSummary
 
@@ -109,7 +109,7 @@ class TeamStatsManager(models.Manager):
             ),
         )
 
-    def stats(self, q):
+    def stats(self, q=None):
         qs = self.get_queryset()
         names_qs = self.names()
         pts_qs = self.total_points().values("id", "total_points")

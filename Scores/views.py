@@ -50,7 +50,9 @@ def StandingsView(
     template = "scores/standings.html"
     season = Season.objects.get(season_number=season_number)
     season_list = Season.objects.all()[:5]
-    active_divisions = season.divisions.all()
+    active_divisions = (
+        season.divisions(manager="details").get_average_rating(season_number).all()
+    )
 
     player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
     team_stats = Team.stats.stats(q=Q(match__week__season=season.id)).filter(
@@ -62,9 +64,11 @@ def StandingsView(
 
     if division_id is not None:
         if season.divisions.filter(id=division_id).exists():
-            division_set = season.divisions.get(id=division_id)
-        else:
-            division_set = season.divisions.none()
+            division_set = (
+                season.divisions(manager="details")
+                .get_average_rating(season_number)
+                .get(id=division_id)
+            )
         player_stats = player_stats.filter(match__week__division_id=division_id)
         team_stats = team_stats.filter(division=division_id)
         team_standings = team_standings.filter(division=division_id)
