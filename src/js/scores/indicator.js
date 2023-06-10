@@ -19,8 +19,8 @@ function setIndicator(table) {
             color = 'rose'
         }
 
-        row.cells[0].children[0].children[0].classList.add(`bg-${color}-500`)
-        row.cells[0].children[0].children[1].classList.add(`bg-${color}-400`, `outline-${color}-700`)
+        row.cells[0].children[0].children[0].children[0].classList.add(`bg-${color}-500`)
+        row.cells[0].children[0].children[0].children[1].classList.add(`bg-${color}-400`, `outline-${color}-700`)
     }
 }
 
