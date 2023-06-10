@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block title %}
 {% endblock title %}
+
 {% block headerScripts %}
   <svg xmlns="http://www.w3.org/2000/svg" class="hidden">
     <symbol id="chevron-r" viewBox="0 0 20 20">
@@ -9,6 +11,7 @@
     </symbol>
   </svg>
 {% endblock headerScripts %}
+
 {% block content %}
   <div class="grid grid-cols-[175px_minmax(0,_1fr)] justify-items-stretch w-full">
     <!-- Sidebar -->
@@ -36,8 +39,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
           </svg>
         </button>
+
         {% block sidebar %}
         {% endblock sidebar %}
+
       </div>
     </aside>
     <!-- Main Content -->
@@ -46,30 +51,41 @@
       <div class="w-full p-5">
         <div class="justify-items-start flex-auto">
           <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">
+
             {% block main_heading %}
             {% endblock main_heading %}
+
           </h2>
           <h3 class="text-slate-200 text-sm md:text-base font-semibold tracking-wider">
+
             {% block breadcrumb_1 %}
             {% endblock breadcrumb_1 %}
+
             {% block breadcrumb_2 %}
               <svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5">
                 <use href="#chevron-r" />
               </svg>
             {% endblock breadcrumb_2 %}
+
             {% block breadcrumb_3 %}
               <svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5">
                 <use href="#chevron-r" />
               </svg>
             {% endblock breadcrumb_3 %}
+
           </h3>
         </div>
       </div>
-      {% block main %}
-      {% endblock main %}
+      <div class="p-2">
+
+        {% block main %}
+        {% endblock main %}
+
+      </div>
     </div>
   </div>
 {% endblock content %}
+
 {% block footerScripts %}
   <script src="{% static "js/sidebar.js" %}"></script>
 {% endblock footerScripts %}

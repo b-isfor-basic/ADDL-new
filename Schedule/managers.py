@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db.models import Case, F, Manager, OuterRef, Q, Subquery, Sum, Value, When
 from django.db.models.functions import JSONObject
-from django.db.models.lookups import GreaterThan, IsNull, Exact
+from django.db.models.lookups import GreaterThan, Exact
 from django.utils import timezone
 
 
@@ -64,13 +64,13 @@ class MatchManager(Manager):
 
         qs = self.get_queryset()
         return qs.annotate(
-                away_team=Subquery(
-                    Team.details.filter(id=OuterRef("awayTeam")).values("team_name")
-                ),
-                home_team=Subquery(
-                    Team.details.filter(id=OuterRef("homeTeam")).values("team_name")
-                ),
-            )
+            away_team=Subquery(
+                Team.details.filter(id=OuterRef("awayTeam")).values("team_name")
+            ),
+            home_team=Subquery(
+                Team.details.filter(id=OuterRef("homeTeam")).values("team_name")
+            ),
+        )
 
     def by_season(self, season):
         return self.get_queryset().filter(week__season__season_number=season)
@@ -88,22 +88,39 @@ class MatchManager(Manager):
         from Scores.models import ScoreSummary
 
         qs = self.with_names()
-        scores = ScoreSummary.objects.all().values('match', 'team').annotate(
-                points=Sum('singles_points', default=0) + Sum('doubles_points', default=0)
+        scores = (
+            ScoreSummary.objects.all()
+            .values("match", "team")
+            .annotate(
+                points=Sum("singles_points", default=0)
+                + Sum("doubles_points", default=0)
             )
-        
+        )
+
         return qs.annotate(
-            home_score=Subquery(scores.filter(match=OuterRef('id'), team=OuterRef('homeTeam')).values('points')),
-            away_score=Subquery(scores.filter(match=OuterRef('id'), team=OuterRef('awayTeam')).values('points'))
-        ).annotate(status=Case(
-            When(Exact(F('home_score'), 0) & Exact(F('away_score'), 0), then=Value("Missing")),
-            When(GreaterThan(F('home_score'), F('away_score')), then=Value("Home")),
-            When(GreaterThan(F('away_score'), F('home_score')), then=Value("Away")),
-            When(Exact(F('home_score'), 10), then=Value("Draw")),
-            default=Value("Missing")
-        ))
-        
-        
+            home_score=Subquery(
+                scores.filter(match=OuterRef("id"), team=OuterRef("homeTeam")).values(
+                    "points"
+                )
+            ),
+            away_score=Subquery(
+                scores.filter(match=OuterRef("id"), team=OuterRef("awayTeam")).values(
+                    "points"
+                )
+            ),
+        ).annotate(
+            status=Case(
+                When(
+                    Exact(F("home_score"), 0) & Exact(F("away_score"), 0),
+                    then=Value("Missing"),
+                ),
+                When(GreaterThan(F("home_score"), F("away_score")), then=Value("Home")),
+                When(GreaterThan(F("away_score"), F("home_score")), then=Value("Away")),
+                When(Exact(F("home_score"), 10), then=Value("Draw")),
+                default=Value("Missing"),
+            )
+        )
+
 
 class SeasonManager(Manager):
     def get_queryset(self):
@@ -113,7 +130,7 @@ class SeasonManager(Manager):
             .prefetch_related("scheduleweek_set", "scheduleweek_set__match_set")
         )
 
-    def get_active(self):
+    def active(self):
         season_start_before_today = Q(match_play_start_dt__lte=timezone.now())
         season_end_after_today = Q(match_play_end_dt__gte=timezone.now())
 
@@ -127,7 +144,6 @@ class SeasonManager(Manager):
                 .filter(season_start_before_today & season_end_after_today)
                 .first()
             )
-
         return self.get_queryset().latest("match_play_start_dt")
 
     def schedule(self):
@@ -135,28 +151,38 @@ class SeasonManager(Manager):
         from Schedule.models import ScheduleWeek, Match
 
         qs = self.get_queryset()
-        season_weeks = ScheduleWeek.objects.filter(season=OuterRef('id')).order_by('division', 'week_number')
-        matches = Match.details.status().values(json=JSONObject(id=F('id'), home_team=F('home_team'), away_team=F('away_team'), status=F('status')))
+        season_weeks = ScheduleWeek.objects.filter(season=OuterRef("id")).order_by(
+            "division", "week_number"
+        )
+        matches = Match.details.status().values(
+            json=JSONObject(
+                id=F("id"),
+                home_team=F("home_team"),
+                away_team=F("away_team"),
+                status=F("status"),
+            )
+        )
 
         return qs.annotate(
-            division=F('divisions'),
+            division=F("divisions"),
         ).annotate(
-            div_name=Subquery(Division.details.named().filter(id=OuterRef('division')).values('name')),
+            div_name=Subquery(
+                Division.details.with_names()
+                .filter(id=OuterRef("division"))
+                .values("name")
+            ),
             weeks=ArraySubquery(
-                season_weeks.filter(
-                    division=OuterRef('division')
-                ).annotate(
-                    week=F('id')
-                ).annotate(
-                    match_qs=ArraySubquery(
-                        matches.filter(
-                            week__id=OuterRef('week')
-                        )
+                season_weeks.filter(division=OuterRef("division"))
+                .annotate(week=F("id"))
+                .annotate(
+                    match_qs=ArraySubquery(matches.filter(week__id=OuterRef("week")))
+                )
+                .values(
+                    matches=JSONObject(
+                        week_num=F("week_number"),
+                        date=F("match_date"),
+                        matches=F("match_qs"),
                     )
-                ).values(matches=JSONObject(
-                    week_num=F('week_number'),
-                    date=F('match_date'),
-                    matches=F('match_qs')
-                ))
-            )
+                )
+            ),
         )

@@ -20,7 +20,7 @@ class Player(AbstractUser):
     class Meta:
         verbose_name = "player"
         verbose_name_plural = "players"
-        ordering = ["first_name", "last_name"]
+        ordering = ["first_name", "last_name", "username"]
 
     def __str__(self):
         return str(self.get_full_name())
@@ -59,7 +59,7 @@ class Team(models.Model):
         if "season" in kwargs:
             season = kwargs.get("season")
         else:
-            season = Season.details.get_active()
+            season = Season.details.active()
 
         matches = self.awayMatches.filter(week__season=season)
         return matches.union(
@@ -72,3 +72,18 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name()
+
+
+# class Membership(models.Model):
+#     """
+#     A membership holds a team's registration for a season. A team can have
+#     multiple memberships, but only one per season.
+#     """
+#
+#     team = models.ForeignKey("Team", models.CASCADE, db_index=True)
+#     season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
+#     division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
+#
+#     objects = models.Manager()
+#     details = TeamDetailsManager()
+#

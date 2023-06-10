@@ -1,12 +1,13 @@
 import re
 
-from django.conf import settings
 from django.db import models
-from django.db.models import F, Value
-from django.db.models.functions import Coalesce, Concat
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+
+from Members.models import Player
+
+from .managers import DivisionManager
 
 
 class Establishment(models.Model):
@@ -136,39 +137,6 @@ class Establishment(models.Model):
         return self.division_set.all()
 
 
-class DivisionManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset()
-
-    def num_active_teams(self):
-        return self.get_queryset().annotate(
-            num_teams=Coalesce(models.Count("team_set"))
-        )
-
-    def matches(self, season=None):
-        qs = self.get_queryset()
-        return (
-            qs.values(week_number="scheduleweek__week_number")
-            .annotate(
-                num_matches=models.Count("scheduleweek__match_set"),
-            )
-            .order_by("week_number")
-        )
-
-    def named(self):
-        qs = self.get_queryset()
-
-        return qs.annotate(
-            area_nm=F("area__shortName"),
-            name=Concat(
-                F("area_nm"),
-                Value(" - "),
-                F("matchNight"),
-                output_field=models.CharField(),
-            ),
-        )
-
-
 class Division(models.Model):
     WEEKDAY_CHOICES = [
         ("Mon", "Mon"),
@@ -206,7 +174,7 @@ class Division(models.Model):
         blank=True,
     )
     divisionManager = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL,
+        to=Player,
         verbose_name="Division Manager",
         on_delete=models.SET_NULL,
         blank=True,

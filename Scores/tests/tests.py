@@ -2,7 +2,7 @@ import uuid
 
 from django.test import TestCase
 
-from .models import ScoreSummary, TeamScoreSummary, Approval, Forfeit
+from Scores.models import ScoreSummary, TeamScoreSummary, Approval, Forfeit
 from Schedule.models import Match
 
 
@@ -62,7 +62,7 @@ class ScoreSummaryModelTest(TestCase):
         test_scoresummary.total_stars = 20
         test_scoresummary.save()
         self.assertEqual(test_scoresummary.total_stars, 20)
-    
+
     def test_scoresummary_str(self):
         test_scoresummary = ScoreSummary.objects.create(self.data)
         test_scoresummary.save()
@@ -71,7 +71,7 @@ class ScoreSummaryModelTest(TestCase):
     def test_scoresummary_get_absolute_url(self):
         test_scoresummary = ScoreSummary.objects.create(self.data)
         test_scoresummary.save()
-        self.assertEqual(test_scoresummary.get_absolute_url(), f"/scores/{self.match.id}/{self.player.id}/")
-
-    
-
+        self.assertEqual(
+            test_scoresummary.get_absolute_url(),
+            f"/scores/{self.match.id}/{self.player.id}/",
+        )
