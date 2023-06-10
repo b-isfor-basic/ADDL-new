@@ -53,5 +53,10 @@ class DivisionManager(models.Manager):
         )
 
         return qs.annotate(
-            area_avg_rating=models.Avg(models.Subquery(ratings.values("rating_score")))
+            area_avg_rating=models.Avg(models.Subquery(ratings.values("rating_score"))),
+            num_teams=models.Count(
+                "team",
+                filter=models.Q(team__season__season_number=season),
+                distinct=True,
+            ),
         )

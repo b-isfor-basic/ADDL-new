@@ -25,7 +25,16 @@
                     {% for team in team_standings|dictsortreversed:'total_points' %}
                         {% if team.division_id == division.id %}
                             <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
-                                <td class="p-2 text-sm font-bold text-center border-r border-slate-800">{{ team.team_name }}</td>
+                                <td class="p-2 text-sm font-bold text-right border-r border-slate-800">
+                                    <span id="indicator{{ forloop.counter }}"
+                                          class="relative inline-flex h-2 w-2 mr-2">
+                                        <span name="indicatorGlow"
+                                              class="absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                                        <span name="indicator"
+                                              class="relative inline-flex rounded-full h-2 w-2 outline-1"></span>
+                                    </span>
+                                    {{ team.team_name }}
+                                </td>
                                 {% for season_week in season.num_weeks_regular_season %}
                                     <td class="p-2 text-sm text-center">
                                         {% for week in team.scores %}
@@ -40,5 +49,7 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="hidden bg-amber-500 bg-emerald-500 bg-rose-500 bg-amber-400 bg-emerald-400 bg-rose-400 outline-rose-700 outline-emerald-700 outline-amber-700">
     </div>
 </div>
