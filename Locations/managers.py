@@ -1,36 +1,36 @@
 from django.db import models
 from django.db.models import F, Value
-from django.db.models.functions import Concat
+from django.db.models.functions import Concat, Coalesce
+
+
+def _get_latest_season():
+    from Schedule.models import Season
+
+    if Season.objects.exists():
+        return Season.objects.latest().season_number
+    return None
 
 
 class DivisionManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset()
 
-    def num_active_teams(self, season=None):
+    def get_num_active_teams(self, season=None):
         if season is None:
-            from Schedule.models import Season
-
-            season = Season.details.latest().season_number
+            season = _get_latest_season()
 
         qs = self.get_queryset()
-        return qs.annotate()
-
-    def matches(self, season=None):
-        qs = self.get_queryset()
-        return (
-            qs.values(week_number="scheduleweek__week_number")
-            .annotate(
-                num_matches=models.Count("scheduleweek__match_set"),
+        return qs.annotate(
+            num_teams=models.Count(
+                "team__id", filter=models.Q(team__season__season_number=season)
             )
-            .order_by("week_number")
         )
 
     def with_names(self):
         qs = self.get_queryset()
 
         return qs.annotate(
-            area_nm=F("area__shortName"),
+            area_nm=Coalesce(F("area__shortName"), F("area__name")),
             name=Concat(
                 F("area_nm"),
                 Value(" - "),
@@ -40,11 +40,10 @@ class DivisionManager(models.Manager):
         )
 
     def get_average_rating(self, season=None):
-        from Schedule.models import Season
         from Scores.models import ScoreSummary
 
         if season is None:
-            season = Season.details.latest().season_number
+            season = _get_latest_season()
 
         qs = self.get_queryset().filter(season__season_number=season)
         ratings = ScoreSummary.stats.filter(team__season__season_number=season).filter(

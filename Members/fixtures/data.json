@@ -1,0 +1,152 @@
+[
+    {
+        "model": "Members.player",
+        "pk": 14,
+        "fields": {
+            "password": "",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "Gary.Garrett",
+            "first_name": "Gary",
+            "last_name": "Garrett",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-02-04T03:12:34.605Z",
+            "phoneNumber": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "Members.player",
+        "pk": 18,
+        "fields": {
+            "password": "",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "James.Hatos",
+            "first_name": "James",
+            "last_name": "Hatos",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-02-04T03:12:34.629Z",
+            "phoneNumber": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "Members.player",
+        "pk": 19,
+        "fields": {
+            "password": "",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "Jake.Utley",
+            "first_name": "Jake",
+            "last_name": "Utley",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-02-04T03:12:34.634Z",
+            "phoneNumber": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "Members.player",
+        "pk": 33,
+        "fields": {
+            "password": "",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "Eric.Keith",
+            "first_name": "Eric",
+            "last_name": "Keith",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-02-04T03:12:34.720Z",
+            "phoneNumber": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "Members.player",
+        "pk": 44,
+        "fields": {
+            "password": "",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "Bo.Scott",
+            "first_name": "Bo",
+            "last_name": "Scott",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-02-04T03:12:34.808Z",
+            "phoneNumber": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "Members.player",
+        "pk": 61,
+        "fields": {
+            "password": "",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "Barry.Bolton",
+            "first_name": "Barry",
+            "last_name": "Bolton",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-02-04T03:12:34.945Z",
+            "phoneNumber": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "Members.team",
+        "pk": 53,
+        "fields": {
+            "division": 1,
+            "season": 3,
+            "players": [
+                61,
+                44
+            ]
+        }
+    },
+    {
+        "model": "Members.team",
+        "pk": 54,
+        "fields": {
+            "division": 1,
+            "season": 3,
+            "players": [
+                33,
+                14
+            ]
+        }
+    },
+    {
+        "model": "Members.team",
+        "pk": 55,
+        "fields": {
+            "division": 1,
+            "season": 3,
+            "players": [
+                19,
+                18
+            ]
+        }
+    }
+]

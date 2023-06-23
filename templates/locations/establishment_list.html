@@ -1,55 +1,73 @@
 {% extends 'base_sidebar.html' %}
 
-{% block title %}Locations{% endblock %}
+{% block title %}
+  Locations
+{% endblock title %}
 
 {% block sidebar %}
-  <div class="">
-    <h1 class="font-black text-amber-500 text-xl mb-2">
-      Active Divisions
-    </h1>
+  <div>
+    <h1 class="font-black text-amber-500 text-xl mb-2">Active Divisions</h1>
     <div class="text-slate-200 justify-around">
-      <p><a href="{% url 'all_areas' %}?is_active=True" class="mx-auto tk-objektiv uppercase hover:underline hover:text-blue-400">
-        View Active
-      </a></p>
-      <p><a href="{% url 'all_areas' %}" class="tk-objektiv uppercase hover:underline hover:text-blue-400">
-        View All
-      </a></p>
+      <p>
+        <a href="{% url 'active_areas' %}"
+           class="mx-auto tk-objektiv hover:underline hover:text-blue-400">View Active</a>
+      </p>
+      <p>
+        <a href="{% url 'all_areas' %}"
+           class="mx-auto tk-objektiv hover:underline hover:text-blue-400">View All</a>
+      </p>
     </div>
   </div>
 {% endblock sidebar %}
 
-{% block breadcrumb_1 %}{% endblock %}
-{% block breadcrumb_2 %}{% endblock %}
-{% block breadcrumb_3 %}{% endblock %}
+{% block main_heading %}
+  Participating Locations
+{% endblock main_heading %}
+
+{% block breadcrumb_1 %}
+{% endblock breadcrumb_1 %}
+
+{% block breadcrumb_2 %}
+{% endblock breadcrumb_2 %}
+
+{% block breadcrumb_3 %}
+{% endblock breadcrumb_3 %}
 
 {% block main %}
-
   {% if all_areas %}
-  <div class="flex flex-wrap justify-around align-top">
-    {% for area in all_areas %}
-    <div class="flex flex-col flex-1 justify-between min-w-fit m-2 bg-slate-700 px-3 pt-5 pb-4 shadow-inner shadow-slate-900 ring-1 ring-slate-900/30 rounded-lg">
-      <div class="">
-      <p class="text-slate-200 text-base tk-objektiv-mk2 font-light uppercase">
-        Area {{ area.number }}
-      </p>
-      <h5 class="text-amber-400 text-2xl leading-tight font-extrabold mb-6 tk-rustica">{{ area.name }}</h5>
-        <p class="text-slate-200 text-sm tk-objektiv-mk2 font-light flex-wrap">
-          {{ area.get_address|linebreaksbr }}
-        </p>
-      </div>
-      <div class="mt-auto">
-        <a href="#">
-            <span class="inline-flex pt-3 text-sm tk-objektiv-mk2 items-center text-slate-200 uppercase hover:underline hover:text-amber-400 after:content-['_↗']">
-              Learn more 
-            </span>
-        </a>
-      </div>
+    <div class="flex flex-wrap flex-row justify-around align-top">
+      {% for area in all_areas %}
+        <div class="flex flex-col flex-1 justify-between min-w-fit m-2 bg-slate-700 px-4 pt-6 pb-4 shadow-inner shadow-slate-900 ring-1 ring-slate-900/30 rounded-lg">
+          <div>
+            <p class="text-slate-300 text-sm tk-rustica uppercase">Area {{ area.number }}</p>
+            <h5 class="text-amber-500 text-xl tracking-wide font-black tk-rustica">{{ area.name }}</h5>
+            <p class="text-slate-300 text-sm uppercase tk-rustica flex-wrap">{{ area.get_address|linebreaksbr }}</p>
+          </div>
+          {% if area.division_set %}
+            <div class="inline-flex text-slate-200 tk-rustica mt-auto align-text-bottom items-end pt-4">
+              <p class="pr-2 text-slate-300 text-sm uppercase tk-rustica">Match Nights:</p>
+              <p>
+                {% for div in area.division_set.all|dictsort:"id" %}
+                  {{ div.matchNight }}
+                  {% if area.division_set.all|length > 1 %}
+                    {% if not forloop.last %},{% endif %}
+                  {% endif %}
+                {% endfor %}
+              </p>
+            </div>
+          {% endif %}
+          {% if area.numberOfBoards %}
+            <div class="inline-flex text-slate-200 tk-rustica mt-auto align-text-bottom items-end">
+              <p class="pr-2 text-slate-300 text-sm uppercase tk-rustica">Boards:</p>
+              <p>{{ area.numberOfBoards }}</p>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
     </div>
-    {% endfor %}
-    {% else %}
+  {% else %}
     <div class="justify-center">
       <p>No establishments found.</p>
     </div>
-    {% endif %}
-  
+  {% endif %}
 {% endblock main %}

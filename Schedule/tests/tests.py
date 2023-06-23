@@ -1,16 +1,24 @@
 from datetime import timedelta
 
-from django.utils import timezone
 from django.test import TestCase
+from django.utils import timezone
 
-from ..models import *
+from Schedule.models import Season, ScheduleWeek, Match
 
 
 class SeasonTestCase(TestCase):
-    def setUp(self):
-        Season.objects.create(
+    fixtures = [
+        "Locations/fixtures/data.json",
+        "Members/fixtures/data.json",
+        "Schedule/fixtures/data.json",
+        "Scores/fixtures/data.json",
+    ]
+
+    @classmethod
+    def setUpTestData(cls):
+        match_play_end_dt = timezone.now() + timedelta(days=84)
+        cls.season = Season.objects.create(
             season_number=39,
             match_play_start_dt=timezone.now(),
-            match_play_end_dt=self.match_play_start_dt + timedelta(days=84),
-            playoff_finals_dt=self.match_play_end_dt + timedelta(days=7),
+            match_play_end_dt=match_play_end_dt,
         )

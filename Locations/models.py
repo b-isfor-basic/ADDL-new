@@ -106,15 +106,16 @@ class Establishment(models.Model):
     managerEmail = models.EmailField(blank=True, null=True)
     managerPhone = PhoneNumberField(blank=True, null=True)
     is_active = models.BooleanField(default=True, db_index=True)
+    numberOfBoards = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
         ordering = ["number"]
 
     def __str__(self):
-        if self.shortName:
-            return f"{self.number} - {self.shortName}"
+        if self.shortName is not None:
+            return f"Area {self.number} - {self.shortName}"
         else:
-            return f"{self.number} - {self.name}"
+            return f"Area {self.number} - {self.name}"
 
     def get_address(self):
         address = ""
@@ -132,9 +133,6 @@ class Establishment(models.Model):
 
     def get_absolute_url(self):
         return reverse("area", kwargs={"pk": self.id})
-
-    def get_area_divisions(self):
-        return self.division_set.all()
 
 
 class Division(models.Model):
@@ -188,7 +186,10 @@ class Division(models.Model):
         ordering = ["area__number", "matchNight"]
 
     def __str__(self):
-        area_nm = self.area.shortName
+        if self.area.shortName is not None:
+            area_nm = self.area.shortName
+        else:
+            area_nm = self.area.name
         night = self.matchNight
         night_abbr = re.sub(r"(nesday|urday|day)", "", night)
         return f"{area_nm} - {night_abbr}"
