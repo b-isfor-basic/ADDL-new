@@ -1,5 +1,6 @@
 import uuid
 
+from django.db.utils import IntegrityError
 from django.test import TestCase
 
 from Scores.models import ScoreSummary, TeamScoreSummary, Forfeit
@@ -40,8 +41,8 @@ class ScoreSummaryModelTest(TestCase):
         )
 
     def test_duplicate_scoresummary_prevented(self):
-        with self.assertRaises(Exception):
-            test_scoresummary = self.scores
+        test_scoresummary = self.scores
+        with self.assertRaises(IntegrityError):
             test_scoresummary2 = ScoreSummary.objects.create(
                 match=test_scoresummary.match,
                 team=test_scoresummary.team,
@@ -57,7 +58,7 @@ class ScoreSummaryModelTest(TestCase):
                 high_in=test_scoresummary.high_in,
                 high_out=test_scoresummary.high_out,
             )
-            test_scoresummary2.save()
+            
 
     def test_scoresummary_weekly_average_ppd(self):
         data = self.scores
