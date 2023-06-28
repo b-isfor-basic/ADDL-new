@@ -42,7 +42,6 @@ def get_division_filter(season=None):
     return season.divisions(manager="details").get_average_rating(season.season_number)
 
 
-@require_safe
 def PlayerSearchView(request, **kwargs):
     template = "scores/partials/player_search.html"
 
@@ -104,7 +103,6 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
 
 # @permission_required("scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit")
 @login_required
-@require_safe
 def CreateScoreSummaryView(request, id, **kwargs):
     match = Match.objects.get(id=id)
     PlayerScoreFormSet = modelformset_factory(
