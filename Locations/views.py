@@ -1,3 +1,6 @@
+from typing import Any, Dict
+from django.db.models.query import QuerySet
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 
@@ -10,11 +13,18 @@ class EstablishmentListView(ListView):
     context_object_name = "all_areas"
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        if "is_active" in self.request.GET.keys():
-            is_active = self.request.GET.get("is_active")
-            qs = qs.filter(is_active=is_active)
-        return qs
+        if self.kwargs.get("is_active"):
+            self.all_areas = Establishment.objects.filter(is_active=True).order_by(
+                "number"
+            )
+        else:
+            self.all_areas = Establishment.objects.all().order_by("number")
+        return self.all_areas
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["all_areas"] = self.all_areas
+        return context
 
 
 class EstablishmentDetailView(DetailView):
@@ -22,6 +32,7 @@ class EstablishmentDetailView(DetailView):
     template_name = "locations/establishment_detail.html"
     context_object_name = "area_detail"
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        return qs.prefetch_related("division_set__scheduleweek_set__match_set")
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["area_divisions"] = self.object.division_set.all()
+        return context

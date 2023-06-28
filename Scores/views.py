@@ -1,14 +1,14 @@
-from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from django.forms import all_valid, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, resolve_url
 from django.views.generic import UpdateView
+from django.views.decorators.http import require_safe, require_GET, require_POST
 
 from Members.models import Player, Team
 from Schedule.models import Match, Season
-
 from Scores.forms import (
     BasePlayerScoreFormSet,
     BaseTeamScoreFormSet,
@@ -16,6 +16,30 @@ from Scores.forms import (
     TeamScoreSummaryForm,
 )
 from Scores.models import ScoreSummary, TeamScoreSummary
+
+if Season.objects.exists():
+    LATEST_SEASON = Season.objects.latest("match_play_start_dt").season_number
+
+
+def get_season(season_number=None):
+    if season_number is None:
+        season_number = LATEST_SEASON
+
+    return Season.objects.get(season_number=season_number)
+
+
+def get_latest_seasons(qty=None):
+    if qty is None:
+        qty = 5
+
+    return Season.objects.all()[:qty]
+
+
+def get_division_filter(season=None):
+    if season is None:
+        season = LATEST_SEASON
+
+    return season.divisions(manager="details").get_average_rating(season.season_number)
 
 
 def PlayerSearchView(request, **kwargs):
@@ -36,20 +60,17 @@ def PlayerSearchView(request, **kwargs):
         return None
 
 
-def StandingsView(
-    request,
-    season_number=Season.objects.latest("match_play_start_dt").season_number,
-    division_id=None,
-    **kwargs
-):
+@require_GET
+def StandingsView(request, season_number=None, division_id=None, qty=None, **kwargs):
     """
     This view handles displaying stats and standings for a given season. Default is
     the current season. If a division is selected, the standings will be filtered to
     only include that division.
     """
     template = "scores/standings.html"
-    season = Season.objects.get(season_number=season_number)
-    season_list = Season.objects.all()[:5]
+
+    season = get_season(season_number)
+    season_list = get_latest_seasons(qty)
     active_divisions = (
         season.divisions(manager="details").get_average_rating(season_number).all()
     )
@@ -60,15 +81,10 @@ def StandingsView(
     )
     team_standings = Team.stats.weekly_points().filter(season=season.id)
 
-    division_set = None
+    division_set = get_division_filter(season)
 
     if division_id is not None:
-        if season.divisions.filter(id=division_id).exists():
-            division_set = (
-                season.divisions(manager="details")
-                .get_average_rating(season_number)
-                .get(id=division_id)
-            )
+        division_set = division_set.filter(id=division_id)
         player_stats = player_stats.filter(match__week__division_id=division_id)
         team_stats = team_stats.filter(division=division_id)
         team_standings = team_standings.filter(division=division_id)
@@ -160,11 +176,14 @@ def CreateScoreSummaryView(request, id, **kwargs):
 
 
 @permission_required(
-    "scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit"
+    "scores.update_scoresummary",
+    "scores.update_teamscoresummary",
+    "scores.update_forfeit",
 )
+@require_safe
 class EditScoreSummaryView(UpdateView):
     model = ScoreSummary
-    template_name = "scores/score_summary.html"
+    template_name = "scores/edit_score_summary.html"
     form_class = PlayerScoreSummaryForm
     context_object_name = "score_summary"
 
