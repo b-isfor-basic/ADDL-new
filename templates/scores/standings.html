@@ -58,8 +58,8 @@
 
 {% block breadcrumb_2 %}
     {{ block.super }}
-    {% if division_set %}
-        {{ division_set }}
+    {% if division_set|length is 1 %}
+        {{ division_set.0 }}
     {% else %}
         All Divisions
     {% endif %}
@@ -321,13 +321,9 @@
 
 {% block tab_3_body %}
     <div class="grid grid-flow-row px-1 pt-2 w-full gap-1 md:gap-6 justify-items-center content-center">
-        {% if division_set %}
-            {% include './standings/standings_table.html' with division=division_set teams=team_standings|dictsortreversed:"total_points" %}
-        {% else %}
-            {% for division in active_divisions %}
-                {% include './standings/standings_table.html' with division=division teams=team_standings|dictsortreversed:"total_points" %}
-            {% endfor %}
-        {% endif %}
+        {% for division in division_set %}
+            {% include './standings/standings_table.html' with division=division teams=team_standings|dictsortreversed:"total_points" %}
+        {% endfor %}
     </div>
 {% endblock tab_3_body %}
 
