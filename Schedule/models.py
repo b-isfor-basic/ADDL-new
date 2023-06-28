@@ -1,14 +1,12 @@
 import uuid
 
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import F, Sum
 from recurrence.fields import RecurrenceField
 
 from Locations.models import Division, Establishment
 from Members.models import Player, Team
-
-from .managers import MatchManager, ScheduleManager, SeasonManager
+from Schedule.managers import MatchManager, ScheduleManager, SeasonManager
 
 
 class ScheduleRule(models.Model):

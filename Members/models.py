@@ -74,10 +74,10 @@ class Team(models.Model):
         return self.name()
 
 
-# class Membership(models.Model):
+# class Registration(models.Model):
 #     """
-#     A membership holds a team's registration for a season. A team can have
-#     multiple memberships, but only one per season.
+#     A registration holds a team's membership for a season. A team can have
+#     multiple registrations, but only one per season.
 #     """
 #
 #     team = models.ForeignKey("Team", models.CASCADE, db_index=True)
@@ -86,4 +86,10 @@ class Team(models.Model):
 #
 #     objects = models.Manager()
 #     details = TeamDetailsManager()
+#
+
+# class Team(models.Model):
+#   
+#     is_active = models.BooleanField(default=True)
+#   
 #

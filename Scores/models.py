@@ -11,8 +11,7 @@ from django.dispatch import receiver
 from Members.models import Team
 from Schedule.models import Match
 
-from .managers import (PlayerScoreSummaryManager,
-                       TeamScoreSummaryManager)
+from .managers import PlayerScoreSummaryManager, TeamScoreSummaryManager
 
 
 class Forfeit(TimeStampedModel, models.Model):
@@ -35,6 +34,7 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
     Holds the summary of a team's scores for a match. Used for calculating
     team stats.
     """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, db_index=True)
@@ -70,11 +70,12 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
 
 class ScoreSummary(TimeStampedModel, models.Model):
     """
-    Holds summarized scores for each Player in a Match. Creation of this model 
+    Holds summarized scores for each Player in a Match. Creation of this model
     is limited to area managers and admins.
     Objects may also be created by the create_summary method in the ScoreDetail
     model.
     """
+
     class Meta:
         unique_together = ["match", "player"]
         verbose_name = "Score Summary"
@@ -82,7 +83,9 @@ class ScoreSummary(TimeStampedModel, models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
-    player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_index=True)
+    player = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_index=True
+    )
     is_sub = models.BooleanField(default=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, db_index=True)
     total_stars = models.IntegerField(blank=True, null=True)
@@ -98,11 +101,6 @@ class ScoreSummary(TimeStampedModel, models.Model):
 
     objects = models.Manager()
     stats = PlayerScoreSummaryManager()
-
-    class Meta:
-        unique_together = ["match", "player"]
-        verbose_name = "Player Score Summary"
-        verbose_name_plural = "Player Score Summaries"
 
     @property
     def total_points(self):
@@ -120,16 +118,19 @@ class ScoreDetail(TimeStampedModel, models.Model):
     A detailed breakdown of a player's scores for a match. Only created when
     scores are submitted by a player and not by an area manager or admin.
     """
+
     class Meta:
         unique_together = ["match", "player"]
         verbose_name = "Score Detail"
         verbose_name_plural = "Score Details"
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    score_summary = models.OneToOneField(ScoreSummary, on_delete=models.CASCADE, blank=True, null=True)
+    score_summary = models.OneToOneField(
+        ScoreSummary, on_delete=models.CASCADE, blank=True, null=True
+    )
     stars_list = ArrayField(
         models.PositiveIntegerField(), max_length=10, blank=True, null=True
     )
@@ -169,7 +170,7 @@ class ScoreDetail(TimeStampedModel, models.Model):
 
 
 # Old score management models. Kept for reference.
-# 
+#
 # class GameScore(models.Model):
 #     """
 #     A single game score for a player in a match.
