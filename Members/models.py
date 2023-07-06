@@ -2,7 +2,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .managers import TeamDetailsManager, TeamStatsQuerySet, TeamStatsManager
+from django_extensions.db.models import TimeStampedModel
+from smart_selects.db_fields import ChainedForeignKey
+
+from .managers import RegistrationManager, TeamDetailsManager, TeamStatsQuerySet, TeamStatsManager
 
 
 class Player(AbstractUser):
@@ -43,8 +46,8 @@ class Team(models.Model):
     players = models.ManyToManyField(
         "Player", related_name="teams", max_length=2, db_index=True
     )
-    division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
-    season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
+    division = models.ManyToManyField("Locations.Division", through="Registration")
+    season = models.ManyToManyField("Schedule.Season", through="Registration")
 
     objects = models.Manager()
     details = TeamDetailsManager()
@@ -86,22 +89,45 @@ class Team(models.Model):
         return self.name()
 
 
-# class Registration(models.Model):
-#     """
-#     A registration holds a team's membership for a season. A team can have
-#     multiple registrations, but only one per season.
-#     """
-#
-#     team = models.ForeignKey("Team", models.CASCADE, db_index=True)
-#     season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
-#     division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
-#
-#     objects = models.Manager()
-#     details = TeamDetailsManager()
-#
+class Registration(TimeStampedModel, models.Model):
+    """
+    A registration holds a team's membership for a season. A team can have
+    multiple registrations, but only one per season.
+    """
 
-# class Team(models.Model):
-#   
-#     is_active = models.BooleanField(default=True)
-#   
-#
+    class Meta:
+        verbose_name = "Team Registration"
+        verbose_name_plural = "Team Registrations"
+        ordering = ["-season", "division", "team"]
+        unique_together = ["season", "team"]
+
+    team = models.ForeignKey("Team", models.CASCADE, db_index=True)
+    season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
+    division = ChainedForeignKey(
+        "Locations.division",
+        chained_field="season",
+        chained_model_field="season",
+        show_all=False,
+        auto_choose=True,
+        sort=True,
+    )
+    created_by = models.ForeignKey(
+        "Player",
+        models.SET_NULL,
+        related_name="registrations_created",
+        null=True,
+        blank=True,
+    )
+    modified_by = models.ForeignKey(
+        "Player",
+        models.SET_NULL,
+        related_name="registrations_modified",
+        null=True,
+        blank=True,
+    )
+
+    objects = models.Manager()
+    details = RegistrationManager()
+
+    def str(self):
+        return f"{self.team} (S{self.season.season_number})"

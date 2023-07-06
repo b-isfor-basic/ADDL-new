@@ -9,7 +9,7 @@ from django_extensions.db.models import TimeStampedModel
 from Members.models import Team
 from Schedule.models import Match
 
-from .managers import (
+from Scores.managers import (
     ForfeitManager,
     PlayerScoreSummaryManager,
     PlayerScoreSummaryQuerySet,
@@ -55,7 +55,9 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, db_index=True)
-    darts_thrown1 = models.IntegerField(blank=True, null=True)
+    darts_thrown1 = models.IntegerField(
+        blank=True, null=True, validators=[MaxValueValidator(50)]
+    )
     score_left1 = models.IntegerField(blank=True, null=True)
     darts_thrown2 = models.IntegerField(blank=True, null=True)
     score_left2 = models.IntegerField(blank=True, null=True)

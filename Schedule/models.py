@@ -2,7 +2,9 @@ import uuid
 
 from django.db import models
 from django.db.models import F, Sum
+
 from recurrence.fields import RecurrenceField
+from smart_selects.db_fields import ChainedForeignKey
 
 from Locations.models import Division, Establishment
 from Members.models import Player, Team
@@ -75,26 +77,38 @@ class ScheduleWeek(models.Model):
     ScheduleWeeks are used to track the progress of the season.
     """
 
+    class Meta:
+        unique_together = ["season", "week_number", "division"]
+        ordering = ["-season", "division", "week_number"]
+
     season = models.ForeignKey(Season, models.CASCADE, db_index=True)
     week_number = models.PositiveIntegerField(db_index=True)
     match_date = models.DateField()
-    division = models.ForeignKey(Division, models.CASCADE, db_index=True)
     playoff_week = models.BooleanField(default=False)
+    division = ChainedForeignKey(
+        Division,
+        chained_field="season",
+        chained_model_field="season",
+        show_all=False,
+        auto_choose=True,
+        sort=True,
+        db_index=True,
+    )
 
     objects = models.Manager()
     details = ScheduleManager()
 
-    class Meta:
-        unique_together = ["season", "week_number", "division"]
-
     def __str__(self):
-        return f"S{self.season.season_number} - W{self.week_number} - Area {self.division.area.number}"
+        return f"S{self.season.season_number}.W{self.week_number} - {self.division}"
 
 
 class Match(models.Model):
     """
     Scheduled matches.
     """
+
+    class Meta:
+        verbose_name_plural = "Matches"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     week = models.ForeignKey(ScheduleWeek, models.CASCADE, null=True, db_index=True)
@@ -113,9 +127,6 @@ class Match(models.Model):
 
     objects = models.Manager()
     details = MatchManager()
-
-    class Meta:
-        verbose_name_plural = "Matches"
 
     def __str__(self):
         return f"{self.awayTeam} v. {self.homeTeam}"

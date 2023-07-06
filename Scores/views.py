@@ -28,11 +28,16 @@ def get_season(season_number="Season.objects.first().season_number"):
     return Season.objects.get(season_number=season_number)
 
 
-def get_latest_seasons(qty=None):
+def get_latest_seasons(start=None, end=None, qty=None):
     if qty is None:
         qty = 5
 
-    return Season.objects.all()[:qty]
+    if start is None:
+        start = 0
+
+    end = start + qty
+
+    return Season.objects.all()[start:end]
 
 
 def get_division_filter(season=LATEST_SEASON):
@@ -92,6 +97,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
 # @permission_required("scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit")
 @login_required
 def CreateScoreSummaryView(request, id, **kwargs):
+    template = "scores/add_score_summary.html"
     match = Match.objects.get(id=id)
     PlayerScoreFormSet = modelformset_factory(
         ScoreSummary,
@@ -108,7 +114,21 @@ def CreateScoreSummaryView(request, id, **kwargs):
         max_num=2,
     )
 
-    template = "scores/add_score_summary.html"
+    if request.method == "GET":
+        team_scores = TeamScoreFormSet(
+            prefix="team",
+            form_kwargs={"match": match},
+            queryset=TeamScoreSummary.objects.filter(match=id)
+            .order_by("match__awayTeam", "match__homeTeam")
+            .all(),
+        )
+        player_scores = PlayerScoreFormSet(
+            prefix="player",
+            form_kwargs={"match": match},
+            queryset=ScoreSummary.objects.filter(match=id)
+            .order_by("match__awayTeam", "match__homeTeam")
+            .all(),
+        )
 
     team_scores = TeamScoreFormSet(
         prefix="team",
