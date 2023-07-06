@@ -5,13 +5,11 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 from Members.models import Team
 from Schedule.models import Match
 
-from .managers import PlayerScoreSummaryManager, TeamScoreSummaryManager
+from Scores.managers import PlayerScoreSummaryManager, TeamScoreSummaryManager
 
 
 class Forfeit(TimeStampedModel, models.Model):
@@ -35,10 +33,17 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
     team stats.
     """
 
+    class Meta:
+        unique_together = ["match", "team"]
+        verbose_name = "Team Score Summary"
+        verbose_name_plural = "Team Score Summaries"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, db_index=True)
-    darts_thrown1 = models.IntegerField(blank=True, null=True)
+    darts_thrown1 = models.IntegerField(
+        blank=True, null=True, validators=[MaxValueValidator(50)]
+    )
     score_left1 = models.IntegerField(blank=True, null=True)
     darts_thrown2 = models.IntegerField(blank=True, null=True)
     score_left2 = models.IntegerField(blank=True, null=True)
@@ -61,11 +66,6 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
         darts_thrown = self.darts_thrown1 + self.darts_thrown2
         scored = 1001 - (self.score_left1 + self.score_left2)
         return round(scored / darts_thrown, 4)
-
-    class Meta:
-        unique_together = ["match", "team"]
-        verbose_name = "Team Score Summary"
-        verbose_name_plural = "Team Score Summaries"
 
 
 class ScoreSummary(TimeStampedModel, models.Model):

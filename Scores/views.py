@@ -28,11 +28,16 @@ def get_season(season_number=None):
     return Season.objects.get(season_number=season_number)
 
 
-def get_latest_seasons(qty=None):
+def get_latest_seasons(start=None, end=None, qty=None):
     if qty is None:
         qty = 5
 
-    return Season.objects.all()[:qty]
+    if start is None:
+        start = 0
+
+    end = start + qty
+
+    return Season.objects.all()[start:end]
 
 
 def get_division_filter(season=None):
@@ -40,24 +45,6 @@ def get_division_filter(season=None):
         season = LATEST_SEASON
 
     return season.divisions(manager="details").get_average_rating(season.season_number)
-
-
-def PlayerSearchView(request, **kwargs):
-    template = "scores/partials/player_search.html"
-
-    if "player" in request.GET.keys():
-        qs = request.GET.get("player")
-        object_list = Player.objects.filter(
-            Q(first_name__icontains=qs)
-            | Q(last_name__icontains=qs)
-            | Q(username__icontains=qs)
-            | Q(email__icontains=qs)
-        ).values("id", "first_name", "last_name", "username", "email")
-
-        context = {"object_list": object_list}
-        return render(request, template, context)
-    else:
-        return None
 
 
 @require_GET
@@ -79,7 +66,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
     team_stats = Team.stats.stats(q=Q(match__week__season=season.id)).filter(
         season=season.id
     )
-    team_standings = Team.stats.weekly_points().filter(season=season.id)
+    team_standings = Team.stats.weekly_points(season=season.id)
 
     division_set = get_division_filter(season)
 
@@ -104,6 +91,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
 # @permission_required("scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit")
 @login_required
 def CreateScoreSummaryView(request, id, **kwargs):
+    template = "scores/add_score_summary.html"
     match = Match.objects.get(id=id)
     PlayerScoreFormSet = modelformset_factory(
         ScoreSummary,
@@ -120,7 +108,21 @@ def CreateScoreSummaryView(request, id, **kwargs):
         max_num=2,
     )
 
-    template = "scores/add_score_summary.html"
+    if request.method == "GET":
+        team_scores = TeamScoreFormSet(
+            prefix="team",
+            form_kwargs={"match": match},
+            queryset=TeamScoreSummary.objects.filter(match=id)
+            .order_by("match__awayTeam", "match__homeTeam")
+            .all(),
+        )
+        player_scores = PlayerScoreFormSet(
+            prefix="player",
+            form_kwargs={"match": match},
+            queryset=ScoreSummary.objects.filter(match=id)
+            .order_by("match__awayTeam", "match__homeTeam")
+            .all(),
+        )
 
     team_scores = TeamScoreFormSet(
         prefix="team",

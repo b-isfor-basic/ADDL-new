@@ -10,6 +10,7 @@ class SeasonAdmin(admin.ModelAdmin):
         "match_play_start_dt",
         "match_play_end_dt",
     ]
+    filter_horizontal = ["divisions"]
 
 
 @admin.register(Match)
@@ -32,7 +33,7 @@ class MatchAdmin(admin.ModelAdmin):
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):
     list_filter = [
-        "created_by",
+        ("created_by", admin.RelatedOnlyFieldListFilter),
         "active_date",
         "inactive_date",
     ]

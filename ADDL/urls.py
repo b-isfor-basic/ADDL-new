@@ -22,6 +22,7 @@ urlpatterns = [
     path("", include("Common.urls"), name="Common"),
     # Django Pages
     path("admin/", admin.site.urls),
+    path("chaining/", include("smart_selects.urls")),
     # App Pages
     path("locations/", include("Locations.urls"), name="Locations"),
     path("members/", include("Members.urls"), name="Members"),

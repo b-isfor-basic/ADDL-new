@@ -1,4 +1,7 @@
+from typing import Any
+
 from django.contrib.postgres.aggregates import ArrayAgg
+from django.contrib.postgres.expressions import ArraySubquery
 from django.db import models
 from django.db.models import (
     Avg,
@@ -9,14 +12,13 @@ from django.db.models import (
     Min,
     OuterRef,
     Q,
-    Sum,
-    When,
-    Value,
     Subquery,
+    Sum,
+    Value,
+    When,
 )
-from django.db.models.functions import Least, Concat, JSONObject
+from django.db.models.functions import Concat, JSONObject, Least
 from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqual
-from django.contrib.postgres.expressions import ArraySubquery
 
 
 class PlayerStatsManager(models.Manager):
@@ -156,8 +158,13 @@ class TeamStatsManager(models.Manager):
             ),
         ).filter(total_darts_thrown__isnull=False)
 
-    def weekly_points(self):
+    # TODO: This is not returning the correct total points value. It isn't filtering by season.
+    def weekly_points(self, season=None):
+        from Schedule.models import Season
         from Scores.models import ScoreSummary
+
+        if season == None:
+            season = Season.objects.latest()
 
         # Return the total number of points scored by the team in all games. Can be filtered.
         qs = self.get_queryset()
@@ -165,9 +172,12 @@ class TeamStatsManager(models.Manager):
         pts_qs = self.total_points().values("id", "total_points")
 
         scores = (
-            ScoreSummary.stats.filter(team=OuterRef("id"))
+            ScoreSummary.stats.filter(team=OuterRef("id"), match__week__season=season)
             .values(week=F("match__week__week_number"))
-            .annotate(total_pts=Sum("singles_points") + Sum("doubles_points"))
+            .annotate(
+                total_pts=Sum("singles_points", filter=Q(match__week__season=season))
+                + Sum("doubles_points", filter=Q(match__week__season=season))
+            )
             .values(json=JSONObject(week=F("week"), points=F("total_pts")))
         )
 
@@ -197,3 +207,25 @@ class TeamDetailsManager(models.Manager):
             )
             .values("id", "team_name")
         )
+
+
+class RegistrationManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                players_names=ArrayAgg("team__players__last_name"),
+                team_name=Concat(
+                    F("players_names__0"),
+                    Value("/"),
+                    F("players_names__1"),
+                    output_field=models.CharField(),
+                ),
+                seasons_played=Count("season", distinct=True),
+                latest_season=Max("season__season_number"),
+            )
+        )
+
+    def create(self, **kwargs):
+        return super().create(**kwargs)
