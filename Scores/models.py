@@ -108,6 +108,8 @@ class ScoreSummary(TimeStampedModel, models.Model):
 
     @property
     def singles_weekly_ppd(self):
+        if self.darts_thrown1 is None or self.darts_thrown2 is None:
+            return None
         darts_thrown = self.darts_thrown1 + self.darts_thrown2
         scored = 1001 - (self.score_left1 + self.score_left2)
         return round(scored / darts_thrown, 4)
