@@ -232,7 +232,54 @@
             </div>
         </div>
         <div class="w-full col-span-1 md:col-start-3 mb-10 justify-center items-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
-            <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Player Rating</h3>
+            <div class="inline-flex w-full justify-between">
+                <div>
+                    <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">Player Rating</h3>
+                </div>
+                <div class="content-center text-amber-500 p-2 group">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="1.5"
+                         stroke="currentColor"
+                         class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                    </svg>
+                    <div class="relative hidden group-hover:flex bg-slate-900/60 z-[15] m-2">
+                        <div class="text-slate-300 font-black tk-rustica">
+                            <h4 class="font-black text-amber-500">Ratings</h4>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>AA</td>
+                                        <td>22.51+</td>
+                                    </tr>
+                                    <tr>
+                                        <td>A</td>
+                                        <td>18.81 - 22.50</td>
+                                    </tr>
+                                    <tr>
+                                        <td>B</td>
+                                        <td>15.41 - 18.80</td>
+                                    </tr>
+                                    <tr>
+                                        <td>C</td>
+                                        <td>12.21 - 15.40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>D</td>
+                                        <td>10.51 - 12.20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>E</td>
+                                        <td>0.00 - 12.20</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="w-full">
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Rating' %}
