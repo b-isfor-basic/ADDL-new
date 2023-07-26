@@ -18,16 +18,16 @@ class ScoreSummaryAdmin(admin.ModelAdmin):
         "total_stars",
         "total_perfects",
     ]
-    search_fields = [
-        "player",
-        "team__name",
-    ]
     ordering = [
         "-match__week__season",
         "match__week__week_number",
         "player__first_name",
         "player__last_name",
     ]
+
+    @admin.display(empty_value="None")
+    def singles_weekly_ppd(self, obj):
+        return obj.singles_weekly_ppd
 
 
 @admin.register(ScoreDetail)
