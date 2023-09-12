@@ -10,12 +10,12 @@ from smart_selects.db_fields import ChainedForeignKey
 from Members.models import Team
 from Schedule.models import Match
 
-from Scores.managers import (
+from .managers import (
     ForfeitManager,
     PlayerScoreSummaryManager,
     PlayerScoreSummaryQuerySet,
     TeamScoreSummaryManager,
-    TeamScoreSummaryQuerySet
+    TeamScoreSummaryQuerySet,
 )
 
 
@@ -32,6 +32,14 @@ class Forfeit(TimeStampedModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, db_index=True)
+
+    objects = models.Manager()
+    details = ForfeitManager()
+
+    class Meta:
+        unique_together = ["match", "team"]
+        verbose_name = "Forfeit"
+        verbose_name_plural = "Forfeits"
 
     objects = models.Manager()
     details = ForfeitManager()
@@ -60,23 +68,29 @@ class TeamScoreSummary(TimeStampedModel, models.Model):
         blank=True, null=True, validators=[MaxValueValidator(50)]
     )
     score_left1 = models.IntegerField(blank=True, null=True)
-    darts_thrown2 = models.IntegerField(blank=True, null=True)
+    darts_thrown2 = models.IntegerField(
+        blank=True, null=True, validators=[MaxValueValidator(50)]
+    )
     score_left2 = models.IntegerField(blank=True, null=True)
 
     objects = models.Manager()
     stats = TeamScoreSummaryManager.from_queryset(TeamScoreSummaryQuerySet)()
+    stats = TeamScoreSummaryManager.from_queryset(TeamScoreSummaryQuerySet)()
 
     @property
-    def weekly_ppd(self):
+    def get_weekly_ppd(self):
         if self.darts_thrown1 is None and self.darts_thrown2 is None:
             return None
         elif self.darts_thrown1 is None:
             self.darts_thrown1 = 50
         elif self.darts_thrown2 is None:
+        elif self.darts_thrown2 is None:
             self.darts_thrown2 = 50
+        elif self.score_left1 is None:
         elif self.score_left1 is None:
             self.darts_thrown1 = 50
             self.score_left1 = 2
+        elif self.score_left2 is None:
         elif self.score_left2 is None:
             self.darts_thrown2 = 50
             self.score_left2 = 2
@@ -118,15 +132,26 @@ class ScoreSummary(TimeStampedModel, models.Model):
 
     objects = models.Manager()
     stats = PlayerScoreSummaryManager.from_queryset(PlayerScoreSummaryQuerySet)()
+    stats = PlayerScoreSummaryManager.from_queryset(PlayerScoreSummaryQuerySet)()
 
     @property
     def total_points(self):
         return self.singles_points + self.doubles_points
 
     @property
-    def singles_weekly_ppd(self):
+    def weekly_ppd(self):
         if self.darts_thrown1 is None and self.darts_thrown2 is None:
             return None
+        elif self.darts_thrown1 is None:
+            self.darts_thrown1 = 50
+        elif self.darts_thrown2 is None:
+            self.darts_thrown2 = 50
+        elif self.score_left1 is None:
+            self.darts_thrown1 = 50
+            self.score_left1 = 2
+        elif self.score_left2 is None:
+            self.darts_thrown2 = 50
+            self.score_left2 = 2
         elif self.darts_thrown1 is None:
             self.darts_thrown1 = 50
         elif self.darts_thrown2 is None:

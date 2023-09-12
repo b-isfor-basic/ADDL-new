@@ -43,6 +43,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter = ["season", ("division", admin.RelatedOnlyFieldListFilter)]
     filter_horizontal = ["players"]
     inlines = [RegistrationInline]
+    search_fields = ["team__players__last_name"]
 
     @admin.display(description="Name")
     def name(self, obj):

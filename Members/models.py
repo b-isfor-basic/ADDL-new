@@ -81,6 +81,21 @@ class Team(models.Model):
         return season_points / games_played if games_played > 0 else 0
 
 
+    def get_average_points_per_match(self, *args, **kwargs):
+        """
+        Returns the average points per match for the team for the given season.
+        """
+        from Schedule.models import Season
+
+        season = kwargs.get("season") if "season" in kwargs else Season.details.active()
+        games_played = self.teamscoresummary_set.filter(match__week__season=season).count()
+        season_points = self.scoresummary_set.filter(match__week__season=season).aggregate(
+            total_points=models.Sum("singles_points") + models.Sum("doubles_points")
+        ).get("total_points")
+        
+        return season_points / games_played if games_played > 0 else 0
+
+
     def name(self):
         plyrs = self.players.all()
         return plyrs[0].last_name + "/" + plyrs[1].last_name
