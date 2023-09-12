@@ -61,6 +61,13 @@ class Season(models.Model):
         """
         num_weeks = (self.match_play_end_dt - self.match_play_start_dt).days // 7
         return list(range(1, num_weeks, 1))
+    
+    @property
+    def get_schedule_weeks_by_division(self):
+        """
+        Returns a list of schedule weeks for each division.
+        """
+        return self.scheduleweek_set.all().order_by("division__area__number", "week_number")
 
 
 class ScheduleWeek(models.Model):

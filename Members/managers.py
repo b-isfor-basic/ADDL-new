@@ -28,7 +28,7 @@ class PlayerStatsManager(models.Manager):
         )
 
 
-class TeamStatsManager(models.Manager):
+class TeamStatsQuerySet(models.QuerySet):
     """
     This is a custom manager that adds the following fields to the Team model:
         total_darts_thrown: The total number of darts thrown by the team in all games.
@@ -40,34 +40,28 @@ class TeamStatsManager(models.Manager):
     get_points(): The total number of points scored by the team in all games. Can be filtered.
     """
 
-    def get_queryset(self, *args, **kwargs):
-        return (
-            super()
-            .get_queryset()
-            .prefetch_related("players", "teamscoresummary_set", "scoresummary_set")
-        )
+    def get(self, *args, **kwargs):
+        return self.prefetch_related(
+            "players", "teamscoresummary_set", "scoresummary_set"
+        ).filter(*args, **kwargs)
 
     def names(self):
-        return (
-            self.get_queryset()
-            .annotate(
-                players_names=ArrayAgg("players__last_name"),
-                team_name=Concat(
-                    F("players_names__0"),
-                    Value("/"),
-                    F("players_names__1"),
-                    output_field=models.CharField(),
-                ),
-            )
-            .values("id", "team_name")
-        )
+        return self.annotate(
+            players_names=ArrayAgg("players__last_name"),
+            team_name=Concat(
+                F("players_names__0"),
+                Value("/"),
+                F("players_names__1"),
+                output_field=models.CharField(),
+            ),
+        ).values("id", "team_name")
 
-    def best_ppd(self, q=None):
+    def best_ppd(self,*args, **kwargs):
         # Return the best week's points per dart for the team.
         from Scores.models import TeamScoreSummary
 
-        qs = self.get_queryset()
-        team_stats = TeamScoreSummary.team_stats.filter(q)
+        qs = self.filter(*args, **kwargs)
+        team_stats = TeamScoreSummary.team_stats.filter(*args, **kwargs)
 
         return qs.annotate(
             best_week_ppd=Max(
@@ -80,8 +74,11 @@ class TeamStatsManager(models.Manager):
         from Scores.models import ScoreSummary
 
         qs = self.get_queryset()
-        ratings = ScoreSummary.stats.filter(q).filter(
-            team=OuterRef("id"), player__in=OuterRef("players__id")
+        ratings = (
+            ScoreSummary.stats.filter(q)
+            .filter(team=OuterRef("id"), player__in=OuterRef("players__id"))
+            .values("team", "player")
+            .rating()
         )
 
         return qs.annotate(
@@ -179,6 +176,10 @@ class TeamStatsManager(models.Manager):
         ).annotate(
             scores=ArraySubquery(scores),
         )
+
+
+class TeamStatsManager(models.Manager):
+    pass
 
 
 class TeamDetailsManager(models.Manager):

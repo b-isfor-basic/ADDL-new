@@ -49,7 +49,7 @@ class DivisionManager(models.Manager):
         ratings = ScoreSummary.stats.filter(team__season__season_number=season).filter(
             team__division=models.OuterRef("id"),
             player__in=models.OuterRef("team__players__id"),
-        )
+        ).values("team__division", "team").rating()
 
         return qs.annotate(
             area_avg_rating=models.Avg(models.Subquery(ratings.values("rating_score"))),
