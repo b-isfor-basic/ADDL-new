@@ -198,7 +198,7 @@ if IS_HEROKU:
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "ADDL Support <support@addl.app>"
-EMAIL_PREFIX = "[ADDL] "
+EMAIL_SUBJECT_PREFIX = "[ADDL] "
 
 
 # Login Redirects
