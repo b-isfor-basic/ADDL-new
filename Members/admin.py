@@ -20,25 +20,30 @@ class PlayerAdmin(UserAdmin, admin.ModelAdmin):
         ),
     ]
     fieldsets += UserAdmin.fieldsets[2:]
+    
+
+@admin.register(Registration)
+class RegistrationAdmin(admin.ModelAdmin):
+    list_filter = ["season", ("division", admin.RelatedOnlyFieldListFilter)]
+    list_display = ("team", "season", "division", "created", "modified")
+    fieldsets = [
+        ("Season", {"fields": ["season", "division"]}),
+        ("Teams", {"fields": ["team"]}),
+    ]
+
+
+class RegistrationInline(admin.TabularInline):
+    model = Registration
+    extra = 5
 
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     list_filter = ["season", ("division", admin.RelatedOnlyFieldListFilter)]
     filter_horizontal = ["players"]
+    inlines = [RegistrationInline]
 
     @admin.display(description="Name")
     def name(self, obj):
         plyrs = obj.players.all()
         return plyrs[0].last_name + "/" + plyrs[1].last_name
-
-
-@admin.register(Registration)
-class RegistrationAdmin(admin.ModelAdmin):
-    list_filter = ["season", ("division", admin.RelatedOnlyFieldListFilter)]
-    list_display = ("team", "season", "division", "created", "modified")
-
-    fieldsets = [
-        ("Season", {"fields": ["season", "division"]}),
-        ("Teams", {"fields": ["team"]}),
-    ]
