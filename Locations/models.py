@@ -190,9 +190,7 @@ class Division(models.Model):
             area_nm = self.area.shortName
         else:
             area_nm = self.area.name
-        night = self.matchNight
-        night_abbr = re.sub(r"(nesday|urday|day)", "", night)
-        return f"{area_nm} - {night_abbr}"
+        return f"{area_nm} - {self.matchNight}"
 
     def get_absolute_url(self):
         return reverse("division_detail", kwargs={"pk": self.id})
