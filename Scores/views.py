@@ -40,10 +40,7 @@ def get_latest_seasons(start=None, end=None, qty=None):
     return Season.objects.all()[start:end]
 
 
-def get_division_filter(season=None):
-    if season is None:
-        season = LATEST_SEASON
-
+def get_division_filter(season='Season.objects.latest()'):
     return season.divisions(manager="details").get_average_rating(season.season_number)
 
 

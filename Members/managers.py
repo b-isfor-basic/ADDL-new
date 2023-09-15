@@ -159,12 +159,10 @@ class TeamStatsManager(models.Manager):
         ).filter(total_darts_thrown__isnull=False)
 
     # TODO: This is not returning the correct total points value. It isn't filtering by season.
-    def weekly_points(self, season=None):
+    def weekly_points(self, season='Season.object.latest()'):
         from Schedule.models import Season
         from Scores.models import ScoreSummary
 
-        if season == None:
-            season = Season.objects.latest()
 
         # Return the total number of points scored by the team in all games. Can be filtered.
         qs = self.get_queryset()
