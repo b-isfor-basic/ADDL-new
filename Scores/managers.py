@@ -33,7 +33,7 @@ class PlayerScoreSummaryManager(models.Manager):
             - best_501_game: lowest darts thrown to win a singles 501 game
         """
 
-        qs = super().get_queryset()
+        qs = super().get_queryset(*args, **kwargs)
         return (
             qs.annotate(
                 weekly_ppd=Case(
@@ -50,7 +50,7 @@ class PlayerScoreSummaryManager(models.Manager):
                 )
             )
             .values(
-                "team__division", "player", "player__first_name", "player__last_name"
+                "team__division", "team", "player", "player__first_name", "player__last_name"
             )
             .annotate(
                 # Get total_darts_thrown, total_score_left, games_included to calculate average ppd
@@ -75,10 +75,16 @@ class PlayerScoreSummaryManager(models.Manager):
                 # '01 stats
                 max_high_in=Max("high_in", default=0),
                 max_high_out=Max("high_out", default=0),
-                best_501_game=Least(
-                    Min("darts_thrown1", filter=Q(score_left1=0)),
-                    Min("darts_thrown2", filter=Q(score_left2=0)),
-                    Value(1000),
+                best_501_game=Case(
+                    When(
+                        Q(score_left1=0)|Q(score_left2=0), 
+                        then=(
+                            Least(
+                                Min("darts_thrown1", filter=Q(score_left1=0)),
+                                Min("darts_thrown2", filter=Q(score_left2=0)),
+                            )
+                        )
+                    ), default=1000
                 ),
                 best_week_singles_ppd=F("max_weekly_ppd"),
                 # Rating stats
@@ -131,7 +137,7 @@ class TeamScoreSummaryManager(models.Manager):
             .get_queryset()
             .filter(*args, **kwargs)
             .select_related(
-                "match", "match__week", "team", "team__division", "team__players"
+                "match__week__season", "team__division", "team__players"
             )
         )
         return (

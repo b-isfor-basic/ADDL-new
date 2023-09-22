@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+from smart_selects.db_fields import ChainedForeignKey
 
 from Members.models import Team
 from Schedule.models import Match
