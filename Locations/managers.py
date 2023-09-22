@@ -46,7 +46,7 @@ class DivisionManager(models.Manager):
             season = _get_latest_season()
 
         qs = self.get_queryset().filter(season__season_number=season)
-        ratings = ScoreSummary.stats.filter(team__season__season_number=season).filter(
+        ratings = ScoreSummary.stats.filter(team__season__season_number=season).distinct().filter(
             team__division=models.OuterRef("id"),
             player__in=models.OuterRef("team__players__id"),
         ).values("team__division", "team").rating()

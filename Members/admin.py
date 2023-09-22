@@ -26,7 +26,7 @@ class PlayerAdmin(UserAdmin, admin.ModelAdmin):
 @admin.register(Registration)
 class RegistrationAdmin(admin.ModelAdmin):
     list_filter = ["season", ("division", admin.RelatedOnlyFieldListFilter)]
-    list_display = ("team", "season", "division", "created", "modified")
+    list_display = ("team", "season", "division")
     fieldsets = [
         ("Season", {"fields": ["season", "division"]}),
         ("Teams", {"fields": ["team"]}),
@@ -48,3 +48,5 @@ class TeamAdmin(admin.ModelAdmin):
     def name(self, obj):
         plyrs = obj.players.all()
         return plyrs[0].last_name + "/" + plyrs[1].last_name
+    
+    

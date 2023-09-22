@@ -3,7 +3,7 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django_extensions.db.models import TimeStampedModel
-from smart_selects.db_fields import ChainedForeignKey
+from smart_selects.db_fields import ChainedForeignKey, ChainedManyToManyField
 
 from .managers import RegistrationManager, TeamDetailsManager, TeamStatsQuerySet, TeamStatsManager
 
@@ -46,14 +46,14 @@ class Team(models.Model):
     players = models.ManyToManyField(
         "Player", related_name="teams", max_length=2, db_index=True
     )
-    division = models.ManyToManyField("Locations.Division", through="Registration")
     season = models.ManyToManyField("Schedule.Season", through="Registration")
+    division = ChainedManyToManyField(chained_field="season", chained_model_field="divisions", to="Locations.Division", through="Registration")
 
     objects = models.Manager()
     details = TeamDetailsManager()
     stats = TeamStatsManager()
 
-    def get_matches(self, *args, **kwargs):
+    def get_matches(self, season='Season.objects.latest()', *args, **kwargs):
         """
         Returns the matches for the team for the given season.
         """
@@ -101,33 +101,18 @@ class Registration(TimeStampedModel, models.Model):
         ordering = ["-season", "division", "team"]
         unique_together = ["season", "team"]
 
-    team = models.ForeignKey("Team", models.CASCADE, db_index=True)
+    team = models.ForeignKey(to="Team", related_name="registrations", on_delete=models.CASCADE)
     season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
     division = ChainedForeignKey(
         "Locations.division",
         chained_field="season",
         chained_model_field="season",
-        show_all=False,
         auto_choose=True,
         sort=True,
-    )
-    created_by = models.ForeignKey(
-        "Player",
-        models.SET_NULL,
-        related_name="registrations_created",
-        null=True,
-        blank=True,
-    )
-    modified_by = models.ForeignKey(
-        "Player",
-        models.SET_NULL,
-        related_name="registrations_modified",
-        null=True,
-        blank=True,
     )
 
     objects = models.Manager()
     details = RegistrationManager()
 
-    def str(self):
+    def __str__(self):
         return f"{self.team} (S{self.season.season_number})"
