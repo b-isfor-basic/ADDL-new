@@ -63,8 +63,8 @@ class Team(models.Model):
 
         matches = self.awayMatches.filter(week__season=season)
         return matches.union(
-            self.homeMatches.filter(week__season=season).order_by("week__week_number")
-        )
+            self.homeMatches.filter(week__season=season)
+        ).order_by("week__week_number")
 
     def get_average_points_per_match(self, *args, **kwargs):
         """

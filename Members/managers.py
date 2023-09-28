@@ -63,7 +63,6 @@ class TeamStatsQuerySet(models.QuerySet):
         from Scores.models import TeamScoreSummary
 
         q=kwargs.get('season', None)
-
         qs = self.filter(*args, **kwargs)
         team_stats = TeamScoreSummary.team_stats.filter(*args, **kwargs)
 

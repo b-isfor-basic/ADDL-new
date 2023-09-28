@@ -34,7 +34,6 @@ def get_latest_seasons(start=None, end=None, qty=None):
 
     if start is None:
         start = 0
-
     end = start + qty
 
     return Season.objects.all()[start:end]

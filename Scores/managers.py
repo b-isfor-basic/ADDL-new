@@ -21,6 +21,7 @@ from django.db.models.functions import DenseRank, Least, Ln
 from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqual
 
 
+
 class PlayerScoreSummaryQuerySet(models.QuerySet):
     def group_by_players(self):
         return self.values("player", "player__first_name", "player__last_name")

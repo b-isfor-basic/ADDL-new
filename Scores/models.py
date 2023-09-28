@@ -19,6 +19,7 @@ from .managers import (
 )
 
 
+
 class Forfeit(TimeStampedModel, models.Model):
     """
     A forfeit for a match.
