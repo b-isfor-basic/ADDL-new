@@ -47,8 +47,8 @@ class DivisionManager(models.Manager):
 
         qs = self.get_queryset().filter(season__season_number=season)
         ratings = ScoreSummary.stats.filter(team__season__season_number=season).distinct().filter(
-            team__division=models.OuterRef("id"),
-            player__in=models.OuterRef("team__players__id"),
+            team__in=models.OuterRef("team"),
+            player__in=models.OuterRef("team__players"),
         ).values("team__division", "team").rating()
 
         return qs.annotate(

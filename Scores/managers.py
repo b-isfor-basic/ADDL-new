@@ -310,7 +310,7 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
         )
 
         return self.values("team", "team_name").annotate(
-            team_rating_score=Avg(player_rating_avg.values("rating_score")),
+            team_rating_score=Avg(player_rating_avg),
             team_rating=Case(
                 When(LessThanOrEqual(F("team_rating_score"), 10.50), then=Value("E")),
                 When(LessThan(F("team_rating_score"), 12.20), then=Value("D")),
@@ -323,7 +323,6 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
             ),
         )
     
-    from django.db.models import Sum, Subquery, OuterRef
 
     class TeamScoreSummaryQuerySet(models.QuerySet):
         def total_wins(self, *args, **kwargs):
