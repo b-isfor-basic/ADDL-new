@@ -13,10 +13,16 @@ class ScoreSummaryAdmin(admin.ModelAdmin):
     list_display = [
         "player",
         "team",
-        "singles_weekly_ppd",
         "total_points",
+        "singles_points",
+        "doubles_points",
+        "darts_thrown1",
+        "score_left1",
+        "darts_thrown2",
+        "score_left2",
         "total_stars",
         "total_perfects",
+        "singles_weekly_ppd",
     ]
     ordering = [
         "-match__week__season",
@@ -24,10 +30,11 @@ class ScoreSummaryAdmin(admin.ModelAdmin):
         "player__first_name",
         "player__last_name",
     ]
+    autocomplete_fields = ["player", "team"]
 
     @admin.display(empty_value="None")
     def singles_weekly_ppd(self, obj):
-        return obj.singles_weekly_ppd
+        return obj.get_weekly_ppd
 
 
 @admin.register(ScoreDetail)
@@ -54,3 +61,21 @@ class TeamScoreSummaryAdmin(admin.ModelAdmin):
         "team",
         "weekly_ppd",
     ]
+    
+    @admin.display(empty_value="None")
+    def weekly_ppd(self, obj):
+        return obj.get_weekly_ppd
+
+
+#@admin.register(Forfeit)
+#class ForfeitAdmin(admin.ModelAdmin):
+#    list_filter = [
+#        "match__week__season",
+#        "match__week__division",
+#        "match__week__week_number",
+#    ]
+#    list_display = [
+#        "week__season",
+#
+#        "team",
+#    ]

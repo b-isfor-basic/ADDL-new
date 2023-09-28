@@ -20,6 +20,7 @@ class PlayerAdmin(UserAdmin, admin.ModelAdmin):
         ),
     ]
     fieldsets += UserAdmin.fieldsets[2:]
+    search_fields = ["first_name", "last_name", "username", "email", "phoneNumber"]
     
 
 @admin.register(Registration)
@@ -42,6 +43,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter = ["season", ("division", admin.RelatedOnlyFieldListFilter)]
     filter_horizontal = ["players"]
     inlines = [RegistrationInline]
+    search_fields = ["team__players__last_name"]
 
     @admin.display(description="Name")
     def name(self, obj):

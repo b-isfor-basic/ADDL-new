@@ -88,8 +88,8 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Points' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"singles_wins" %}
-                            {% include './stats/table_body.html' with stat=record.singles_wins %}
+                        {% for record in player_stats.group_by_players.total_wins|dictsortreversed:"singles_pts" %}
+                            {% include './stats/table_body.html' with stat=record.singles_pts %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -101,8 +101,8 @@
                 <table class="p-1 w-full text-slate-400">
                     {% include './stats/table_head.html' with stat_title='Points' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"doubles_wins" %}
-                            {% include './stats/table_body.html' with stat=record.doubles_wins %}
+                        {% for record in player_stats.group_by_players.total_wins|dictsortreversed:"doubles_pts" %}
+                            {% include './stats/table_body.html' with stat=record.doubles_pts %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -114,8 +114,8 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Points' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"total_wins" %}
-                            {% include './stats/table_body.html' with stat=record.total_wins|default:'N/A' %}
+                        {% for record in player_stats.group_by_players.total_wins|dictsortreversed:"points" %}
+                            {% include './stats/table_body.html' with stat=record.points|default:'N/A' %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -129,7 +129,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Stars' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"stars" %}
+                        {% for record in player_stats.group_by_players.total_stars|dictsortreversed:"stars" %}
                             {% include './stats/table_body.html' with stat=record.stars %}
                         {% endfor %}
                     </tbody>
@@ -142,7 +142,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='SPG' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"avg_stars_per_game" %}
+                        {% for record in player_stats.group_by_players.average_stars_per_game|dictsortreversed:"avg_stars_per_game" %}
                             {% include './stats/table_body.html' with stat=record.avg_stars_per_game|floatformat:"2" %}
                         {% endfor %}
                     </tbody>
@@ -155,7 +155,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Perfects' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"perfects" %}
+                        {% for record in player_stats.group_by_players.total_perfects|dictsortreversed:"perfects" %}
                             {% include './stats/table_body.html' with stat=record.perfects %}
                         {% endfor %}
                     </tbody>
@@ -170,7 +170,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Best 501' %}
                     <tbody>
-                        {% for record in player_stats|dictsort:"best_501_game" %}
+                        {% for record in player_stats.group_by_players.best_501_game|dictsort:"best_501_game" %}
                             {% include './stats/table_body.html' with stat=record.best_501_game %}
                         {% endfor %}
                     </tbody>
@@ -183,7 +183,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Best PPD' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"best_week_singles_ppd" %}
+                        {% for record in player_stats.group_by_players.best_week_ppd|dictsortreversed:"best_week_singles_ppd" %}
                             {% include './stats/table_body.html' with stat=record.best_week_singles_ppd|floatformat:"4" %}
                         {% endfor %}
                     </tbody>
@@ -196,7 +196,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='PPD' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"avg_ppd" %}
+                        {% for record in player_stats.group_by_players.average_ppd|dictsortreversed:"avg_ppd" %}
                             {% include './stats/table_body.html' with stat=record.avg_ppd|floatformat:"4" %}
                         {% endfor %}
                     </tbody>
@@ -211,7 +211,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='High In' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"max_high_in" %}
+                        {% for record in player_stats.group_by_players.highest_in|dictsortreversed:"max_high_in" %}
                             {% include './stats/table_body.html' with stat=record.max_high_in %}
                         {% endfor %}
                     </tbody>
@@ -224,7 +224,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='High Out' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"max_high_out" %}
+                        {% for record in player_stats.group_by_players.highest_out|dictsortreversed:"max_high_out" %}
                             {% include './stats/table_body.html' with stat=record.max_high_out %}
                         {% endfor %}
                     </tbody>
@@ -237,7 +237,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Rating' %}
                     <tbody>
-                        {% for record in player_stats|dictsortreversed:"rating_score" %}
+                        {% for record in player_stats.weekly_ppd.group_by_players.rating|dictsortreversed:"rating_score" %}
                             {% include './stats/table_body.html' with stat=record.rating stat2=record.rating_score %}
                         {% endfor %}
                     </tbody>
@@ -255,8 +255,8 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='PPD' %}
                     <tbody>
-                        {% for record in team_stats|dictsortreversed:"avg_ppd" %}
-                            {% include './stats/table_body.html' with stat=record.avg_ppd|floatformat:'4' name=record.team_name %}
+                        {% for record in team_stats.avg_doubles_ppd|dictsortreversed:"avg_doubles_ppd" %}
+                            {% include './stats/table_body.html' with stat=record.avg_doubles_ppd|floatformat:'4' name=record.team_name %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -268,8 +268,8 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Best PPD' %}
                     <tbody>
-                        {% for record in team_stats|dictsortreversed:"best_week_ppd" %}
-                            {% include './stats/table_body.html' with stat=record.best_week_ppd|floatformat:"4" name=record.team_name %}
+                        {% for record in team_stats.best_week_doubles_ppd|dictsortreversed:"best_week_doubles_ppd" %}
+                            {% include './stats/table_body.html' with stat=record.best_week_doubles_ppd|floatformat:"4" name=record.team_name %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -281,7 +281,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Best 501' %}
                     <tbody>
-                        {% for record in team_stats|dictsort:"best_501_game" %}
+                        {% for record in team_stats.best_501_game|dictsort:"best_501_game" %}
                             {% include './stats/table_body.html' with stat=record.best_501_game name=record.team_name %}
                         {% endfor %}
                     </tbody>
@@ -296,8 +296,8 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Points' %}
                     <tbody>
-                        {% for record in team_stats|dictsortreversed:"total_points" %}
-                            {% include './stats/table_body.html' with stat=record.total_points name=record.team_name %}
+                        {% for record in team_stats.total_wins|dictsortreversed:"points" %}
+                            {% include './stats/table_body.html' with stat=record.points name=record.team_name %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -309,7 +309,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Rating' %}
                     <tbody>
-                        {% for record in team_stats|dictsortreversed:"team_rating_score" %}
+                        {% for record in team_stats.rating|dictsortreversed:"team_rating_score" %}
                             {% include './stats/table_body.html' with stat=record.team_rating stat2=record.team_rating_score name=record.team_name %}
                         {% endfor %}
                     </tbody>
