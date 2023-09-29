@@ -321,7 +321,7 @@
 
 {% block tab_3_body %}
     <div class="grid grid-flow-row px-1 pt-2 w-full gap-1 md:gap-6 justify-items-center content-center">
-        {% for division in division_set %}
+        {% for division in division_set.get_average_rating %}
             {% include './standings/standings_table.html' with division=division teams=team_standings|dictsortreversed:"total_points" %}
         {% endfor %}
     </div>

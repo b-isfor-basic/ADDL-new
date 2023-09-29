@@ -4,10 +4,9 @@ from django.db.models.functions import Concat, Coalesce
 
 
 def _get_latest_season():
-    from Schedule.models import Season
 
-    if Season.objects.exists():
-        return Season.objects.latest().season_number
+    if 'Season.objects.exists()':
+        return 'Season.objects.latest().season_number'
     return None
 
 
@@ -39,20 +38,16 @@ class DivisionManager(models.Manager):
             ),
         )
 
-    def get_average_rating(self, season=None):
+    def get_average_rating(self, season=_get_latest_season()):
         from Scores.models import ScoreSummary
 
-        if season is None:
-            season = _get_latest_season()
-
         qs = self.get_queryset().filter(season__season_number=season)
-        ratings = ScoreSummary.stats.filter(team__season__season_number=season).distinct().filter(
-            team__in=models.OuterRef("team"),
-            player__in=models.OuterRef("team__players"),
-        ).values("team__division", "team").rating()
+        ratings = ScoreSummary.stats.filter(match__week__season__season_number=season).filter(
+            team__division=models.OuterRef("pk"),
+        ).rating().values('team__division', 'team', 'rating_score')
 
         return qs.annotate(
-            area_avg_rating=models.Avg(models.Subquery(ratings.values("rating_score"))),
+            area_avg_rating=models.Avg(models.Subquery(ratings.values('rating_score'))),
             num_teams=models.Count(
                 "team",
                 filter=models.Q(team__season__season_number=season),

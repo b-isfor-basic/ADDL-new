@@ -18,10 +18,10 @@ from Scores.forms import (
 from Scores.models import ScoreSummary, TeamScoreSummary
 
 
-LATEST_SEASON = "Season.objects.first().season_number"
+LATEST_SEASON = "Season.objects.latest().season_number"
 
 
-def get_season(season_number="Season.objects.first().season_number"):
+def get_season(season_number):
     if season_number is None:
         season_number = LATEST_SEASON
 
@@ -40,7 +40,7 @@ def get_latest_seasons(start=None, end=None, qty=None):
 
 
 def get_division_filter(season=LATEST_SEASON):
-    return season.divisions(manager="details").get_average_rating(season.season_number)
+    return season.divisions(manager="details").all()
 
 
 @require_GET
@@ -54,10 +54,10 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
 
     season = get_season(season_number)
     season_list = get_latest_seasons(qty)
-    division_set = get_division_filter(season)
-    active_divisions = (
-        season.divisions(manager="details").get_average_rating(season_number).all()
+    division_set = (
+        season.divisions(manager="details").all()
     )
+    active_divisions = get_division_filter(season)
 
     player_stats = (
         ScoreSummary.stats.filter(match__week__season=season.id)
@@ -67,8 +67,6 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
     )
     team_standings = (
         ScoreSummary.stats.filter(match__week__season=season.id)
-        .group_by_teams()
-        .total_wins()
     )
 
     if division_id is not None:
