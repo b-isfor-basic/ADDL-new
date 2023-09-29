@@ -135,14 +135,13 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
     def rating(self):
         return (
             self.weekly_ppd()
-            .annotate(weekly_ppd=F("weekly_ppd"))
             .group_by_players()
             .average_ppd()
             .win_percentage()
             .average_stars_per_game()
             .annotate(
                 rating_score=(
-                    (Ln(F("weekly_ppd")) * 3.5)
+                    (Ln(Avg("weekly_ppd")) * 3.5)
                     + (F("win_percentage") * 8.0)
                     + (F("avg_stars_per_game") * 5.0)
                 ),
