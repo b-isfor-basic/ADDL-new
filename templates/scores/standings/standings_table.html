@@ -39,12 +39,13 @@
                                 </td>
                                 {% for season_week in season.num_weeks_regular_season %}
                                     <td class="p-2 text-sm text-center">
-                                        {% for week in team.scores %}
-                                            {% if season_week == week.week %}{{ week.points }}{% endif %}
+                                        {% regroup team_standings by week as scores_list %}
+                                        {% for week in scores_list %}
+                                            xr{% if season_week == week.week %}{{ week.points }}{% endif %}
                                         {% endfor %}
                                     </td>
                                 {% endfor %}
-                                <td class="p-2 text-sm font-bold text-center border-l border-slate-800">{{ team.total_points }}</td>
+                                <td class="p-2 text-sm font-bold text-center border-l border-slate-800">{{ team.points }}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}

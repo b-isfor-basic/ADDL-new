@@ -27,6 +27,10 @@ class Player(AbstractUser):
 
     def __str__(self):
         return str(self.get_full_name())
+    
+    def create(self, *args, **kwargs):
+        pw = kwargs.get("password") if "password" in kwargs else self.set_unusable_password()
+        return super().create(password=pw, *args, **kwargs)
 
 
 class Team(models.Model):
@@ -51,7 +55,7 @@ class Team(models.Model):
 
     objects = models.Manager()
     details = TeamDetailsManager()
-    stats = TeamStatsManager()
+    stats = TeamStatsManager().from_queryset(TeamStatsQuerySet)()
 
     def get_matches(self, season='Season.objects.latest()', *args, **kwargs):
         """
@@ -80,25 +84,11 @@ class Team(models.Model):
         
         return season_points / games_played if games_played > 0 else 0
 
-
-    def get_average_points_per_match(self, *args, **kwargs):
-        """
-        Returns the average points per match for the team for the given season.
-        """
-        from Schedule.models import Season
-
-        season = kwargs.get("season") if "season" in kwargs else Season.details.active()
-        games_played = self.teamscoresummary_set.filter(match__week__season=season).count()
-        season_points = self.scoresummary_set.filter(match__week__season=season).aggregate(
-            total_points=models.Sum("singles_points") + models.Sum("doubles_points")
-        ).get("total_points")
-        
-        return season_points / games_played if games_played > 0 else 0
-
-
+    @property
     def name(self):
         plyrs = self.players.all()
         return plyrs[0].last_name + "/" + plyrs[1].last_name
+    
 
     def __str__(self):
         return self.name()

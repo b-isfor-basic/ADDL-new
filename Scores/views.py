@@ -1,3 +1,5 @@
+from typing import Any
+from django import http
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
@@ -5,7 +7,7 @@ from django.forms import all_valid, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, resolve_url
 from django.views.decorators.http import require_GET, require_safe
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, TemplateView
 
 from Members.models import Player, Team
 from Schedule.models import Match, Season
@@ -65,8 +67,14 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
     team_stats = (
         TeamScoreSummary.stats.filter(match__week__season=season.id)
     )
+    team_total_points = (
+        TeamScoreSummary.stats.filter(match__week__season=season.id).total_points(season=season.id)
+    )
     team_standings = (
-        ScoreSummary.stats.filter(match__week__season=season.id)
+        ScoreSummary.stats.filter(match__week__season=season.id).values('team__division', 'team').get_standings()
+    )
+    team_rating = (
+        TeamScoreSummary.stats.filter(match__week__season=season.id).team_rating(season=season.id)
     )
 
     if division_id is not None:
@@ -74,6 +82,8 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
         player_stats = player_stats.filter(match__week__division=division_id)
         team_stats = team_stats.filter(match__week__division=division_id)
         team_standings = team_standings.filter(match__week__division=division_id)
+        team_total_points = team_total_points.filter(match__week__division=division_id)
+        team_rating = team_rating.filter(match__week__division=division_id)
 
     context = {
         "season": season,
@@ -83,6 +93,8 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
         "player_stats": player_stats,
         "team_stats": team_stats,
         "team_standings": team_standings,
+        "team_total_points": team_total_points,
+        "team_rating": team_rating,
     }
     return render(request, template, context)
 

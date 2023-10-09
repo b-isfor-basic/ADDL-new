@@ -34,7 +34,7 @@ class ScoreSummaryAdmin(admin.ModelAdmin):
 
     @admin.display(empty_value="None")
     def singles_weekly_ppd(self, obj):
-        return obj.get_weekly_ppd
+        return obj.weekly_ppd
 
 
 @admin.register(ScoreDetail)
