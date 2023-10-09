@@ -356,7 +356,7 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
             .values("team")
             .annotate(
                 points=Subquery(pts.values("total_pts")),
-            ).with_names()
+            ).with_names().distinct("team")
         )
 
 
