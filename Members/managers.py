@@ -249,6 +249,8 @@ class TeamDetailsManager(models.Manager):
         return (
             super()
             .get_queryset()
+            .select_related('players', 'division', 'season')
+            .prefetch_related('players__scoresummary_set', 'players__last_name')
             .annotate(
                 players_names=ArrayAgg("players__last_name"),
                 team_name=Concat(

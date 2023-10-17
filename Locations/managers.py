@@ -56,4 +56,4 @@ class DivisionQuerySet(models.QuerySet):
 
 class DivisionManager(models.Manager.from_queryset(DivisionQuerySet)):
     def get_queryset(self):
-        return super().get_queryset().with_names()
+        return super().get_queryset().select_related('area').with_names()

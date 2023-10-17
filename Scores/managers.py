@@ -191,13 +191,12 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
         )
 
 
-class PlayerScoreSummaryManager(models.Manager):
+class PlayerScoreSummaryManager(models.Manager.from_queryset(PlayerScoreSummaryQuerySet)):
     def get_queryset(self, *args, **kwargs):
-        return (
-            PlayerScoreSummaryQuerySet(self.model, using=self._db)
+        return (super().get_queryset()
             .filter(*args, **kwargs)
             .select_related("player", "team")
-        )
+        .prefetch_related('player__last_name', 'player__first_name', 'match__week__season', 'player__teams', 'team__players'))
 
     def _adjusted_player_pts(self, team_total_pts, player_total_points):
         return round(player_total_points * 11 / team_total_pts)
@@ -357,12 +356,12 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
         )
 
 
-class TeamScoreSummaryManager(models.Manager):
+class TeamScoreSummaryManager(models.Manager.from_queryset(TeamScoreSummaryQuerySet)):
     def get_queryset(self, *args, **kwargs):
         return (
             TeamScoreSummaryQuerySet(self.model, using=self._db)
             .select_related("team")
-            .prefetch_related("team__players", "match__week__season")
+            .prefetch_related("team__players__last_name", "match__week__season")
         )
 
 
