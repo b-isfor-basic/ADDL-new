@@ -255,8 +255,8 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='PPD' %}
                     <tbody>
-                        {% for record in team_stats.avg_doubles_ppd|dictsortreversed:"avg_doubles_ppd" %}
-                            {% include './stats/table_body.html' with stat=record.avg_doubles_ppd|floatformat:'4' name=record.team_name %}
+                        {% for record in team_stats|dictsortreversed:'avg_ppd' %}
+                            {% include './stats/table_body.html' with stat=record.avg_ppd|floatformat:"4" name=record.team_name %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -268,8 +268,8 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Best PPD' %}
                     <tbody>
-                        {% for record in team_stats.best_week_doubles_ppd|dictsortreversed:"best_week_doubles_ppd" %}
-                            {% include './stats/table_body.html' with stat=record.best_week_doubles_ppd|floatformat:"4" name=record.team_name %}
+                        {% for record in team_stats|dictsortreversed:'best_week_ppd' %}
+                            {% include './stats/table_body.html' with stat=record.best_week_ppd|floatformat:"4" name=record.team_name %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -281,7 +281,7 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Best 501' %}
                     <tbody>
-                        {% for record in team_stats.best_501_game|dictsort:"best_501_game" %}
+                        {% for record in team_stats|dictsort:"best_501_game" %}
                             {% include './stats/table_body.html' with stat=record.best_501_game name=record.team_name %}
                         {% endfor %}
                     </tbody>
@@ -296,8 +296,8 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Points' %}
                     <tbody>
-                        {% for record in team_total_points|dictsortreversed:"points" %}
-                            {% include './stats/table_body.html' with stat=record.points name=record.team_name %}
+                        {% for record in team_stats|dictsortreversed:"total_points" %}
+                            {% include './stats/table_body.html' with stat=record.total_points|default:None name=record.team_name %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -309,8 +309,8 @@
                 <table class="p-1 w-full">
                     {% include './stats/table_head.html' with stat_title='Rating' %}
                     <tbody>
-                        {% for record in team_rating|dictsortreversed:"rating_score" %}
-                            {% include './stats/table_body.html' with stat=record.rating stat2=record.rating_score name=record.team_name %}
+                        {% for record in team_stats|dictsortreversed:"team_rating_score" %}
+                            {% include './stats/table_body.html' with stat=record.team_rating|default:None stat2=record.team_rating_score|default:None|floatformat:"4" name=record.team_name %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -321,9 +321,11 @@
 
 {% block tab_3_body %}
     <div class="grid grid-flow-row px-1 pt-2 w-full gap-1 md:gap-6 justify-items-center content-center">
-        {% for division in division_set.get_average_rating %}
-            {% include './standings/standings_table.html' with division=division teams=team_standings|dictsortreversed:"points" %}
+        {% if division_set %}
+        {% for division in division_set %}
+            {% include './standings/standings_table.html' with division=division teams=team_standings %}
         {% endfor %}
+    {% endif %}
     </div>
 {% endblock tab_3_body %}
 

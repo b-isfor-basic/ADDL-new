@@ -6,6 +6,7 @@ from django.db.models import (
     Avg,
     Case,
     Count,
+    Expression,
     ExpressionWrapper,
     F,
     Max,
@@ -33,7 +34,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
         return self.annotate(
             singles_pts=Sum("singles_points", default=0),
             doubles_pts=Sum("doubles_points", default=0),
-        ).annotate(points=F("singles_pts") + F("doubles_pts"))
+        ).annotate(points=(F("singles_pts") + F("doubles_pts")))
 
     def wins_by_team(self):
         from Members.models import Team
@@ -81,7 +82,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             ppd=ExpressionWrapper(
                 (Value(501.0) * Value(2) - F("score_left1") - F("score_left2"))
                 / (F("darts_thrown1") + F("darts_thrown2")),
-                output_field=models.FloatField(),
+                output_field=models.DecimalField(),
             )
         )
 
@@ -98,7 +99,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             .annotate(
                 avg_spg=ExpressionWrapper(
                     F("stars") / (Count("match_id", distinct=True) * 10.0),
-                    output_field=models.FloatField(),
+                    output_field=models.DecimalField(),
                 )
             )
         )
@@ -110,7 +111,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             .annotate(
                 win_percentage=ExpressionWrapper(
                     F("points") / (Count("match_id", distinct=True) * 10.0),
-                    output_field=models.FloatField(),
+                    output_field=models.DecimalField(),
                 ),
             )
         )
@@ -131,9 +132,6 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             .filter(player=OuterRef("player"))
             .values("avg_spg")
         )
-        team_name_qs = Subquery(
-            Team.details.filter(pk=OuterRef("team")).values("team_name")
-        )
 
         return (
             self.values(
@@ -147,14 +145,13 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
                 avg_ppd=ppd_qs,
                 win_percentage=win_pct_qs,
                 avg_stars_per_game=spg_qs,
-                team_name=team_name_qs,
             )
             .annotate(
                 rating_score=ExpressionWrapper(
                     (Ln(Avg("avg_ppd")) * 3.5)
                     + (Avg("win_percentage") * 8.0)
                     + (Avg("avg_stars_per_game") * 5.0),
-                    output_field=models.FloatField(),
+                    output_field=models.DecimalField(),
                 ),
                 rating=Case(
                     When(LessThanOrEqual(F("rating_score"), 10.50), then=Value("E")),
@@ -321,7 +318,7 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
     def team_rating(self, season):
         from Scores.models import ScoreSummary
         # Get player ratings for subquery expression
-        ratings = ScoreSummary.stats.filter(match__week__season=season).filter(player__in=OuterRef('team__players')).rating().values('team').annotate(team_rating=(F('rating_score')))
+        ratings = ScoreSummary.stats.filter(match__week__season=season).rating().values('team','rating_score').annotate(team_rating=Avg(F('rating_score'), filter=Q(player__in=OuterRef('team__players'), default=0.0)))
         return (
             self.with_names()
             .values("team", "team__division", "team_name")

@@ -171,7 +171,7 @@ class Division(models.Model):
         null=True,
         blank=True,
     )
-    divisionManager = models.ForeignKey(
+    division_manager = models.ForeignKey(
         to=Player,
         verbose_name="Division Manager",
         on_delete=models.SET_NULL,

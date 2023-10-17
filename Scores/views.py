@@ -10,6 +10,7 @@ from django.views.decorators.http import require_GET, require_safe
 from django.views.generic import UpdateView, TemplateView
 
 from Members.models import Player, Team
+from Locations.models import Division
 from Schedule.models import Match, Season
 from Scores.forms import (
     BasePlayerScoreFormSet,
@@ -56,34 +57,24 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
 
     season = get_season(season_number)
     season_list = get_latest_seasons(qty)
-    division_set = (
-        season.divisions(manager="details").all()
-    )
-    active_divisions = get_division_filter(season)
-
+    active_divisions = Division.details.filter(season=season.id).get_average_rating(season=season.id)
+    division_set = active_divisions
+    teams = Team.stats.filter(season=season.id)
     player_stats = (
         ScoreSummary.stats.filter(match__week__season=season.id)
     )
     team_stats = (
-        TeamScoreSummary.stats.filter(match__week__season=season.id)
-    )
-    team_total_points = (
-        TeamScoreSummary.stats.filter(match__week__season=season.id).total_points(season=season.id)
+        teams.stats(season=season.id)
     )
     team_standings = (
-        ScoreSummary.stats.filter(match__week__season=season.id).values('team__division', 'team').get_standings()
-    )
-    team_rating = (
-        TeamScoreSummary.stats.filter(match__week__season=season.id).team_rating(season=season.id)
+        teams.weekly_points(season=season.id)
     )
 
     if division_id is not None:
-        division_set = division_set.filter(id=division_id)
+        division_set = active_divisions.filter(id=division_id)
         player_stats = player_stats.filter(match__week__division=division_id)
-        team_stats = team_stats.filter(match__week__division=division_id)
-        team_standings = team_standings.filter(match__week__division=division_id)
-        team_total_points = team_total_points.filter(match__week__division=division_id)
-        team_rating = team_rating.filter(match__week__division=division_id)
+        team_stats = team_stats.filter(division__id__contains=division_id)
+        team_standings = team_standings.filter(division__id__contains=division_id)
 
     context = {
         "season": season,
@@ -92,9 +83,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
         "division_set": division_set,
         "player_stats": player_stats,
         "team_stats": team_stats,
-        "team_standings": team_standings,
-        "team_total_points": team_total_points,
-        "team_rating": team_rating,
+        "team_standings": team_standings.values()
     }
     return render(request, template, context)
 

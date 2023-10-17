@@ -5,7 +5,12 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django_extensions.db.models import TimeStampedModel
 from smart_selects.db_fields import ChainedForeignKey, ChainedManyToManyField
 
-from .managers import RegistrationManager, TeamDetailsManager, TeamStatsQuerySet, TeamStatsManager
+from .managers import (
+    RegistrationManager,
+    TeamDetailsManager,
+    TeamStatsQuerySet,
+    TeamStatsManager,
+)
 
 
 class Player(AbstractUser):
@@ -19,7 +24,7 @@ class Player(AbstractUser):
     """
 
     phoneNumber = PhoneNumberField("Phone Number", blank=True)
-    
+
     class Meta:
         verbose_name = "player"
         verbose_name_plural = "players"
@@ -27,9 +32,13 @@ class Player(AbstractUser):
 
     def __str__(self):
         return str(self.get_full_name())
-    
+
     def create(self, *args, **kwargs):
-        pw = kwargs.get("password") if "password" in kwargs else self.set_unusable_password()
+        pw = (
+            kwargs.get("password")
+            if "password" in kwargs
+            else self.set_unusable_password()
+        )
         return super().create(password=pw, *args, **kwargs)
 
 
@@ -51,13 +60,18 @@ class Team(models.Model):
         "Player", related_name="teams", max_length=2, db_index=True
     )
     season = models.ManyToManyField("Schedule.Season", through="Registration")
-    division = ChainedManyToManyField(chained_field="season", chained_model_field="divisions", to="Locations.Division", through="Registration")
+    division = ChainedManyToManyField(
+        chained_field="season",
+        chained_model_field="divisions",
+        to="Locations.Division",
+        through="Registration",
+    )
 
     objects = models.Manager()
     details = TeamDetailsManager()
     stats = TeamStatsManager().from_queryset(TeamStatsQuerySet)()
 
-    def get_matches(self, season='Season.objects.latest()', *args, **kwargs):
+    def get_matches(self, season="Season.objects.latest()", *args, **kwargs):
         """
         Returns the matches for the team for the given season.
         """
@@ -66,9 +80,9 @@ class Team(models.Model):
         season = kwargs.get("season") if "season" in kwargs else Season.details.active()
 
         matches = self.awayMatches.filter(week__season=season)
-        return matches.union(
-            self.homeMatches.filter(week__season=season)
-        ).order_by("week__week_number")
+        return matches.union(self.homeMatches.filter(week__season=season)).order_by(
+            "week__week_number"
+        )
 
     def get_average_points_per_match(self, *args, **kwargs):
         """
@@ -77,21 +91,26 @@ class Team(models.Model):
         from Schedule.models import Season
 
         season = kwargs.get("season") if "season" in kwargs else Season.details.active()
-        games_played = self.teamscoresummary_set.filter(match__week__season=season).count()
-        season_points = self.scoresummary_set.filter(match__week__season=season).aggregate(
-            total_points=models.Sum("singles_points") + models.Sum("doubles_points")
-        ).get("total_points")
-        
+        games_played = self.teamscoresummary_set.filter(
+            match__week__season=season
+        ).count()
+        season_points = (
+            self.scoresummary_set.filter(match__week__season=season)
+            .aggregate(
+                total_points=models.Sum("singles_points") + models.Sum("doubles_points")
+            )
+            .get("total_points")
+        )
+
         return season_points / games_played if games_played > 0 else 0
 
     @property
     def name(self):
         plyrs = self.players.all()
         return plyrs[0].last_name + "/" + plyrs[1].last_name
-    
 
     def __str__(self):
-        return self.name()
+        return self.name
 
 
 class Registration(TimeStampedModel, models.Model):
@@ -106,7 +125,9 @@ class Registration(TimeStampedModel, models.Model):
         ordering = ["-season", "division", "team"]
         unique_together = ["season", "team"]
 
-    team = models.ForeignKey(to="Team", related_name="registrations", on_delete=models.CASCADE)
+    team = models.ForeignKey(
+        to="Team", related_name="registrations", on_delete=models.CASCADE
+    )
     season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
     division = ChainedForeignKey(
         "Locations.division",

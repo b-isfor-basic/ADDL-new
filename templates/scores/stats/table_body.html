@@ -2,7 +2,6 @@
     <td class="p-1 text-sm text-center">
             {{ forloop.counter }}
     </td>
-    {% if division|length > 1 %}<td class="p-1 text-sm text-center">{{ record.team__division }}</td>{% endif %}
     <td class="p-1 text-sm text-center">
         {% if record.player__first_name %}
             {{ record.player__first_name }} {{ record.player__last_name }}
@@ -13,7 +12,7 @@
         {% endif %}
     </td>
     <td class="p-1 text-sm text-center">
-        {% if stat is None or stat == 1000 or stat == "N/A" or stat == 0 %}
+        {% if stat is None or stat == 1000 or stat == "N/A" or stat == 0 or stat == '0.0000' %}
             -
         {% else %}
             {{ stat }}

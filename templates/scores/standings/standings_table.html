@@ -2,16 +2,18 @@
     <div class="w-full mb-10 justify-center items-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
         <div class="flex w-full p-1">
             <div class="inline-flex flex-grow">
-                <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">{{ division.name }}</h3>
+                <h3 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">{{ division }}</h3>
             </div>
+            {% if division.area_avg_rating > 0 %}
             <div class="inline-flex flex-shrink">
                 <p class="tk-rustica text-slate-400 text-right text-sm md:text-base p-2 leading-6">
                     Avg Rating: <span class="text-slate-300 text-base md:text-lg">{{ division.area_avg_rating|floatformat:'4' }}</span>
                 </p>
             </div>
+            {% endif %}
         </div>
         <div class="w-full overflow-x-scroll">
-            <table id="area{{ division.area.number }}Standings" class="p-1 w-full">
+            <table id="div{{ division.id }}Standings" class="p-1 w-full">
                 <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
                     <tr>
                         <th scope="col" class="p-2 font-light">Team</th>
@@ -22,8 +24,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for team in team_standings|dictsortreversed:'points' %}
-                        {% if team.division.first.id == division.id %}
+                    {% for team in teams|dictsortreversed:"total_points" %}
+                        {% if team.team_div == division.id %}
                             <tr class="bg-slate-700 text-slate-200 border-b border-slate-800 hover:bg-slate-700/50">
                                 <td class="p-2 text-sm font-bold text-right border-r border-slate-800">
                                     <div class="flex flex-row flex-nowrap w-full justify-between items-center">
@@ -39,13 +41,12 @@
                                 </td>
                                 {% for season_week in season.num_weeks_regular_season %}
                                     <td class="p-2 text-sm text-center">
-                                        {% regroup team_standings by week as scores_list %}
-                                        {% for week in scores_list %}
-                                            xr{% if season_week == week.week %}{{ week.points }}{% endif %}
+                                        {% for score in team.scores %}
+                                            {% if season_week == score.week %}{{ score.points }}{% endif %}
                                         {% endfor %}
                                     </td>
                                 {% endfor %}
-                                <td class="p-2 text-sm font-bold text-center border-l border-slate-800">{{ team.points }}</td>
+                                <td class="p-2 text-sm font-bold text-center border-l border-slate-800">{{ team.total_points }}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}
