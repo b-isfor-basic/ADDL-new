@@ -24,7 +24,7 @@ class PlayerStatsManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .prefetch_related("team__set", "playerscoresummary_set")
+            .prefetch_related("team__set", "scoresummary_set")
         )
 
 

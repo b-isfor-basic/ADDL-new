@@ -30,7 +30,6 @@ class ScoreSummaryAdmin(admin.ModelAdmin):
         "player__first_name",
         "player__last_name",
     ]
-    autocomplete_fields = ["player", "team"]
 
     @admin.display(empty_value="None")
     def singles_weekly_ppd(self, obj):

@@ -6,7 +6,6 @@ from django.db.models import (
     Avg,
     Case,
     Count,
-    Expression,
     ExpressionWrapper,
     F,
     Max,
@@ -19,7 +18,7 @@ from django.db.models import (
     When,
     Window,
 )
-from django.db.models.functions import DenseRank, Least, Ln
+from django.db.models.functions import DenseRank, Least, Ln, Greatest, Coalesce
 from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqual
 
 
@@ -116,19 +115,22 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             )
         )
 
-    def rating(self):
-        from Members.models import Team
+    def rating(self, *args, **kwargs):
+        from Schedule.models import Season
+        season = kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
+
+        base_qs = self.prefetch_related('match__week__season', 'player__last_name').filter(match__week__season=season)
 
         ppd_qs = Subquery(
-            self.average_ppd().filter(player=OuterRef("player")).values("avg_ppd")
+            base_qs.average_ppd().filter(player=OuterRef("player")).values("avg_ppd")
         )
         win_pct_qs = Subquery(
-            self.win_percentage()
+            base_qs.win_percentage()
             .filter(player=OuterRef("player"))
             .values("win_percentage")
         )
         spg_qs = Subquery(
-            self.average_stars_per_game()
+            base_qs.average_stars_per_game()
             .filter(player=OuterRef("player"))
             .values("avg_spg")
         )
@@ -147,13 +149,12 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
                 avg_stars_per_game=spg_qs,
             )
             .annotate(
-                rating_score=ExpressionWrapper(
+                rating_score=Greatest(ExpressionWrapper(
                     (Ln(Avg("avg_ppd")) * 3.5)
                     + (Avg("win_percentage") * 8.0)
-                    + (Avg("avg_stars_per_game") * 5.0),
-                    output_field=models.DecimalField(),
-                ),
-                rating=Case(
+                    + (Avg("avg_stars_per_game") * 5.0), output_field=models.DecimalField()),
+                Value(0.0), output_field=models.DecimalField()),
+                rating=Coalesce(Case(
                     When(LessThanOrEqual(F("rating_score"), 10.50), then=Value("E")),
                     When(LessThan(F("rating_score"), 12.20), then=Value("D")),
                     When(LessThan(F("rating_score"), 15.40), then=Value("C")),
@@ -162,7 +163,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
                     When(
                         GreaterThanOrEqual(F("rating_score"), 22.50), then=Value("AA")
                     ),
-                ),
+                ), Value(""))
             )
         )
 
