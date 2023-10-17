@@ -59,9 +59,9 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
     season_list = get_latest_seasons(qty)
     active_divisions = Division.details.filter(season=season.id).get_average_rating(season=season.id)
     division_set = active_divisions
-    teams = Team.stats.prefetch_related('players__last_name', 'scoresummary_set').filter(season=season.id)
+    teams = Team.stats.prefetch_related('players__last_name', 'scoresummary_set', 'scoresummary__match__week__season', 'division').filter(season=season.id)
     player_stats = (
-        ScoreSummary.stats.prefetch_related('player__last_name', 'team__players').filter(match__week__season=season.id)
+        ScoreSummary.stats.prefetch_related('player__last_name', 'player__first_name', 'match__week__season', 'player__teams', 'team__players').filter(match__week__season=season.id)
     )
     team_stats = (
         teams.stats(season=season.id)
