@@ -118,11 +118,11 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
                 win_percentage=win_pct_qs,
                 avg_stars_per_game=spg_qs,
             )
-        ).values('player').distinct().annotate(
-                rating_score=ExpressionWrapper(
-                    (Ln(F("avg_ppd")) * 3.5)
+        ).values('player', 'player__first_name', 'player__last_name').distinct().annotate(
+                rating_score=
+                    ((Ln(F("avg_ppd")) * 3.5)
                     + (F("win_percentage") * 8.0)
-                    + (F("avg_stars_per_game") * 5.0), output_field=models.FloatField(default=0.0)),
+                    + (F("avg_stars_per_game") * 5.0)),
                 rating=Coalesce(Case(
                     When(LessThanOrEqual(F("rating_score"), 10.50), then=Value("E")),
                     When(LessThan(F("rating_score"), 12.20), then=Value("D")),
