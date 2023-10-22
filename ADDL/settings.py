@@ -18,7 +18,7 @@ if "SECRET_KEY" in os.environ:
 # Generally avoid wildcards(*). However since Heroku router provides hostname validation it is ok
 if IS_HEROKU:
     ALLOWED_HOSTS = ["*"]
-    CSRF_TRUSTED_ORIGINS = ["https://*.addl.app", "https://addl-portal.herokuapp.com"]
+    CSRF_TRUSTED_ORIGINS = ["https://www.addl.app", "https://addl-portal.herokuapp.com"]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
