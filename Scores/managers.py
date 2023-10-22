@@ -16,8 +16,13 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Least, Ln, Coalesce
-from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqual
+from django.db.models.functions import Least, Ln, Coalesce, Greatest
+from django.db.models.lookups import (
+    GreaterThanOrEqual,
+    LessThan,
+    LessThanOrEqual,
+    Exact,
+)
 
 
 class PlayerScoreSummaryQuerySet(models.QuerySet):
@@ -105,49 +110,40 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
         )
 
-        base_qs = (
-            self.prefetch_related(
-                "match__week__season",
-                "player__first_name",
-                "player__last_name",
-                "team__division",
-            )
-            .filter(match__week__season=season)
-        )
-
-        ppd_qs = Subquery(base_qs.filter(player=OuterRef("player")).values("player").average_ppd().values("avg_ppd"))
-        win_pct_qs = Subquery(base_qs.filter(player=OuterRef("player")).values("player").win_percentage().values("win_percentage"))
-        spg_qs = Subquery(base_qs.filter(player=OuterRef("player")).values("player").average_stars_per_game().values("avg_spg"))
-
         return (
-            base_qs.annotate(
-                avg_ppd=ppd_qs,
-                win_percentage=win_pct_qs,
-                avg_stars_per_game=spg_qs,
-            )
-            .values("player", first_name=F("player__first_name"), last_name=F("player__last_name"))
-            .distinct()
+            self.values("player")
             .annotate(
-                rating_score=(
-                    (Ln(F("avg_ppd")) * 3.5)
-                    + (F("win_percentage") * 8.0)
-                    + (F("avg_stars_per_game") * 5.0)
+                ppd=ExpressionWrapper(
+                    (Value(501.0) * Value(2) - F("score_left1") - F("score_left2"))
+                    / (F("darts_thrown1") + F("darts_thrown2")),
+                    output_field=models.FloatField(),
                 ),
-                rating=Coalesce(
-                    Case(
-                        When(
-                            LessThanOrEqual(F("rating_score"), 10.50), then=Value("E")
-                        ),
-                        When(LessThan(F("rating_score"), 12.20), then=Value("D")),
-                        When(LessThan(F("rating_score"), 15.40), then=Value("C")),
-                        When(LessThan(F("rating_score"), 18.80), then=Value("B")),
-                        When(LessThan(F("rating_score"), 22.50), then=Value("A")),
-                        When(
-                            GreaterThanOrEqual(F("rating_score"), 22.50),
-                            then=Value("AA"),
-                        ),
+                num_games=(Count("match_id", distinct=True) * 10.0),
+            )
+            .values("player",first_name=F('player__first_name'), last_name=F('player__last_name'))
+            .annotate(
+                avg_ppd=Avg(F("ppd")),
+                win_pct=(Sum("singles_points") + Sum("doubles_points"))
+                / F("num_games"),
+                avg_stars_per_game=Sum("total_stars") / F("num_games"),
+            ).annotate(
+                rating_score=Greatest(
+                    (Ln(F("avg_ppd")) * 3.5)
+                    + (F("win_pct") * 8.0)
+                    + (F("avg_stars_per_game") * 5.0),
+                    Value(0.0),
+                ),
+                rating=Case(
+                    When(Exact(F("rating_score"), 0.0), then=Value("")),
+                    When(LessThanOrEqual(F("rating_score"), 10.50), then=Value("E")),
+                    When(LessThan(F("rating_score"), 12.20), then=Value("D")),
+                    When(LessThan(F("rating_score"), 15.40), then=Value("C")),
+                    When(LessThan(F("rating_score"), 18.80), then=Value("B")),
+                    When(LessThan(F("rating_score"), 22.50), then=Value("A")),
+                    When(
+                        GreaterThanOrEqual(F("rating_score"), 22.50),
+                        then=Value("AA"),
                     ),
-                    Value(""),
                 ),
             )
         )
@@ -188,8 +184,6 @@ class PlayerScoreSummaryManager(
             .filter(*args, **kwargs)
             .select_related("player", "team")
             .prefetch_related(
-                "player__last_name",
-                "player__first_name",
                 "match__week__season",
                 "player__teams",
             )
