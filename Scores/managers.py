@@ -126,6 +126,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
                 avg_stars_per_game=spg_qs,
             )
             .values("player", "player__first_name", "player__last_name")
+            .distinct()
             .annotate(
                 rating_score=(
                     (Ln(F("avg_ppd")) * 3.5)
