@@ -26,7 +26,7 @@ class Player(AbstractUser):
     phoneNumber = PhoneNumberField("Phone Number", blank=True)
 
     objects = models.Manager()
-    stats = PlayerStatsManager()
+    # stats = PlayerStatsManager()
 
     class Meta:
         verbose_name = "player"
@@ -36,13 +36,13 @@ class Player(AbstractUser):
     def __str__(self):
         return str(self.get_full_name())
 
-    def create(self, *args, **kwargs):
-        pw = (
-            kwargs.get("password")
-            if "password" in kwargs
-            else self.set_unusable_password()
-        )
-        return super().create(password=pw, *args, **kwargs)
+    # def create(self, *args, **kwargs):
+    #     pw = (
+    #         kwargs.get("password")
+    #         if "password" in kwargs
+    #         else self.set_unusable_password()
+    #     )
+    #     return super().create(password=pw, *args, **kwargs)
 
 
 class Team(models.Model):

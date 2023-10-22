@@ -118,7 +118,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
                 win_percentage=win_pct_qs,
                 avg_stars_per_game=spg_qs,
             )
-        ).values('player').annotate(
+        ).values('player').distinct().annotate(
                 rating_score=ExpressionWrapper(
                     (Ln(F("avg_ppd")) * 3.5)
                     + (F("win_percentage") * 8.0)
