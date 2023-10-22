@@ -113,18 +113,19 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
         return (
             self.values("player")
             .annotate(
-                num_games=(Count("match_id", distinct=True) * 10.0),
+                total_darts_thrown = Sum('darts_thrown1') + Sum('darts_thrown2'),
+                total_score_left = Sum('score_left1') + Sum('score_left2'),
+                num_games=(Count("match_id", distinct=True)),
             )
             .values("player",first_name=F('player__first_name'), last_name=F('player__last_name'))
             .annotate(
-                    avg_ppd=Avg(
-                    (Value(501.0) * Value(2) - F("score_left1") - F("score_left2"))
-                    / (F("darts_thrown1") + F("darts_thrown2")),
-                    output_field=models.FloatField(),
-                ),
-                win_pct=(Sum("singles_points") + Sum("doubles_points"))
-                / F("num_games"),
-                avg_stars_per_game=Sum("total_stars") / F("num_games"),
+                    avg_ppd=ExpressionWrapper(
+                        ((Value(1001.0) * F('num_games')) - F("total_score_left")) / F("total_darts_thrown"),
+                        output_field=models.FloatField(),
+                    ),
+                    win_pct=(Sum("singles_points") + Sum("doubles_points"))
+                        / (F("num_games") * Value(10.0)),
+                    avg_stars_per_game=Sum("total_stars") / (F("num_games") * Value(10.0)),
             ).annotate(
                 rating_score=Greatest(
                     (Ln(F("avg_ppd")) * 3.5)

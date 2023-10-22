@@ -54,7 +54,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
     division_set = Division.details.filter(season=season.id)
     teams = Team.stats.filter(season=season.id)
     player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
-    player_ratings = ScoreSummary.stats.filter(match__week__season=season.id).rating()
+    player_ratings = ScoreSummary.stats.filter(match__week__season=season.id).rating(season=season.id)
     team_stats = teams.stats(season=season.id)
     team_standings = teams.weekly_points(season=season.id)
 
@@ -74,7 +74,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
         "player_stats": player_stats,
         "team_stats": team_stats,
         "team_standings": team_standings.values(),
-        "player_ratings": player_ratings.values(),
+        "player_ratings": player_ratings,
     }
     return render(request, template, context)
 
