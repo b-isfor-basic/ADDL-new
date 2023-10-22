@@ -103,31 +103,27 @@ def CreateScoreSummaryView(request, id, **kwargs):
         team_scores = TeamScoreFormSet(
             prefix="team",
             form_kwargs={"match": match},
-            queryset=TeamScoreSummary.objects.filter(match=id).order_by(
-                "match__awayTeam", "match__homeTeam"
-            ),
+            queryset=TeamScoreSummary.objects.filter(match=id)
+            .order_by("match__awayTeam", "match__homeTeam")
+            .all(),
         )
         player_scores = PlayerScoreFormSet(
             prefix="player",
             form_kwargs={"match": match},
-            queryset=ScoreSummary.objects.filter(match=id).order_by(
-                "match__awayTeam", "match__homeTeam", "scoresummary__id"
-            ),
+            queryset=ScoreSummary.objects.filter(match=id)
+            .order_by("match__awayTeam", "match__homeTeam")
+            .all(),
         )
 
     team_scores = TeamScoreFormSet(
         prefix="team",
         form_kwargs={"match": match},
-        queryset=Match.objects.get(id=id)
-        .teamscoresummary_set.all()
-        .order_by("match__awayTeam", "match__homeTeam", "teamscoresummary__id"),
+        queryset=Match.objects.get(id=id).teamscoresummary_set.all(),
     )
     player_scores = PlayerScoreFormSet(
         prefix="player",
         form_kwargs={"match": match},
-        queryset=Match.objects.get(id=id)
-        .scoresummary_set.all()
-        .order_by("match__awayTeam", "match__homeTeam", "scoresummary__id"),
+        queryset=Match.objects.get(id=id).scoresummary_set.all(),
     )
 
     if request.method == "POST":
