@@ -65,14 +65,18 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
         )
 
     def average_ppd(self):
-        return self.weekly_ppd().values("player", "player__first_name", "player__last_name").annotate(avg_ppd=Avg(F("ppd")))
+        return (
+            self.weekly_ppd()
+            .values("player", "player__first_name", "player__last_name")
+            .annotate(avg_ppd=Avg(F("ppd")))
+        )
 
     def matches_played(self):
         return self.annotate(matches_played=Count("match_id", distinct=True))
 
     def average_stars_per_game(self):
         return (
-            self.annotate(stars=Sum("total_stars",default=0))
+            self.annotate(stars=Sum("total_stars", default=0))
             .values("player", "player__first_name", "player__last_name")
             .annotate(
                 avg_spg=ExpressionWrapper(
@@ -96,21 +100,24 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
 
     def rating(self, *args, **kwargs):
         from Schedule.models import Season
-        season = kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
 
-        base_qs = self.prefetch_related('match__week__season', 'player__first_name', 'player__last_name', 'team__division').filter(match__week__season=season)
+        season = (
+            kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
+        )
 
-        ppd_qs = base_qs.average_ppd().filter(player=OuterRef("player")).values("avg_ppd")
-        win_pct_qs = (
-            base_qs.win_percentage()
-            .filter(player=OuterRef("player"))
-            .values("win_percentage")
+        base_qs = (
+            self.prefetch_related(
+                "match__week__season",
+                "player__first_name",
+                "player__last_name",
+                "team__division",
+            )
+            .filter(match__week__season=season)
         )
-        spg_qs = (
-            base_qs.average_stars_per_game()
-            .filter(player=OuterRef("player"))
-            .values("avg_spg")
-        )
+
+        ppd_qs = Subquery(base_qs.filter(player=OuterRef("player")).values("player").average_ppd().values("avg_ppd"))
+        win_pct_qs = Subquery(base_qs.filter(player=OuterRef("player")).values("player").win_percentage().values("win_percentage"))
+        spg_qs = Subquery(base_qs.filter(player=OuterRef("player")).values("player").average_stars_per_game().values("avg_spg"))
 
         return (
             base_qs.annotate(
@@ -118,22 +125,31 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
                 win_percentage=win_pct_qs,
                 avg_stars_per_game=spg_qs,
             )
-        ).values('player', 'player__first_name', 'player__last_name').distinct().annotate(
-                rating_score=
-                    ((Ln(F("avg_ppd")) * 3.5)
+            .values("player", "player__first_name", "player__last_name")
+            .annotate(
+                rating_score=(
+                    (Ln(F("avg_ppd")) * 3.5)
                     + (F("win_percentage") * 8.0)
-                    + (F("avg_stars_per_game") * 5.0)),
-                rating=Coalesce(Case(
-                    When(LessThanOrEqual(F("rating_score"), 10.50), then=Value("E")),
-                    When(LessThan(F("rating_score"), 12.20), then=Value("D")),
-                    When(LessThan(F("rating_score"), 15.40), then=Value("C")),
-                    When(LessThan(F("rating_score"), 18.80), then=Value("B")),
-                    When(LessThan(F("rating_score"), 22.50), then=Value("A")),
-                    When(
-                        GreaterThanOrEqual(F("rating_score"), 22.50), then=Value("AA")
+                    + (F("avg_stars_per_game") * 5.0)
+                ),
+                rating=Coalesce(
+                    Case(
+                        When(
+                            LessThanOrEqual(F("rating_score"), 10.50), then=Value("E")
+                        ),
+                        When(LessThan(F("rating_score"), 12.20), then=Value("D")),
+                        When(LessThan(F("rating_score"), 15.40), then=Value("C")),
+                        When(LessThan(F("rating_score"), 18.80), then=Value("B")),
+                        When(LessThan(F("rating_score"), 22.50), then=Value("A")),
+                        When(
+                            GreaterThanOrEqual(F("rating_score"), 22.50),
+                            then=Value("AA"),
+                        ),
                     ),
-                ), Value(""))
+                    Value(""),
+                ),
             )
+        )
 
     def avg_points_per_match(self):
         return (
@@ -153,19 +169,30 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
 
     def best_week_ppd(self):
         return (
-            self.weekly_ppd().group_by_players()
+            self.weekly_ppd()
+            .group_by_players()
             .annotate(
                 best_week_singles_ppd=Max("ppd"),
             )
         )
 
 
-class PlayerScoreSummaryManager(models.Manager.from_queryset(PlayerScoreSummaryQuerySet)):
+class PlayerScoreSummaryManager(
+    models.Manager.from_queryset(PlayerScoreSummaryQuerySet)
+):
     def get_queryset(self, *args, **kwargs):
-        return (super().get_queryset()
+        return (
+            super()
+            .get_queryset()
             .filter(*args, **kwargs)
             .select_related("player", "team")
-        .prefetch_related('player__last_name', 'player__first_name', 'match__week__season', 'player__teams'))
+            .prefetch_related(
+                "player__last_name",
+                "player__first_name",
+                "match__week__season",
+                "player__teams",
+            )
+        )
 
     def _adjusted_player_pts(self, team_total_pts, player_total_points):
         return round(player_total_points * 11 / team_total_pts)
@@ -243,7 +270,7 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
         )
 
     def weekly_doubles_ppd(self):
-        return self.filter(Q(darts_thrown1__gte=1)&Q(darts_thrown2__gte=1)).annotate(
+        return self.filter(Q(darts_thrown1__gte=1) & Q(darts_thrown2__gte=1)).annotate(
             weekly_doubles_ppd=(
                 ((501.0 * 2) - (F("score_left1") + F("score_left2")))
                 / (F("darts_thrown1") + F("darts_thrown2"))
@@ -252,13 +279,10 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
 
     def avg_doubles_ppd(self):
         return (
-            (
-                self.weekly_doubles_ppd()
-                .values("team")
-                .annotate(avg_doubles_ppd=Avg(F("weekly_doubles_ppd")))
-            )
-            .with_names()
-        )
+            self.weekly_doubles_ppd()
+            .values("team")
+            .annotate(avg_doubles_ppd=Avg(F("weekly_doubles_ppd")))
+        ).with_names()
 
     def best_501_game(self):
         return (
@@ -275,23 +299,31 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
 
     def best_week_doubles_ppd(self):
         return (
-            (
-                self.weekly_doubles_ppd()
-                .values("team")
-                .annotate(best_week_doubles_ppd=Max(F("weekly_doubles_ppd")))
-            )
-            .with_names()
-        )
+            self.weekly_doubles_ppd()
+            .values("team")
+            .annotate(best_week_doubles_ppd=Max(F("weekly_doubles_ppd")))
+        ).with_names()
 
     def team_rating(self, season):
         from Scores.models import ScoreSummary
+
         # Get player ratings for subquery expression
-        ratings = ScoreSummary.stats.filter(match__week__season=season).rating().values('team','rating_score').annotate(team_rating=Avg(F('rating_score'), filter=Q(player__in=OuterRef('team__players'), default=0.0)))
+        ratings = (
+            ScoreSummary.stats.filter(match__week__season=season)
+            .rating()
+            .values("team", "rating_score")
+            .annotate(
+                team_rating=Avg(
+                    F("rating_score"),
+                    filter=Q(player__in=OuterRef("team__players"), default=0.0),
+                )
+            )
+        )
         return (
             self.with_names()
             .values("team", "team__division", "team_name")
             .annotate(
-                rating_score=Avg(ratings.values('team_rating')),
+                rating_score=Avg(ratings.values("team_rating")),
                 rating=Case(
                     When(LessThanOrEqual(F("rating_score"), 10.50), then=Value("E")),
                     When(LessThan(F("rating_score"), 12.20), then=Value("D")),
@@ -309,19 +341,18 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
         from Scores.models import ScoreSummary
 
         pts = (
-            ScoreSummary.stats.select_related('team').prefetch_related('match__week__season').filter(match__week__season=season, team=OuterRef("team"))
+            ScoreSummary.stats.select_related("team")
+            .prefetch_related("match__week__season")
+            .filter(match__week__season=season, team=OuterRef("team"))
             .values("team")
-            .annotate(singles_pts=Sum("singles_points"),
-                      doubles_pts=Sum("doubles_points"))
+            .annotate(
+                singles_pts=Sum("singles_points"), doubles_pts=Sum("doubles_points")
+            )
             .annotate(total_pts=F("singles_pts") + F("doubles_pts"))
         )
 
-        return (
-            self
-            .values("team")
-            .annotate(
-                points=Subquery(pts.values("total_pts")),
-            )
+        return self.values("team").annotate(
+            points=Subquery(pts.values("total_pts")),
         )
 
 
