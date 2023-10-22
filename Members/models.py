@@ -25,7 +25,7 @@ class Player(AbstractUser):
 
     phoneNumber = PhoneNumberField("Phone Number", blank=True)
 
-    objects = models.Manager()
+    # objects = models.Manager()
     # stats = PlayerStatsManager()
 
     class Meta:
