@@ -69,17 +69,12 @@ class TeamStatsQuerySet(models.QuerySet):
             kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
         )
         ratings = (
-            ScoreSummary.stats.filter(match__week__season=season)
-            .rating()
-            .values("team", "player")
-            .annotate(rating_score=F("rating_score"))
+            ScoreSummary.stats.filter(match__week__season=season).rating(season=season)
         )
-
+        
         return self.annotate(
             team_rating_score=Avg(
-                ratings.filter(team=OuterRef("id"))
-                .filter(player__in=OuterRef("players"))
-                .values("rating_score")
+                ratings.filter(player__in=OuterRef('players')).values('rating_score'), default=0.0
             ),
             team_rating=Case(
                 When(LessThanOrEqual(F("team_rating_score"), 10.50), then=Value("E")),
@@ -194,7 +189,7 @@ class TeamStatsQuerySet(models.QuerySet):
                     .values("avg_doubles_ppd")
                 ),
                 Value(0.0),
-                output_field=models.DecimalField(decimal_places=4, max_digits=6),
+                output_field=models.FloatField(),
             ),
             best_week_ppd=Greatest(
                 Subquery(
@@ -203,7 +198,7 @@ class TeamStatsQuerySet(models.QuerySet):
                     .values("best_week_ppd")
                 ),
                 Value(0.0),
-                output_field=models.DecimalField(decimal_places=4, max_digits=6),
+                output_field=models.FloatField(),
             ),
             team_rating_score=Greatest(
                 Subquery(
@@ -212,7 +207,7 @@ class TeamStatsQuerySet(models.QuerySet):
                     .values("team_rating_score")
                 ),
                 Value(0.0),
-                output_field=models.DecimalField(decimal_places=4, max_digits=6),
+                output_field=models.FloatField(),
             ),
             team_rating=Coalesce(
                 Subquery(
@@ -229,7 +224,7 @@ class TeamStatsQuerySet(models.QuerySet):
         )
 
 
-class TeamStatsManager(models.Manager):
+class TeamStatsManager(models.Manager.from_queryset(TeamStatsQuerySet)):
     def get_queryset(self):
         return (
             super()

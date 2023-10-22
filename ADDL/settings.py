@@ -18,6 +18,7 @@ if "SECRET_KEY" in os.environ:
 # Generally avoid wildcards(*). However since Heroku router provides hostname validation it is ok
 if IS_HEROKU:
     ALLOWED_HOSTS = ["*"]
+    CSRF_TRUSTED_ORIGINS = ["addl.app", "addl-portal.herokuapp.com"]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
@@ -28,6 +29,7 @@ if not IS_HEROKU:
 # Application definition
 INSTALLED_APPS = [
     # Django included packages
+    "debug_toolbar",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -40,7 +42,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_extensions",
     "phonenumber_field",
-    "recurrence",
     "smart_selects",
     # Created packages
     "Members.apps.MembersConfig",
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -222,9 +224,9 @@ sentry_sdk.init(
         ),
     ],
     _experiments={
-        "profiles_sample_rate": 0.5,
+        "profiles_sample_rate": 0.2,
     },
-    max_breadcrumbs=50,
+    max_breadcrumbs=10,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
@@ -239,3 +241,10 @@ sentry_sdk.init(
 
 # Smart Selects Settings
 USE_DJANGO_JQUERY = True
+
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

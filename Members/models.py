@@ -6,9 +6,9 @@ from django_extensions.db.models import TimeStampedModel
 from smart_selects.db_fields import ChainedForeignKey, ChainedManyToManyField
 
 from .managers import (
+    PlayerStatsManager,
     RegistrationManager,
     TeamDetailsManager,
-    TeamStatsQuerySet,
     TeamStatsManager,
 )
 
@@ -24,6 +24,9 @@ class Player(AbstractUser):
     """
 
     phoneNumber = PhoneNumberField("Phone Number", blank=True)
+
+    objects = models.Manager()
+    stats = PlayerStatsManager()
 
     class Meta:
         verbose_name = "player"
@@ -69,7 +72,7 @@ class Team(models.Model):
 
     objects = models.Manager()
     details = TeamDetailsManager()
-    stats = TeamStatsManager().from_queryset(TeamStatsQuerySet)()
+    stats = TeamStatsManager()
 
     def get_matches(self, season="Season.objects.latest()", *args, **kwargs):
         """

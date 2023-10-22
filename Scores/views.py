@@ -1,13 +1,10 @@
-from typing import Any
-from django import http
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from django.forms import all_valid, modelformset_factory
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, resolve_url
-from django.views.decorators.http import require_GET, require_safe
-from django.views.generic import UpdateView, TemplateView
+from django.shortcuts import render
+from django.views.decorators.http import require_GET
 
 from Members.models import Player, Team
 from Locations.models import Division
@@ -42,10 +39,6 @@ def get_latest_seasons(start=None, end=None, qty=None):
     return Season.objects.all()[start:end]
 
 
-def get_division_filter(season=LATEST_SEASON):
-    return season.divisions(manager="details").all()
-
-
 @require_GET
 def StandingsView(request, season_number=None, division_id=None, qty=None, **kwargs):
     """
@@ -57,24 +50,19 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
 
     season = get_season(season_number)
     season_list = get_latest_seasons(qty)
-    active_divisions = Division.details.filter(season=season.id).get_average_rating(season=season.id)
-    division_set = active_divisions
-    teams = Team.stats.prefetch_related('players__last_name', 'scoresummary_set', 'scoresummary__match__week__season', 'division').filter(season=season.id)
-    player_stats = (
-        ScoreSummary.stats.filter(match__week__season=season.id)
-    )
-    team_stats = (
-        teams.stats(season=season.id)
-    )
-    team_standings = (
-        teams.weekly_points(season=season.id)
-    )
+    active_divisions = season.divisions.all()
+    division_set = Division.details.filter(season=season.id)
+    teams = Team.stats.filter(season=season.id)
+    player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
+    team_stats = teams.stats(season=season.id)
+    team_standings = teams.weekly_points(season=season.id)
 
     if division_id is not None:
-        division_set = active_divisions.filter(id=division_id)
+        division_set = division_set.filter(id=division_id)
         player_stats = player_stats.filter(match__week__division=division_id)
-        team_stats = team_stats.filter(division__id__contains=division_id)
-        team_standings = team_standings.filter(division__id__contains=division_id)
+        teams = teams.filter(division__id=division_id)
+        team_stats = team_stats.filter(division__id=division_id)
+        team_standings = team_standings.filter(division__id=division_id)
 
     context = {
         "season": season,
@@ -83,7 +71,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
         "division_set": division_set,
         "player_stats": player_stats,
         "team_stats": team_stats,
-        "team_standings": team_standings.values()
+        "team_standings": team_standings.values(),
     }
     return render(request, template, context)
 
@@ -112,27 +100,31 @@ def CreateScoreSummaryView(request, id, **kwargs):
         team_scores = TeamScoreFormSet(
             prefix="team",
             form_kwargs={"match": match},
-            queryset=TeamScoreSummary.objects.filter(match=id)
-            .order_by("match__awayTeam", "match__homeTeam")
-            .all(),
+            queryset=TeamScoreSummary.objects.filter(match=id).order_by(
+                "match__awayTeam", "match__homeTeam"
+            ),
         )
         player_scores = PlayerScoreFormSet(
             prefix="player",
             form_kwargs={"match": match},
-            queryset=ScoreSummary.objects.filter(match=id)
-            .order_by("match__awayTeam", "match__homeTeam")
-            .all(),
+            queryset=ScoreSummary.objects.filter(match=id).order_by(
+                "match__awayTeam", "match__homeTeam", "scoresummary__id"
+            ),
         )
 
     team_scores = TeamScoreFormSet(
         prefix="team",
         form_kwargs={"match": match},
-        queryset=Match.objects.get(id=id).teamscoresummary_set.all(),
+        queryset=Match.objects.get(id=id)
+        .teamscoresummary_set.all()
+        .order_by("match__awayTeam", "match__homeTeam", "teamscoresummary__id"),
     )
     player_scores = PlayerScoreFormSet(
         prefix="player",
         form_kwargs={"match": match},
-        queryset=Match.objects.get(id=id).scoresummary_set.all(),
+        queryset=Match.objects.get(id=id)
+        .scoresummary_set.all()
+        .order_by("match__awayTeam", "match__homeTeam", "scoresummary__id"),
     )
 
     if request.method == "POST":

@@ -1,6 +1,5 @@
 from math import floor
 
-from django.contrib.postgres.aggregates import StringAgg
 from django.db import IntegrityError, models
 from django.db.models import (
     Avg,
@@ -16,9 +15,8 @@ from django.db.models import (
     Sum,
     Value,
     When,
-    Window,
 )
-from django.db.models.functions import DenseRank, Least, Ln, Greatest, Coalesce
+from django.db.models.functions import Least, Ln, Coalesce
 from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqual
 
 
@@ -34,25 +32,6 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             singles_pts=Sum("singles_points", default=0),
             doubles_pts=Sum("doubles_points", default=0),
         ).annotate(points=(F("singles_pts") + F("doubles_pts")))
-
-    def wins_by_team(self):
-        from Members.models import Team
-
-        return (
-            self
-            .annotate(
-                team_name=Team.details.filter(pk=OuterRef("team")).values("team_name")
-            ).values('team__division', 'team', 'team_name').total_wins()
-        )
-
-    def get_standings(self):
-        from Members.models import Team
-
-        return self.total_wins().annotate(
-            team_name=Team.details.filter(pk=OuterRef("team")).values("team_name"),
-            division=F("team__division"),
-            week=F("match__week__week_number"),
-        )
 
     def total_stars(self):
         return self.annotate(
@@ -81,7 +60,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             ppd=ExpressionWrapper(
                 (Value(501.0) * Value(2) - F("score_left1") - F("score_left2"))
                 / (F("darts_thrown1") + F("darts_thrown2")),
-                output_field=models.DecimalField(),
+                output_field=models.FloatField(),
             )
         )
 
@@ -98,7 +77,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             .annotate(
                 avg_spg=ExpressionWrapper(
                     F("stars") / (Count("match_id", distinct=True) * 10.0),
-                    output_field=models.DecimalField(),
+                    output_field=models.FloatField(),
                 )
             )
         )
@@ -110,7 +89,7 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
             .annotate(
                 win_percentage=ExpressionWrapper(
                     F("points") / (Count("match_id", distinct=True) * 10.0),
-                    output_field=models.DecimalField(),
+                    output_field=models.FloatField(),
                 ),
             )
         )
@@ -119,41 +98,31 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
         from Schedule.models import Season
         season = kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
 
-        base_qs = self.prefetch_related('match__week__season', 'player__last_name').filter(match__week__season=season)
+        base_qs = self.prefetch_related('match__week__season', 'player__first_name', 'player__last_name', 'team__division').filter(match__week__season=season)
 
-        ppd_qs = Subquery(
-            base_qs.average_ppd().filter(player=OuterRef("player")).values("avg_ppd")
-        )
-        win_pct_qs = Subquery(
+        ppd_qs = base_qs.average_ppd().filter(player=OuterRef("player")).values("avg_ppd")
+        win_pct_qs = (
             base_qs.win_percentage()
             .filter(player=OuterRef("player"))
             .values("win_percentage")
         )
-        spg_qs = Subquery(
+        spg_qs = (
             base_qs.average_stars_per_game()
             .filter(player=OuterRef("player"))
             .values("avg_spg")
         )
 
         return (
-            self.values(
-                "team__division",
-                "team",
-                "player",
-                "player__first_name",
-                "player__last_name",
-            )
-            .annotate(
+            base_qs.annotate(
                 avg_ppd=ppd_qs,
                 win_percentage=win_pct_qs,
                 avg_stars_per_game=spg_qs,
             )
-            .annotate(
-                rating_score=Greatest(ExpressionWrapper(
-                    (Ln(Avg("avg_ppd")) * 3.5)
-                    + (Avg("win_percentage") * 8.0)
-                    + (Avg("avg_stars_per_game") * 5.0), output_field=models.DecimalField()),
-                Value(0.0), output_field=models.DecimalField()),
+        ).values('player').annotate(
+                rating_score=ExpressionWrapper(
+                    (Ln(F("avg_ppd")) * 3.5)
+                    + (F("win_percentage") * 8.0)
+                    + (F("avg_stars_per_game") * 5.0), output_field=models.FloatField(default=0.0)),
                 rating=Coalesce(Case(
                     When(LessThanOrEqual(F("rating_score"), 10.50), then=Value("E")),
                     When(LessThan(F("rating_score"), 12.20), then=Value("D")),
@@ -165,7 +134,6 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
                     ),
                 ), Value(""))
             )
-        )
 
     def avg_points_per_match(self):
         return (
@@ -197,7 +165,7 @@ class PlayerScoreSummaryManager(models.Manager.from_queryset(PlayerScoreSummaryQ
         return (super().get_queryset()
             .filter(*args, **kwargs)
             .select_related("player", "team")
-        .prefetch_related('player__last_name', 'player__first_name', 'match__week__season', 'player__teams', 'team__players'))
+        .prefetch_related('player__last_name', 'player__first_name', 'match__week__season', 'player__teams'))
 
     def _adjusted_player_pts(self, team_total_pts, player_total_points):
         return round(player_total_points * 11 / team_total_pts)
@@ -341,7 +309,7 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
         from Scores.models import ScoreSummary
 
         pts = (
-            ScoreSummary.stats.filter(match__week__season=season, team=OuterRef("team"))
+            ScoreSummary.stats.select_related('team').prefetch_related('match__week__season').filter(match__week__season=season, team=OuterRef("team"))
             .values("team")
             .annotate(singles_pts=Sum("singles_points"),
                       doubles_pts=Sum("doubles_points"))
@@ -353,7 +321,7 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
             .values("team")
             .annotate(
                 points=Subquery(pts.values("total_pts")),
-            ).with_names().distinct("team")
+            )
         )
 
 
@@ -362,7 +330,7 @@ class TeamScoreSummaryManager(models.Manager.from_queryset(TeamScoreSummaryQuery
         return (
             TeamScoreSummaryQuerySet(self.model, using=self._db)
             .select_related("team")
-            .prefetch_related("team__players__last_name", "match__week__season")
+            .prefetch_related("team__players", "team__division", "match__week__season")
         )
 
 
