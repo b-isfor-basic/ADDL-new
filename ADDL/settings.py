@@ -82,6 +82,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "ADDL.wsgi.application"
+MAX_CONN_AGE = 0 if IS_HEROKU else 60
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
