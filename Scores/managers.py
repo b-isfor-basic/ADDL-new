@@ -113,16 +113,15 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
         return (
             self.values("player")
             .annotate(
-                ppd=ExpressionWrapper(
-                    (Value(501.0) * Value(2) - F("score_left1") - F("score_left2"))
-                    / (F("darts_thrown1") + F("darts_thrown2")),
-                    output_field=models.FloatField(),
-                ),
                 num_games=(Count("match_id", distinct=True) * 10.0),
             )
             .values("player",first_name=F('player__first_name'), last_name=F('player__last_name'))
             .annotate(
-                avg_ppd=Avg(F("ppd")),
+                    avg_ppd=Avg(
+                    (Value(501.0) * Value(2) - F("score_left1") - F("score_left2"))
+                    / (F("darts_thrown1") + F("darts_thrown2")),
+                    output_field=models.FloatField(),
+                ),
                 win_pct=(Sum("singles_points") + Sum("doubles_points"))
                 / F("num_games"),
                 avg_stars_per_game=Sum("total_stars") / F("num_games"),
