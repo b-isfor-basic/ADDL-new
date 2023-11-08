@@ -3,11 +3,11 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from django.forms import all_valid, modelformset_factory
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, resolve_url
-from django.views.generic import UpdateView
-from django.views.decorators.http import require_safe, require_GET, require_POST
+from django.shortcuts import render
+from django.views.decorators.http import require_GET
 
 from Members.models import Player, Team
+from Locations.models import Division
 from Schedule.models import Match, Season
 from Scores.forms import (
     BasePlayerScoreFormSet,
@@ -17,47 +17,26 @@ from Scores.forms import (
 )
 from Scores.models import ScoreSummary, TeamScoreSummary
 
-if Season.objects.exists():
-    LATEST_SEASON = Season.objects.latest("match_play_start_dt").season_number
+
+LATEST_SEASON = "Season.objects.latest().season_number"
 
 
-def get_season(season_number=None):
+def get_season(season_number):
     if season_number is None:
         season_number = LATEST_SEASON
 
     return Season.objects.get(season_number=season_number)
 
 
-def get_latest_seasons(qty=None):
+def get_latest_seasons(start=None, end=None, qty=None):
     if qty is None:
         qty = 5
 
-    return Season.objects.all()[:qty]
+    if start is None:
+        start = 0
+    end = start + qty
 
-
-def get_division_filter(season=None):
-    if season is None:
-        season = LATEST_SEASON
-
-    return season.divisions(manager="details").get_average_rating(season.season_number)
-
-
-def PlayerSearchView(request, **kwargs):
-    template = "scores/partials/player_search.html"
-
-    if "player" in request.GET.keys():
-        qs = request.GET.get("player")
-        object_list = Player.objects.filter(
-            Q(first_name__icontains=qs)
-            | Q(last_name__icontains=qs)
-            | Q(username__icontains=qs)
-            | Q(email__icontains=qs)
-        ).values("id", "first_name", "last_name", "username", "email")
-
-        context = {"object_list": object_list}
-        return render(request, template, context)
-    else:
-        return None
+    return Season.objects.all()[start:end]
 
 
 @require_GET
@@ -71,23 +50,21 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
 
     season = get_season(season_number)
     season_list = get_latest_seasons(qty)
-    active_divisions = (
-        season.divisions(manager="details").get_average_rating(season_number).all()
-    )
-
+    active_divisions = season.divisions.all()
+    division_set = Division.details.filter(season=season.id)
+    teams = Team.stats.filter(season=season.id)
     player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
-    team_stats = Team.stats.stats(q=Q(match__week__season=season.id)).filter(
-        season=season.id
-    )
-    team_standings = Team.stats.weekly_points().filter(season=season.id)
-
-    division_set = get_division_filter(season)
+    player_ratings = ScoreSummary.stats.filter(match__week__season=season.id).rating(season=season.id)
+    team_stats = teams.stats(season=season.id)
+    team_standings = teams.weekly_points(season=season.id)
 
     if division_id is not None:
         division_set = division_set.filter(id=division_id)
-        player_stats = player_stats.filter(match__week__division_id=division_id)
-        team_stats = team_stats.filter(division=division_id)
-        team_standings = team_standings.filter(division=division_id)
+        player_stats = player_stats.filter(match__week__division=division_id)
+        teams = teams.filter(division__id=division_id)
+        team_stats = team_stats.filter(division__id=division_id)
+        team_standings = team_standings.filter(division__id=division_id)
+        player_ratings = player_ratings.filter(match__week__division=division_id)
 
     context = {
         "season": season,
@@ -96,7 +73,8 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
         "division_set": division_set,
         "player_stats": player_stats,
         "team_stats": team_stats,
-        "team_standings": team_standings,
+        "team_standings": team_standings.values(),
+        "player_ratings": player_ratings,
     }
     return render(request, template, context)
 
@@ -104,6 +82,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
 # @permission_required("scores.add_scoresummary", "scores.add_teamscoresummary", "scores.add_forfeit")
 @login_required
 def CreateScoreSummaryView(request, id, **kwargs):
+    template = "scores/add_score_summary.html"
     match = Match.objects.get(id=id)
     PlayerScoreFormSet = modelformset_factory(
         ScoreSummary,
@@ -120,7 +99,21 @@ def CreateScoreSummaryView(request, id, **kwargs):
         max_num=2,
     )
 
-    template = "scores/add_score_summary.html"
+    if request.method == "GET":
+        team_scores = TeamScoreFormSet(
+            prefix="team",
+            form_kwargs={"match": match},
+            queryset=TeamScoreSummary.objects.filter(match=id)
+            .order_by("match__awayTeam", "match__homeTeam")
+            .all(),
+        )
+        player_scores = PlayerScoreFormSet(
+            prefix="player",
+            form_kwargs={"match": match},
+            queryset=ScoreSummary.objects.filter(match=id)
+            .order_by("match__awayTeam", "match__homeTeam")
+            .all(),
+        )
 
     team_scores = TeamScoreFormSet(
         prefix="team",
@@ -175,25 +168,24 @@ def CreateScoreSummaryView(request, id, **kwargs):
     return render(request, template, context)
 
 
-@permission_required(
-    "scores.update_scoresummary",
-    "scores.update_teamscoresummary",
-    "scores.update_forfeit",
-)
-@require_safe
-class EditScoreSummaryView(UpdateView):
-    model = ScoreSummary
-    template_name = "scores/edit_score_summary.html"
-    form_class = PlayerScoreSummaryForm
-    context_object_name = "score_summary"
+@permission_required("players.view_player")
+def PlayerSearchView(request, **kwargs):
+    template = "scores/partials/player_search.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+    try:
+        q = request.GET.get(**kwargs)["P", "q"]
+        qs = Player.objects.filter(
+            Q(first_name__icontains=q)
+            | Q(last_name__icontains=q)
+            | Q(username__icontains=q)
+            | Q(email__icontains=q)
+        ).values("id", "first_name", "last_name", "username", "email")
 
-    def get_success_url(self):
-        return resolve_url(
-            "scores:view_scores", kwargs={"id": self.object.id, "success": "true"}
+        context = {"players": qs}
+        return render(request, template, context)
+    except:
+        return Player.objects.all().values(
+            "id", "first_name", "last_name", "username", "email"
         )
 
 

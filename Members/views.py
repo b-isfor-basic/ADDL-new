@@ -9,8 +9,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render
 from django.views.generic import CreateView
 
-from .forms import PlayerCreationForm
-from .models import Player
+from Members.forms import PlayerCreationForm
+from Members.models import Player
 
 
 class SuccessMessageMixin(SuccessMessageMixin):
