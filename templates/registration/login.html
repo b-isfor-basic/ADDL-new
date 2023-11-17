@@ -1,76 +1,99 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
-{% block title %}Login{% endblock title %}
+{% block title %}
+  Login
+{% endblock title %}
 
 {% block headerScripts %}
-<script defer src="{% static './js/htmx.min.js' %}"></script>
+  <script defer src="{% static './js/htmx.min.js' %}"></script>
 {% endblock headerScripts %}
 
 {% block content %}
-<div class="w-full md:w-1/2 min-h-fit max-h-max mt-8 space-y-2 justify-center items-center rounded-lg p-4 shadow-xl bg-slate-700 shadow-slate-900/30">
-
-  <h2 class="tk-rustica place-self-start text-left text-2xl md:text-2xl font-bold text-amber-400 uppercase">Login</h2>
-  <div id="card_body">
-  
-    <form class="flex flex-col space-y-4 w-full justify-center items-center" id="login-form" method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    
-    {% if form.non_field_errors %}
-      <div class="m-4 relative justify-end align-end ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-900/30">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="absolute -top-2 -left-2 fill-slate-800 stroke-rose-300 h-5 w-5 flex-none">
-          <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
-        </svg>
-        <strong class="text-rose-300 font-semibold">Error!</strong>
-        <span class="text-rose-300">{{ form.non_field_errors }}</span>
+  <div class="w-full md:w-1/2 min-h-fit max-h-max mt-8 space-y-2 justify-center items-center rounded-lg p-4 shadow-xl bg-slate-700 shadow-slate-900/30">
+    <h2 class="tk-rustica place-self-start text-left text-2xl md:text-2xl font-bold text-amber-400 uppercase">Login</h2>
+    <div id="card_body">
+      <form class="flex flex-col space-y-4 w-full justify-center items-center"
+            id="login-form"
+            method="post"
+            action="{% url 'login' %}">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="m-4 relative justify-end align-end ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-900/30">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24"
+                 fill="currentColor"
+                 class="absolute -top-2 -left-2 fill-slate-800 stroke-rose-300 h-5 w-5 flex-none">
+              <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
+            </svg>
+            <strong class="text-rose-300 font-semibold">Error!</strong>
+            <span class="text-rose-300">{{ form.non_field_errors }}</span>
+          </div>
+        {% endif %}
+        <div class="w-full my-2 rounded-full items-center justify-center bg-slate-800/50 shadow-slate-900/30 shadow-inner">
+          <div class="flex items-center w-full">
+            <div class="text-amber-400 px-2 items-center">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   viewBox="0 0 24 24"
+                   fill="currentColor"
+                   class="w-6 h-6">
+                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <input type="text"
+                   name="username"
+                   id="id_username"
+                   class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent focus:ring-inset"
+                   placeholder="username"
+                   required="">
+          </input>
+        </div>
       </div>
-  {% endif %}  
-  
       <div class="w-full my-2 rounded-full items-center justify-center bg-slate-800/50 shadow-slate-900/30 shadow-inner">
         <div class="flex items-center w-full">
           <div class="text-amber-400 px-2 items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-              <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 20 20"
+                 fill="currentColor"
+                 class="w-6 h-6">
+              <path fill-rule="evenodd" d="M8 7a5 5 0 113.61 4.804l-1.903 1.903A1 1 0 019 14H8v1a1 1 0 01-1 1H6v1a1 1 0 01-1 1H3a1 1 0 01-1-1v-2a1 1 0 01.293-.707L8.196 8.39A5.002 5.002 0 018 7zm5-3a.75.75 0 000 1.5A1.5 1.5 0 0114.5 7 .75.75 0 0016 7a3 3 0 00-3-3z" clip-rule="evenodd" />
             </svg>
           </div>
-          <input type="text" name="username" id="id_username" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent focus:ring-inset" placeholder="username" required=""></input>
-        </div>
+          <input type="password"
+                 name="password"
+                 id="id_password"
+                 class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent focus:ring-inset"
+                 placeholder="password"
+                 required="">
+        </input>
       </div>
-      <div class="w-full my-2 rounded-full items-center justify-center bg-slate-800/50 shadow-slate-900/30 shadow-inner">
-        <div class="flex items-center w-full">
-          <div class="text-amber-400 px-2 items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
-              <path fill-rule="evenodd" d="M8 7a5 5 0 113.61 4.804l-1.903 1.903A1 1 0 019 14H8v1a1 1 0 01-1 1H6v1a1 1 0 01-1 1H3a1 1 0 01-1-1v-2a1 1 0 01.293-.707L8.196 8.39A5.002 5.002 0 018 7zm5-3a.75.75 0 000 1.5A1.5 1.5 0 0114.5 7 .75.75 0 0016 7a3 3 0 00-3-3z" clip-rule="evenodd" />
-            </svg>            
-          </div>
-          <input type="password" name="password" id="id_password" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent focus:ring-inset" placeholder="password" required=""></input>
-        </div>
-      </div>
-      
-      <div class="w-full p-2">
-        <button class="p-1 my-4 w-full bg-slate-800 shadow-inner shadow-slate-900/40 ring-1 ring-slate-900/30 rounded-lg text-amber-400 font-semibold tk-rustica uppercase border border-amber-400 hover:bg-amber-900/60 hover:ease-in-out hover:duration-500" type="submit">
-          <span class="text-amber-400">
-            Submit
-          </span>
-        </button>
-      </div>
-    </form>
-    
-    <div class="flex flex-row justify-around text-blue-400 text-center">
-      <button type="button" hx-get="{% url 'password_reset' %}" hx-target="#card_body" hx-swap="innerHTML" class="appearance-none hover:text-amber-400 hover:underline">Forgot Password?</button>
-      <a href="{% url 'register' %}" class=" hover:text-amber-400 hover:underline">Register New Player</a>
     </div>
+    <div class="w-full p-2">
+      <button class="p-1 my-4 w-full bg-slate-800 shadow-inner shadow-slate-900/40 ring-1 ring-slate-900/30 rounded-lg text-amber-400 font-semibold tk-rustica uppercase border border-amber-400 hover:bg-amber-900/60 hover:ease-in-out hover:duration-500"
+              type="submit">
+        <span class="text-amber-400">Submit</span>
+      </button>
+    </div>
+  </form>
+  <div class="flex flex-row justify-around text-blue-400 text-center">
+    <button type="button"
+            hx-get="{% url 'password_reset' %}"
+            hx-target="#card_body"
+            hx-swap="innerHTML"
+            class="appearance-none hover:text-amber-400 hover:underline">Forgot Password?</button>
+    <a href="{% url 'register' %}"
+       class="hover:text-amber-400 hover:underline">Register New Player</a>
   </div>
 </div>
 </div>
 </div>
-{% endblock %}
+</div>
+{% endblock content %}
 
 {% block footerScripts %}
-<script>
+  <script>
   document.body.addEventListener('htmx:configRequest', (event) => {
     event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
   })
-</script>
+  </script>
 {% endblock footerScripts %}

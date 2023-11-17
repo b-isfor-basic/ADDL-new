@@ -19,7 +19,6 @@ from .managers import (
 )
 
 
-
 class Forfeit(TimeStampedModel, models.Model):
     """
     A forfeit for a match.
@@ -32,7 +31,12 @@ class Forfeit(TimeStampedModel, models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.ForeignKey(Match, on_delete=models.CASCADE, db_index=True)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, db_index=True)
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.CASCADE,
+        db_index=True,
+        limit_choices_to={"match__awayTeam": "team", "match__homeTeam": "team"},
+    )
 
     objects = models.Manager()
     details = ForfeitManager()
@@ -139,16 +143,6 @@ class ScoreSummary(TimeStampedModel, models.Model):
     def weekly_ppd(self):
         if self.darts_thrown1 is None and self.darts_thrown2 is None:
             return None
-        elif self.darts_thrown1 is None:
-            self.darts_thrown1 = 50
-        elif self.darts_thrown2 is None:
-            self.darts_thrown2 = 50
-        elif self.score_left1 is None:
-            self.darts_thrown1 = 50
-            self.score_left1 = 2
-        elif self.score_left2 is None:
-            self.darts_thrown2 = 50
-            self.score_left2 = 2
         elif self.darts_thrown1 is None:
             self.darts_thrown1 = 50
         elif self.darts_thrown2 is None:

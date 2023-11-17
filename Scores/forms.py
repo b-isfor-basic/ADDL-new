@@ -12,15 +12,14 @@ CLASS_ATTRS = "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 bg
 
 
 class BaseTeamScoreFormSet(forms.BaseModelFormSet):
-
     def get_form_kwargs(self, index):
-        #from Schedule.models import Match
+        # from Schedule.models import Match
 
         kwargs = super().get_form_kwargs(index)
         match = kwargs.pop("match")
-        #match = Match.objects.get(id=match_id)
+        # match = Match.objects.get(id=match_id)
         if index < 1:
-            if match.teamscoresummary_set.exists():
+            if match.teamscoresummary_set.filter(team=match.awayTeam).exists():
                 pk = match.teamscoresummary_set.filter(team=match.awayTeam)[0].id
             else:
                 pk = None
@@ -31,7 +30,7 @@ class BaseTeamScoreFormSet(forms.BaseModelFormSet):
                 }
             )
         else:
-            if match.teamscoresummary_set.exists():
+            if match.teamscoresummary_set.filter(team=match.homeTeam).exists():
                 pk = match.teamscoresummary_set.filter(team=match.homeTeam)[0].id
             else:
                 pk = None
@@ -42,21 +41,20 @@ class BaseTeamScoreFormSet(forms.BaseModelFormSet):
                 }
             )
         return kwargs
-    
 
     def clean(self):
         """
         Verify that only one team has 0 score left for each game.
         """
         cleaned_data = super().clean()
-        
+
         pts_left = []
         for form in self.forms:
-            forfeit = form.cleaned_data.get('mark_as_forfeit')
+            forfeit = form.cleaned_data.get("mark_as_forfeit")
             score_left1 = form.cleaned_data.get("score_left1")
             score_left2 = form.cleaned_data.get("score_left2")
             team_pts_left = [score_left1, score_left2]
-            pts_left.append(team_pts_left)                
+            pts_left.append(team_pts_left)
 
         for i in list(range(0, 2)):
             if forfeit:
@@ -118,7 +116,7 @@ class TeamScoreSummaryForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        if cleaned_data.get('mark_as_forfeit'):
+        if cleaned_data.get("mark_as_forfeit"):
             match = cleaned_data.get("match")
             team = cleaned_data.get("team")
             Forfeit.details.create(match=match, team=team)
@@ -141,7 +139,7 @@ class BasePlayerScoreFormSet(forms.BaseModelFormSet):
         match = kwargs.pop("match")
         # match = Match.objects.get(id=match_id)
         if index < 2:
-            if match.scoresummary_set.exists():
+            if match.scoresummary_set.filter(team=match.awayTeam).exists():
                 qs = match.scoresummary_set.filter(team=match.awayTeam)
                 player = qs[index].player.id
                 pk = qs[index].id
@@ -161,7 +159,7 @@ class BasePlayerScoreFormSet(forms.BaseModelFormSet):
             )
         else:
             player_num = index - 2
-            if match.scoresummary_set.exists():
+            if match.scoresummary_set.filter(team=match.homeTeam).exists():
                 qs = match.scoresummary_set.filter(team=match.homeTeam)
                 player = qs[player_num].player.id
                 pk = qs[player_num].id
@@ -191,8 +189,16 @@ class BasePlayerScoreFormSet(forms.BaseModelFormSet):
         doubles_pts = []
         total_points = 0
         for form in self.forms:
-            singles = form.cleaned_data.get("singles_points")
-            doubles = form.cleaned_data.get("doubles_points")
+            singles = (
+                form.cleaned_data.get("singles_points")
+                if form.cleaned_data.get("singles_points")
+                else 0
+            )
+            doubles = (
+                form.cleaned_data.get("doubles_points")
+                if form.cleaned_data.get("doubles_points")
+                else 0
+            )
             total_points += singles
             total_points += doubles
             doubles_pts.append(doubles)
@@ -308,6 +314,13 @@ class PlayerScoreSummaryForm(forms.ModelForm):
                     "Invalid score. Perfects = 3 Stars. Please add 3 Stars to the total Stars per Perfect."
                 )
 
+    def substitute_check(self, team, player):
+        """Checks that the player is not a substitute."""
+        if player in team.players.all():
+            return
+        else:
+            self.data["is_"]
+
     def clean(self):
         """
         Clean the form and verify that total_perfects is not greater than total_stars.
@@ -327,47 +340,3 @@ class PlayerScoreSummaryForm(forms.ModelForm):
             return
 
         return cleaned_data
-
-
-# Old score entry forms. Kept for reference.
-#
-#  class ScoresetForm(forms.ModelForm):
-#     class Meta:
-#         model = Scoreset
-#         fields = ["player"]
-#         widgets = {"player": forms.widgets.Input()}
-
-
-# class GameScoreForm(forms.ModelForm):
-#     class Meta:
-#         model = GameScore
-#         fields = [
-#             "stars",
-#             "perfects",
-#             "game_point",
-#             "in_thrown",
-#             "out_thrown",
-#             "darts_thrown",
-#             "score_left",
-#         ]
-#         widgets = {
-#             "stars": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-left", "placeholder": "stars"}
-#             ),
-#             "perfects": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-center", "placeholder": "perfects"}
-#             ),
-#             "in_thrown": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-center", "placeholder": "in"}
-#             ),
-#             "out_thrown": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-center", "placeholder": "out"}
-#             ),
-#             "darts_thrown": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-center", "placeholder": "thrown"}
-#             ),
-#             "score_left": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-right", "placeholder": "left"}
-#             ),
-#             "game_point": forms.widgets.NumberInput(),
-#         }
