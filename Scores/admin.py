@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ScoreDetail, ScoreSummary, TeamScoreSummary
+from .models import Forfeit, ScoreDetail, ScoreSummary, TeamScoreSummary
 
 
 @admin.register(ScoreSummary)
@@ -60,21 +60,33 @@ class TeamScoreSummaryAdmin(admin.ModelAdmin):
         "team",
         "weekly_ppd",
     ]
-    
+
     @admin.display(empty_value="None")
     def weekly_ppd(self, obj):
         return obj.get_weekly_ppd
 
 
-#@admin.register(Forfeit)
-#class ForfeitAdmin(admin.ModelAdmin):
-#    list_filter = [
-#        "match__week__season",
-#        "match__week__division",
-#        "match__week__week_number",
-#    ]
-#    list_display = [
-#        "week__season",
-#
-#        "team",
-#    ]
+@admin.register(Forfeit)
+class ForfeitAdmin(admin.ModelAdmin):
+    list_filter = [
+        "match__week__season",
+        "match__week__division",
+        "match__week__week_number",
+    ]
+
+    @admin.display(empty_value="None")
+    def season(self, obj):
+        return obj.match.week.season
+
+    @admin.display(empty_value="None")
+    def division(self, obj):
+        return obj.match.week.division
+
+    @admin.display(empty_value="None")
+    def week(self, obj):
+        return obj.match.week.week_number
+
+    list_display = [
+        "match",
+        "team",
+    ]

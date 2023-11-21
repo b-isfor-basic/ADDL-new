@@ -42,7 +42,7 @@
                                 {% for season_week in season.num_weeks_regular_season %}
                                     <td class="p-2 text-sm text-center">
                                         {% for score in team.scores %}
-                                            {% if season_week == score.week %}{{ score.points }}{% endif %}
+                                            {% if season_week == score.week %}{% if score.points >= 0 %} {{ score.points }} {% elif score.points < 0 %} F {% endif %}{% endif %}
                                         {% endfor %}
                                     </td>
                                 {% endfor %}

@@ -21,11 +21,7 @@ from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqu
 
 class PlayerStatsManager(models.Manager):
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .prefetch_related("team__set", "scoresummary_set")
-        )
+        return super().get_queryset().prefetch_related("team__set", "scoresummary_set")
 
 
 class TeamStatsQuerySet(models.QuerySet):
@@ -68,13 +64,14 @@ class TeamStatsQuerySet(models.QuerySet):
         season = (
             kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
         )
-        ratings = (
-            ScoreSummary.stats.filter(match__week__season=season).rating(season=season)
+        ratings = ScoreSummary.stats.filter(match__week__season=season).rating(
+            season=season
         )
-        
+
         return self.annotate(
             team_rating_score=Avg(
-                ratings.filter(player__in=OuterRef('players')).values('rating_score'), default=0.0
+                ratings.filter(player__in=OuterRef("players")).values("rating_score"),
+                default=0.0,
             ),
             team_rating=Case(
                 When(LessThanOrEqual(F("team_rating_score"), 10.50), then=Value("E")),
@@ -112,7 +109,7 @@ class TeamStatsQuerySet(models.QuerySet):
         )
 
     def weekly_points(self, *args, **kwargs):
-        from Schedule.models import Season
+        from Schedule.models import Season, Match
         from Scores.models import ScoreSummary
 
         season = (
@@ -123,13 +120,37 @@ class TeamStatsQuerySet(models.QuerySet):
         pts_qs = self.total_points(season=season).values("id", "total_points")
 
         scores = (
-            ScoreSummary.objects.filter(team=OuterRef("id"), match__week__season=season)
-            .values(week=F("match__week__week_number"))
-            .annotate(
-                weekly_pts=Sum("singles_points", filter=Q(match__week__season=season))
-                + Sum("doubles_points", filter=Q(match__week__season=season))
+            Match.objects.filter(
+                Q(awayTeam=OuterRef("id")) | Q(homeTeam=OuterRef("id")),
+                week__season=season,
             )
-            .values(json=JSONObject(week=F("week"), points=F("weekly_pts")))
+            .values(week_num=F("week__week_number"))
+            .annotate(
+                weekly_pts=Case(
+                    When(forfeit__team=OuterRef("id"), then=Value(-1)),
+                    When(
+                        scoresummary__team=OuterRef("id"),
+                        then=(
+                            Sum(
+                                "scoresummary__singles_points",
+                                filter=Q(
+                                    week__season=season,
+                                    scoresummary__team=OuterRef("id"),
+                                ),
+                            )
+                            + Sum(
+                                "scoresummary__doubles_points",
+                                filter=Q(
+                                    week__season=season,
+                                    scoresummary__team=OuterRef("id"),
+                                ),
+                            )
+                        ),
+                    ),
+                    default=None,
+                )
+            )
+            .values(json=JSONObject(week=F("week_num"), points=F("weekly_pts")))
         )
 
         return (
@@ -244,8 +265,8 @@ class TeamDetailsManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .select_related('players', 'division', 'season')
-            .prefetch_related('players__scoresummary_set', 'players__last_name')
+            .select_related("players", "division", "season")
+            .prefetch_related("players__scoresummary_set", "players__last_name")
             .annotate(
                 players_names=ArrayAgg("players__last_name"),
                 team_name=Concat(
