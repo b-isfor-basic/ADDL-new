@@ -39,7 +39,7 @@
                                         <a href="{% url 'add_scoresheet' match.id %}"
                                         {% if match.status == "Missing" %}
                                             class="text-sm mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase">
-                                            <span class="text-xs text-cyan-400 underline underline-offset-1">ENTER</span>
+                                            <span class="text-xs text-amber-400 underline underline-offset-1 hover:text-cyan-300">ENTER</span>
                                         {% else %}
                                            class="group mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase hover:ring-1
                                                   {% if "Home" in match.status %}
