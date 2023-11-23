@@ -157,7 +157,7 @@ def CreateScoreSummaryView(request, id, **kwargs):
                 )
                 return HttpResponseRedirect("/schedule/")
             else:
-                all_valid(team_scores, player_scores)
+                all_valid([team_scores, player_scores])
                 player_scores.save()
                 team_scores.save()
                 messages.add_message(
