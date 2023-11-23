@@ -29,5 +29,5 @@ class DivisionAdmin(admin.ModelAdmin):
     list_display = [
         "area",
         "matchNight",
-        "divisionManager",
+        "division_manager",
     ]

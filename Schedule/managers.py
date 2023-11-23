@@ -1,61 +1,101 @@
+from collections.abc import Iterable, Sequence
 from datetime import datetime as dt
 from datetime import timedelta
 
 from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import Case, F, Manager, OuterRef, Q, Subquery, Sum, Value, When
+from django.db.models import (
+    Case,
+    Count,
+    F,
+    Manager,
+    Max,
+    OuterRef,
+    Q,
+    QuerySet,
+    Subquery,
+    Sum,
+    Value,
+    When,
+    FloatField,
+    ExpressionWrapper,
+)
 from django.db.models.functions import JSONObject
 from django.db.models.lookups import GreaterThan, Exact
 from django.utils import timezone
 
 
 class ScheduleManager(Manager):
-    # TODO: This is not functional yet. Needs to be revised.
-    def create(self, season):
-        from .models import Match, Season
+    pass
 
-        season = Season.objects.get(pk=season)
-        divisions = season.divisions.all()
-        start_dt = season.match_play_start_dt
-        end_dt = season.match_play_end_dt
 
-        def get_weeks(start_dt, end_dt, season, division):
-            match_night = dt.strptime(division.matchNight, "%A").weekday()
-            start_dt = dt.date(start_dt) + timedelta(
-                days=match_night.weekday() - start_dt.weekday()
-            )
-            weeks = []
-            week_number = 1
-            current_dt = dt.date(start_dt)
-            print(match_night, start_dt, end_dt, weeks)
-            while dt.date(current_dt) <= dt.date(end_dt):
-                weeks.append(
-                    super().create(
-                        week=week_number,
-                        date=dt.date(current_dt),
-                        season=season,
-                        division=division,
+class MatchQuerySet(QuerySet):
+    def weekly_ppd(self, group):
+        if group == "player":
+            table = "scoresummary"
+        elif group == "team":
+            table = "teamscoresummary"
+        return (
+            self.values(party=F(f"{table}__{group}"), week_num=F("week__week_number"))
+            .annotate(
+                ppd=ExpressionWrapper(
+                    (
+                        Value(501.0) * Value(2)
+                        - F(f"{table}__score_left1")
+                        - F(f"{table}__score_left2")
                     )
+                    / (F(f"{table}__darts_thrown1") + F(f"{table}__darts_thrown2")),
+                    output_field=FloatField(),
                 )
-                current_dt += timedelta(days=7)
-                week_number += 1
-            return weeks
+            )
+            .filter(ppd__isnull=False)
+        )
 
-        for division in divisions:
-            if division.scheduleweek_set.filter(season=season).exists():
-                return print(f"Schedule for {season} and {division} already exists.")
-            weeks = get_weeks(start_dt, end_dt, season, division)
-            for week in weeks:
-                week.save()
+    def average_ppd(self, group):
+        return (
+            self.weekly_ppd(group)
+            .values("party")
+            .annotate(avg_ppd=Sum("ppd") / Count("week_num"))
+        )
+
+    def best_ppd(self, group):
+        return self.weekly_ppd(group).values("party").annotate(best_ppd=Max("ppd"))
+
+    def total_points(self, group):
+        q = f"scoresummary__{group}"
+        return (
+            self.values(q)
+            .annotate(
+                singles_wins=Sum("scoresummary__singles_points", default=0),
+                doubles_wins=Sum("scoresummary__doubles_points", default=0),
+            )
+            .annotate(
+                total_points=F("singles_wins") + F("doubles_wins"),
+            )
+        )
+
+    def weekly_points_by_division(self):
+        return (
+            self.values("week__division", "week__week_number", "scoresummary__team")
+            .annotate(
+                points=Sum("scoresummary__singles_points", default=0)
+                + Sum("scoresummary__doubles_points", default=0)
+            )
+            .order_by("week__division", "week__week_number")
+        )
 
 
-class MatchManager(Manager):
+class MatchManager(Manager.from_queryset(MatchQuerySet)):
     def get_queryset(self):
         return (
             super()
             .get_queryset()
-            .select_related("awayTeam", "homeTeam")
+            .select_related("awayTeam", "homeTeam", "week")
             .prefetch_related(
-                "scoresummary_set", "awayTeam__players", "homeTeam__players"
+                "scoresummary_set",
+                "awayTeam__players",
+                "homeTeam__players",
+                "week__season",
+                "teamscoresummary_set",
             )
         )
 
@@ -110,6 +150,14 @@ class MatchManager(Manager):
             ),
         ).annotate(
             status=Case(
+                When(
+                    Exact(F("forfeit__team"), F("homeTeam")),
+                    then=Value('Away <span class="pl-1 text-rose-400 text-xs align-center text-center">F</span>'),
+                ),
+                When(
+                    Exact(F("forfeit__team"), F("awayTeam")),
+                    then=Value('Home <span class="pl-1 text-rose-400 text-xs align-center text-center">F</span>'),
+                ),
                 When(
                     Exact(F("home_score"), 0) & Exact(F("away_score"), 0),
                     then=Value("Missing"),

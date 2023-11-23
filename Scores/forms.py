@@ -1,18 +1,25 @@
+import uuid
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import Avg
 
 from Members.models import Player
 from Scores.models import Forfeit, ScoreSummary, TeamScoreSummary
 
-CLASS_ATTRS = "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200  bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+CLASS_ATTRS = "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+
 
 class BaseTeamScoreFormSet(forms.BaseModelFormSet):
     def get_form_kwargs(self, index):
+        # from Schedule.models import Match
+
         kwargs = super().get_form_kwargs(index)
         match = kwargs.pop("match")
+        # match = Match.objects.get(id=match_id)
         if index < 1:
-            if match.teamscoresummary_set.exists():
+            if match.teamscoresummary_set.filter(team=match.awayTeam).exists():
                 pk = match.teamscoresummary_set.filter(team=match.awayTeam)[0].id
             else:
                 pk = None
@@ -23,7 +30,7 @@ class BaseTeamScoreFormSet(forms.BaseModelFormSet):
                 }
             )
         else:
-            if match.teamscoresummary_set.exists():
+            if match.teamscoresummary_set.filter(team=match.homeTeam).exists():
                 pk = match.teamscoresummary_set.filter(team=match.homeTeam)[0].id
             else:
                 pk = None
@@ -43,17 +50,26 @@ class BaseTeamScoreFormSet(forms.BaseModelFormSet):
 
         pts_left = []
         for form in self.forms:
+            forfeit = form.cleaned_data.get("mark_as_forfeit")
             score_left1 = form.cleaned_data.get("score_left1")
             score_left2 = form.cleaned_data.get("score_left2")
             team_pts_left = [score_left1, score_left2]
             pts_left.append(team_pts_left)
 
         for i in list(range(0, 2)):
-            if pts_left[0][i] == pts_left[1][i]:
+            if forfeit:
+                break
+            elif pts_left[0][i] == 0 and pts_left[1][i] == 0:
                 raise forms.ValidationError(
                     f"Invalid score for Doubles 501 - Game {str(i+1)}. \
-                        Both teams cannot have the same score left. If the \
-                        value is unknown, the winning team should enter 0 \
+                        Both teams cannot have 0 score left. If the value \
+                        is unknown, the winning team should enter 0 and \
+                        the losing team should enter 2."
+                )
+            elif pts_left[0][i] == pts_left[1][i]:
+                raise forms.ValidationError(
+                    f"You must declare a winner for Doubles 501 - Game {str(i+1)} by setting at least one team's Score Left to 0. \
+                        If the value is unknown, the winning team should enter 0 \
                         and the losing team should enter 2."
                 )
 
@@ -61,7 +77,7 @@ class BaseTeamScoreFormSet(forms.BaseModelFormSet):
             return
 
         return cleaned_data
-    
+
 
 class TeamScoreSummaryForm(forms.ModelForm):
     """
@@ -98,35 +114,32 @@ class TeamScoreSummaryForm(forms.ModelForm):
         }
 
     def clean(self):
-        """
-        Verify if the match is being marked as a forfeit.
-        """
         cleaned_data = super().clean()
 
-        forfeit = cleaned_data.get("mark_as_forfeit")
-        if forfeit:
-            record = Forfeit.objects.create(
-                match=cleaned_data.get("match"),
-                team=cleaned_data.get("team"),
-            )
-            record.save()
-            return record
-
-        if any(self.errors):
-            return
-
-        return cleaned_data
+        if cleaned_data.get("mark_as_forfeit"):
+            match = cleaned_data.get("match")
+            team = cleaned_data.get("team")
+            Forfeit.details.create(match=match, team=team)
+            return cleaned_data
 
 
 class BasePlayerScoreFormSet(forms.BaseModelFormSet):
     def get_queryset(self):
-        return super().get_queryset().select_related("player", "team", "match").order_by("match__awayTeam", "match__homeTeam")
+        return (
+            super()
+            .get_queryset()
+            .select_related("player", "team", "match")
+            .order_by("match__awayTeam", "match__homeTeam")
+        )
 
     def get_form_kwargs(self, index):
+        # from Schedule.models import Match
+
         kwargs = super().get_form_kwargs(index)
         match = kwargs.pop("match")
+        # match = Match.objects.get(id=match_id)
         if index < 2:
-            if match.scoresummary_set.exists():
+            if match.scoresummary_set.filter(team=match.awayTeam).exists():
                 qs = match.scoresummary_set.filter(team=match.awayTeam)
                 player = qs[index].player.id
                 pk = qs[index].id
@@ -136,12 +149,17 @@ class BasePlayerScoreFormSet(forms.BaseModelFormSet):
             kwargs.update(
                 {
                     "prefix": f"away-player-{index}",
-                    "initial": {"pk": pk, "match": match.id, "team": match.awayTeam, "player": player},
+                    "initial": {
+                        "pk": pk,
+                        "match": match.id,
+                        "team": match.awayTeam,
+                        "player": player,
+                    },
                 }
             )
         else:
             player_num = index - 2
-            if match.scoresummary_set.exists():
+            if match.scoresummary_set.filter(team=match.homeTeam).exists():
                 qs = match.scoresummary_set.filter(team=match.homeTeam)
                 player = qs[player_num].player.id
                 pk = qs[player_num].id
@@ -151,7 +169,12 @@ class BasePlayerScoreFormSet(forms.BaseModelFormSet):
             kwargs.update(
                 {
                     "prefix": f"home-player-{player_num}",
-                    "initial": {"pk": pk, "match": match.id, "team": match.homeTeam, "player": player},
+                    "initial": {
+                        "pk": pk,
+                        "match": match.id,
+                        "team": match.homeTeam,
+                        "player": player,
+                    },
                 }
             )
         return kwargs
@@ -166,13 +189,17 @@ class BasePlayerScoreFormSet(forms.BaseModelFormSet):
         doubles_pts = []
         total_points = 0
         for form in self.forms:
-            singles = form.cleaned_data.get("singles_points")
-            doubles = form.cleaned_data.get("doubles_points")
-            if singles is None:
-                singles = 0
-            if doubles is None:
-                doubles = 0
-            total_points += singles 
+            singles = (
+                form.cleaned_data.get("singles_points")
+                if form.cleaned_data.get("singles_points")
+                else 0
+            )
+            doubles = (
+                form.cleaned_data.get("doubles_points")
+                if form.cleaned_data.get("doubles_points")
+                else 0
+            )
+            total_points += singles
             total_points += doubles
             doubles_pts.append(doubles)
 
@@ -243,7 +270,9 @@ class PlayerScoreSummaryForm(forms.ModelForm):
                     "x-ref": "select",
                     ":value": " selectedPlayer() ",
                 },
-                choices=Player.objects.all().values_list("id", "first_name", "last_name").order_by("first_name", "last_name"),
+                choices=Player.objects.all()
+                .values_list("id", "first_name", "last_name")
+                .order_by("first_name", "last_name"),
             ),
         }
 
@@ -255,7 +284,7 @@ class PlayerScoreSummaryForm(forms.ModelForm):
                 "class": CLASS_ATTRS,
                 "x-ref": "firstName",
             }
-        )
+        ),
     )
     last_name = forms.CharField(
         required=False,
@@ -264,11 +293,11 @@ class PlayerScoreSummaryForm(forms.ModelForm):
                 "class": CLASS_ATTRS,
                 "x-ref": "lastName",
             }
-        )
+        ),
     )
 
     def total_points_check(self, singles_points=0, doubles_points=0):
-        ''' Checks that the total points for the player does not exceed 10.'''
+        """Checks that the total points for the player does not exceed 10."""
 
         if singles_points | doubles_points:
             if singles_points + doubles_points > 10:
@@ -277,13 +306,20 @@ class PlayerScoreSummaryForm(forms.ModelForm):
                 )
 
     def perfects_check(self, total_perfects=0, total_stars=0):
-        '''Checks that there are at least 3 stars per perfect'''
+        """Checks that there are at least 3 stars per perfect"""
 
         if total_perfects is not None:
             if total_perfects * 3 > total_stars:
                 raise forms.ValidationError(
                     "Invalid score. Perfects = 3 Stars. Please add 3 Stars to the total Stars per Perfect."
                 )
+
+    def substitute_check(self, team, player):
+        """Checks that the player is not a substitute."""
+        if player in team.players.all():
+            return
+        else:
+            self.data["is_"]
 
     def clean(self):
         """
@@ -304,47 +340,3 @@ class PlayerScoreSummaryForm(forms.ModelForm):
             return
 
         return cleaned_data
-
-
-# Old score entry forms. Kept for reference.
-# 
-#  class ScoresetForm(forms.ModelForm):
-#     class Meta:
-#         model = Scoreset
-#         fields = ["player"]
-#         widgets = {"player": forms.widgets.Input()}
-
-
-# class GameScoreForm(forms.ModelForm):
-#     class Meta:
-#         model = GameScore
-#         fields = [
-#             "stars",
-#             "perfects",
-#             "game_point",
-#             "in_thrown",
-#             "out_thrown",
-#             "darts_thrown",
-#             "score_left",
-#         ]
-#         widgets = {
-#             "stars": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-left", "placeholder": "stars"}
-#             ),
-#             "perfects": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-center", "placeholder": "perfects"}
-#             ),
-#             "in_thrown": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-center", "placeholder": "in"}
-#             ),
-#             "out_thrown": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-center", "placeholder": "out"}
-#             ),
-#             "darts_thrown": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-center", "placeholder": "thrown"}
-#             ),
-#             "score_left": forms.widgets.NumberInput(
-#                 attrs={"class": "ss-right", "placeholder": "left"}
-#             ),
-#             "game_point": forms.widgets.NumberInput(),
-#         }

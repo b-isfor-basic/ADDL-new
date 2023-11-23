@@ -2,7 +2,15 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .managers import TeamDetailsManager, TeamStatsManager
+from django_extensions.db.models import TimeStampedModel
+from smart_selects.db_fields import ChainedForeignKey, ChainedManyToManyField
+
+from .managers import (
+    PlayerStatsManager,
+    RegistrationManager,
+    TeamDetailsManager,
+    TeamStatsManager,
+)
 
 
 class Player(AbstractUser):
@@ -17,6 +25,9 @@ class Player(AbstractUser):
 
     phoneNumber = PhoneNumberField("Phone Number", blank=True)
 
+    # objects = models.Manager()
+    # stats = PlayerStatsManager()
+
     class Meta:
         verbose_name = "player"
         verbose_name_plural = "players"
@@ -24,6 +35,14 @@ class Player(AbstractUser):
 
     def __str__(self):
         return str(self.get_full_name())
+
+    # def create(self, *args, **kwargs):
+    #     pw = (
+    #         kwargs.get("password")
+    #         if "password" in kwargs
+    #         else self.set_unusable_password()
+    #     )
+    #     return super().create(password=pw, *args, **kwargs)
 
 
 class Team(models.Model):
@@ -43,53 +62,86 @@ class Team(models.Model):
     players = models.ManyToManyField(
         "Player", related_name="teams", max_length=2, db_index=True
     )
-    division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
-    season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
+    season = models.ManyToManyField("Schedule.Season", through="Registration")
+    division = ChainedManyToManyField(
+        chained_field="season",
+        chained_model_field="divisions",
+        to="Locations.Division",
+        through="Registration",
+    )
 
     objects = models.Manager()
     details = TeamDetailsManager()
     stats = TeamStatsManager()
 
-    def get_matches(self, *args, **kwargs):
+    def get_matches(self, season="Season.objects.latest()", *args, **kwargs):
         """
         Returns the matches for the team for the given season.
         """
         from Schedule.models import Season
 
-        if "season" in kwargs:
-            season = kwargs.get("season")
-        else:
-            season = Season.details.active()
+        season = kwargs.get("season") if "season" in kwargs else Season.details.active()
 
         matches = self.awayMatches.filter(week__season=season)
-        return matches.union(
-            self.homeMatches.filter(week__season=season).order_by("week__week_number")
+        return matches.union(self.homeMatches.filter(week__season=season)).order_by(
+            "week__week_number"
         )
 
+    def get_average_points_per_match(self, *args, **kwargs):
+        """
+        Returns the average points per match for the team for the given season.
+        """
+        from Schedule.models import Season
+
+        season = kwargs.get("season") if "season" in kwargs else Season.details.active()
+        games_played = self.teamscoresummary_set.filter(
+            match__week__season=season
+        ).count()
+        season_points = (
+            self.scoresummary_set.filter(match__week__season=season)
+            .aggregate(
+                total_points=models.Sum("singles_points") + models.Sum("doubles_points")
+            )
+            .get("total_points")
+        )
+
+        return season_points / games_played if games_played > 0 else 0
+
+    @property
     def name(self):
         plyrs = self.players.all()
         return plyrs[0].last_name + "/" + plyrs[1].last_name
 
     def __str__(self):
-        return self.name()
+        return self.name
 
 
-# class Registration(models.Model):
-#     """
-#     A registration holds a team's membership for a season. A team can have
-#     multiple registrations, but only one per season.
-#     """
-#
-#     team = models.ForeignKey("Team", models.CASCADE, db_index=True)
-#     season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
-#     division = models.ForeignKey("Locations.Division", models.CASCADE, db_index=True)
-#
-#     objects = models.Manager()
-#     details = TeamDetailsManager()
-#
+class Registration(TimeStampedModel, models.Model):
+    """
+    A registration holds a team's membership for a season. A team can have
+    multiple registrations, but only one per season.
+    """
 
-# class Team(models.Model):
-#   
-#     is_active = models.BooleanField(default=True)
-#   
-#
+    class Meta:
+        verbose_name = "Team Registration"
+        verbose_name_plural = "Team Registrations"
+        ordering = ["-season", "division", "team"]
+        unique_together = ["season", "team"]
+
+    team = models.ForeignKey(
+        to="Team", related_name="registrations", on_delete=models.CASCADE
+    )
+    season = models.ForeignKey("Schedule.Season", models.CASCADE, db_index=True)
+    division = ChainedForeignKey(
+        "Locations.division",
+        chained_field="season",
+        chained_model_field="season",
+        auto_choose=True,
+        sort=True,
+    )
+
+    objects = models.Manager()
+    details = RegistrationManager()
+
+    def __str__(self):
+        return f"{self.team} (S{self.season.season_number})"

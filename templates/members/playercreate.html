@@ -1,95 +1,158 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
-{% block title %}Registration{% endblock title %}
+{% block title %}
+  Registration
+{% endblock title %}
 
 {% block content %}
-
-<div class="w-full mt-8 p-5 justify-center align-center rounded-lg shadow-xl bg-slate-700 shadow-slate-900/30">
-  <div class="justify-items-start flex-auto">
-    <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">New Player Registration</h2>
-    <p class="pt-4 text-slate-200 text-sm">Complete the form below to create an account. Fields marked with <span class="text-rose-400">*</span> are required.</p>
-  </div>
-  <form class="justify-evenly items-center pt-4" id="new-player-form" method="post" action="{% url 'register' %}">
-        {% csrf_token %}
-  {% if form.non_field_errors %}
-    <div id="errorBox" class="m-4 relative flex justify-center items-center ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-600/10">
-      <button type="button" data-hs-remove-element="#errorBox">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="absolute -top-2 -left-2 fill-rose-900 stroke-rose-300 h-5 w-5 flex-none">
-          <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
-        </svg>
-      </button>
-      <strong class="text-rose-400 font-semibold">Error!</strong>
-      <p class="text-rose-400">{{ form.non_field_errors }}</p>
+  <div class="w-full mt-8 p-5 justify-center align-center rounded-lg shadow-xl bg-slate-700 shadow-slate-900/30">
+    <div class="justify-items-start flex-auto">
+      <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">New Player Registration</h2>
+      <p class="pt-4 text-slate-200 text-sm">
+        Complete the form below to create an account. Fields marked with <span class="text-rose-400">*</span> are required.
+      </p>
     </div>
-  {% endif %}  
-        <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 md:gap-5 align-middle items-center w-full text-slate-200 border-t border-t-slate-600 py-4">
-          <h3 class="md:col-span-1 text-amber-400 text-lg md:text-xl font-black place-self-start pb-2">Account Information</h3>
-          <div class="md:col-span-2 items-center space-y-2 md:space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div class="col-span-1">
-                <label for="{{ form.username.id_for_label }}">Username<span class="text-rose-400">*</span></label>
-                <input type="text" name="username" id="id_username" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="username" required="">
-                <span class="text-sm text-rose-400 leading-5">{{ form.username.errors }}</span>
-              </div>
-              <div class="col-span-1">
-                <label for="{{ form.email.id_for_label }}" class="text-slate-200">Email<span class="text-rose-400">*</span></label>
-                <input type="email" name="email" id="id_email" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="example@email.com" required="">
-                <span class="text-sm text-rose-400 leading-5">{{ form.email.errors }}</span>
-              </div>
-              <div class="col-span-1">
-                <label for="id_password1">Password<span class="text-rose-400">*</span></label>
-                <input type="password" name="password1" id="id_password1" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Pa$5w0rd" required="">
-                <span class="text-sm text-rose-400 leading-5">{{ form.password1.errors }}{{ form.password2.errors}}</span>
-              </div>
-              <div class="col-span-1">
-                <label for="id_password2" class="text-slate-200">Confirm Password<span class="text-rose-400">*</span></label>
-                <input type="password" name="password2" id="id_password2" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Pa$5w0rd" required="">
-              </div>
+    <form class="justify-evenly items-center pt-4"
+          id="new-player-form"
+          method="post"
+          action="{% url 'register' %}">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div id="errorBox"
+             class="m-4 relative flex justify-center items-center ml-auto w-full h-fit px-4 py-3 rounded-lg ring-1 ring-rose-300 shadow-rose-800/10 shadow-lg bg-rose-600/10">
+          <button type="button" data-hs-remove-element="#errorBox">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 20 20"
+                 fill="currentColor"
+                 class="absolute -top-2 -left-2 fill-rose-900 stroke-rose-300 h-5 w-5 flex-none">
+              <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          <strong class="text-rose-400 font-semibold">Error!</strong>
+          <p class="text-rose-400">{{ form.non_field_errors }}</p>
+        </div>
+      {% endif %}
+      <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 md:gap-5 align-middle items-center w-full text-slate-200 border-t border-t-slate-600 py-4">
+        <h3 class="md:col-span-1 text-amber-400 text-lg md:text-xl font-black place-self-start pb-2">Account Information</h3>
+        <div class="md:col-span-2 items-center space-y-2 md:space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="col-span-1">
+              <label for="{{ form.username.id_for_label }}">
+                Username<span class="text-rose-400">*</span>
+              </label>
+              <input type="text"
+                     name="username"
+                     id="id_username"
+                     class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                     placeholder="username"
+                     required="">
+              <span class="text-sm text-rose-400 leading-5">{{ form.username.errors }}</span>
             </div>
+            <div class="col-span-1">
+              <label for="{{ form.email.id_for_label }}" class="text-slate-200">
+                Email<span class="text-rose-400">*</span>
+              </label>
+              <input type="email"
+                     name="email"
+                     id="id_email"
+                     class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                     placeholder="example@email.com"
+                     required="">
+              <span class="text-sm text-rose-400 leading-5">{{ form.email.errors }}</span>
+            </div>
+            <div class="col-span-1">
+              <label for="id_password1">
+                Password<span class="text-rose-400">*</span>
+              </label>
+              <input type="password"
+                     name="password1"
+                     id="id_password1"
+                     class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                     placeholder="Pa$sw0rd"
+                     required="">
+              <span class="text-sm text-rose-400 leading-5">{{ form.password1.errors }}{{ form.password2.errors }}</span>
+            </div>
+            <div class="col-span-1">
+              <label for="id_password2" class="text-slate-200">
+                Confirm Password<span class="text-rose-400">*</span>
+              </label>
+              <input type="password"
+                     name="password2"
+                     id="id_password2"
+                     class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                     placeholder="Pa$sw0rd"
+                     required="">
+            </div>
+          </div>
         </fieldset>
-
         <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 gap-5 align-middle items-center w-full text-slate-200 border-t border-t-slate-600 py-4">
           <h3 class="md:col-span-1 text-amber-400 text-lg md:text-xl font-black place-self-start pb-2">Player Information</h3>
           <div class="md:col-span-2 items-center space-y-2 md:space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="col-span-1">
-                <label for="id_first_name">First Name<span class="text-rose-400">*</span></label>
-                <input type="text" name="first_name" id="id_first_name" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Phil" required="">
+                <label for="id_first_name">
+                  First Name<span class="text-rose-400">*</span>
+                </label>
+                <input type="text"
+                       name="first_name"
+                       id="id_first_name"
+                       class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                       placeholder="Phil"
+                       required="">
                 <span class="text-sm text-rose-400 leading-5">{{ form.first_name.errors }}</span>
               </div>
               <div class="col-span-1">
-                <label for="id_last_name" class="text-slate-200">Last Name<span class="text-rose-400">*</span></label>
-                <input type="text" name="last_name" id="id_last_name" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="Taylor" required="">
+                <label for="id_last_name" class="text-slate-200">
+                  Last Name<span class="text-rose-400">*</span>
+                </label>
+                <input type="text"
+                       name="last_name"
+                       id="id_last_name"
+                       class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                       placeholder="Taylor"
+                       required="">
                 <span class="text-sm text-rose-400 leading-5">{{ form.last_name.errors }}</span>
               </div>
               <div class="col-span-1">
-                <label for="id_phoneNumber">Phone Number<span class="text-rose-400">*</span></label>
-                <input type="tel" name="phoneNumber" id="id_phoneNumber" class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent" placeholder="(555) 867-5309" data-mask="(000) 000-0000" required="">
+                <label for="id_phoneNumber">
+                  Phone Number<span class="text-rose-400">*</span>
+                </label>
+                <input type="tel"
+                       name="phoneNumber"
+                       id="id_phoneNumber"
+                       class="w-full h-10 px-3 text-base placeholder-slate-400 text-slate-200 transition-colors duration-200 ease-in-out bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+                       placeholder="(555) 867-5309"
+                       data-mask="(000) 000-0000"
+                       required="">
                 <span class="text-sm text-rose-400">{{ form.phoneNumber.errors }}</span>
               </div>
             </div>
-          <div class="md:col-start-2 col-span-2 items-center pt-4">
-            <input type="checkbox" name="terms" id="terms" class="form-checkbox rounded-md h-5 w-5 text-amber-400 bg-slate-800 border-amber-400 border shadow-slate-900/30 shadow-inner focus:ring-0 focus:outline-none active:text-slate-800" required="">
-            <span class="ml-2 text-slate-200">I understand and agree to the <a href="{% url 'terms' %}" class="text-blue-400 hover:underline hover:text-amber-400">Terms of Service</a> and <a href="{% url 'privacy' %}" class="text-blue-400 hover:underline hover:text-amber-400">Privacy Policy</a>.</span></input>
+            <div class="md:col-start-2 col-span-2 items-center pt-4">
+              <input type="checkbox"
+                     name="terms"
+                     id="terms"
+                     class="form-checkbox rounded-md h-5 w-5 text-amber-400 bg-slate-800 border-amber-400 border shadow-slate-900/30 shadow-inner focus:ring-0 focus:outline-none active:text-slate-800"
+                     required="">
+              <span class="ml-2 text-slate-200">I understand and agree to the <a href="{% url 'terms' %}"
+    class="text-blue-400 hover:underline hover:text-amber-400">Terms of Service</a> and <a href="{% url 'privacy' %}"
+    class="text-blue-400 hover:underline hover:text-amber-400">Privacy Policy</a>.</span>
+            </input>
           </div>
         </fieldset>
         <div class="flex items-end justify-center mt-6">
-            <button class="p-1 mx-4 mt-6 w-full bg-slate-800 shadow-inner shadow-slate-900/40 ring-1 ring-slate-900/30 rounded-lg text-amber-400 font-semibold tk-rustica uppercase border border-amber-400 hover:transition-all hover:bg-amber-900/60 hover:ease-in-out hover:duration-500" type="submit">
-                <span class="text-center text-amber-400">
-                    Create Account
-                </span>
-            </button>
-      </div>
-    </form>
+          <button class="p-1 mx-4 mt-6 w-full bg-slate-800 shadow-inner shadow-slate-900/40 ring-1 ring-slate-900/30 rounded-lg text-amber-400 font-semibold tk-rustica uppercase border border-amber-400 hover:transition-all hover:bg-amber-900/60 hover:ease-in-out hover:duration-500"
+                  type="submit">
+            <span class="text-center text-amber-400">Create Account</span>
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
-
 {% endblock content %}
 
 {% block footerScripts %}
-<script src="{% static './jquery/dist/jquery.slim.min.js' %}"></script>
-<script src="{% static './jquery-mask-plugin/dist/jquery.mask.min.js' %}"></script>
+  <script src="{% static './jquery/dist/jquery.slim.min.js' %}"></script>
+  <script src="{% static './jquery-mask-plugin/dist/jquery.mask.min.js' %}"></script>
 {% endblock footerScripts %}
-

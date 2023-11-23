@@ -183,22 +183,22 @@ class DivisionModelTestCase(TestCase):
     def test_division_manager(self):
         division = self.div1
         expected_manager = self.plyr1
-        self.assertEquals(expected_manager, division.divisionManager)
+        self.assertEquals(expected_manager, division.division_manager)
 
     def test_multiple_divisions_same_manager(self):
         division1 = self.div1
         division2 = self.div2
-        division1.divisionManager = self.plyr1
-        division2.divisionManager = self.plyr1
+        division1.division_manager = self.plyr1
+        division2.division_manager = self.plyr1
         expected_manager = self.plyr1
-        self.assertEquals(expected_manager, division1.divisionManager)
-        self.assertEquals(expected_manager, division2.divisionManager)
+        self.assertEquals(expected_manager, division1.division_manager)
+        self.assertEquals(expected_manager, division2.division_manager)
 
     def test_division_manager_removed(self):
         division = self.div1
-        division.divisionManager = None
+        division.division_manager = None
         expected_manager = None
-        self.assertEquals(expected_manager, division.divisionManager)
+        self.assertEquals(expected_manager, division.division_manager)
 
     # Tests for detials Manager methods
     def test_division_num_active_teams(self):
