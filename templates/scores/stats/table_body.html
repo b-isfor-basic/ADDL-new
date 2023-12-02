@@ -14,7 +14,7 @@
         {% endif %}
     </td>
     <td class="p-1 text-sm text-center">
-        {% if stat is None or stat == 1000 or stat == "N/A" or stat == 0 or stat2 == '0.0000' or stat == '0.0000' or stat == '0.00' %}
+        {% if stat == None or stat == 1000 or stat == "N/A" or stat == 0 or stat2 == '0.0000' or stat == '0.0000' or stat == '0.00' %}
             -
         {% else %}
             {{ stat }}
