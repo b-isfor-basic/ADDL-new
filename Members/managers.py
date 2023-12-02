@@ -109,6 +109,68 @@ class TeamStatsQuerySet(models.QuerySet):
             ),
         )
 
+    def avg_doubles_ppd(self, *args, **kwargs):
+        from Schedule.models import Season
+
+        season = (
+            kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
+        )
+
+        return self.annotate(
+            avg_doubles_ppd=Greatest(
+                (
+                    (
+                        1001.0
+                        * Count(
+                            "teamscoresummary__match__id",
+                            filter=Q(
+                                teamscoresummary__darts_thrown1__gte=1,
+                                teamscoresummary__darts_thrown2__gte=1,
+                                teamscoresummary__match__week__season=season,
+                            ),
+                        )
+                    )
+                    - (
+                        Sum(
+                            "teamscoresummary__score_left1",
+                            filter=Q(
+                                teamscoresummary__darts_thrown1__gte=1,
+                                teamscoresummary__darts_thrown2__gte=1,
+                                teamscoresummary__match__week__season=season,
+                            ),
+                        )
+                        + Sum(
+                            "teamscoresummary__score_left2",
+                            filter=Q(
+                                teamscoresummary__darts_thrown1__gte=1,
+                                teamscoresummary__darts_thrown2__gte=1,
+                                teamscoresummary__match__week__season=season,
+                            ),
+                        )
+                    )
+                )
+                / (
+                    Sum(
+                        "teamscoresummary__darts_thrown1",
+                        filter=Q(
+                            teamscoresummary__darts_thrown1__gte=1,
+                            teamscoresummary__darts_thrown2__gte=1,
+                            teamscoresummary__match__week__season=season,
+                        ),
+                    )
+                    + Sum(
+                        "teamscoresummary__darts_thrown2",
+                        filter=Q(
+                            teamscoresummary__darts_thrown1__gte=1,
+                            teamscoresummary__darts_thrown2__gte=1,
+                            teamscoresummary__match__week__season=season,
+                        ),
+                    )
+                ),
+                Value(0.0),
+            )
+        )
+
     def weekly_points(self, *args, **kwargs):
         from Schedule.models import Season, Match
         from Scores.models import ScoreSummary
@@ -178,11 +240,7 @@ class TeamStatsQuerySet(models.QuerySet):
         rating_qs = self.rating(season=season).values(
             "id", "team_rating_score", "team_rating"
         )
-        avg_ppd_qs = (
-            TeamScoreSummary.stats.filter(match__week__season=season)
-            .avg_doubles_ppd()
-            .values("team", "avg_doubles_ppd")
-        )
+        avg_ppd_qs = self.avg_doubles_ppd(season=season).values("id", "avg_doubles_ppd")
 
         return (
             self.names()
@@ -222,11 +280,8 @@ class TeamStatsQuerySet(models.QuerySet):
                 team_rating=Subquery(
                     rating_qs.filter(id=OuterRef("id")).values("team_rating")
                 ),
-                avg_ppd=Max(
-                    Subquery(
-                        avg_ppd_qs.filter(team=OuterRef("id")).values("avg_doubles_ppd")
-                    ),
-                    default=0.0000,
+                avg_ppd=Subquery(
+                    avg_ppd_qs.filter(id=OuterRef("id")).values("avg_doubles_ppd")
                 ),
             )
         )
