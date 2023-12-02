@@ -270,7 +270,7 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
             team_name=Team.details.filter(pk=OuterRef("team")).values("team_name"),
         )
 
-    def weekly_doubles_ppd(self):
+    def weekly_doubles_ppd(self, *args, **kwargs):
         return (
             self.filter(Q(darts_thrown1__gte=1) & Q(darts_thrown2__gte=1))
             .annotate(
@@ -285,8 +285,11 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
     def avg_doubles_ppd(self):
         return (
             self.weekly_doubles_ppd()
+            .filter(weekly_doubles_ppd__isnull=False)
             .values("team")
-            .annotate(avg_doubles_ppd=Avg(F("weekly_doubles_ppd"), default=Value(0.0)))
+            .annotate(
+                avg_doubles_ppd=Greatest(Avg(F("weekly_doubles_ppd")), Value(0.0000))
+            )
             .values("team", "avg_doubles_ppd")
         )
 
