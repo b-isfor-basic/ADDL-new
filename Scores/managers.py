@@ -113,20 +113,26 @@ class PlayerScoreSummaryQuerySet(models.QuerySet):
         return (
             self.values("player")
             .annotate(
-                total_darts_thrown = Sum('darts_thrown1') + Sum('darts_thrown2'),
-                total_score_left = Sum('score_left1') + Sum('score_left2'),
+                total_darts_thrown=Sum("darts_thrown1") + Sum("darts_thrown2"),
+                total_score_left=Sum("score_left1") + Sum("score_left2"),
                 num_games=(Count("match_id", distinct=True)),
             )
-            .values("player",first_name=F('player__first_name'), last_name=F('player__last_name'))
+            .values(
+                "player",
+                first_name=F("player__first_name"),
+                last_name=F("player__last_name"),
+            )
             .annotate(
-                    avg_ppd=ExpressionWrapper(
-                        ((Value(1001.0) * F('num_games')) - F("total_score_left")) / F("total_darts_thrown"),
-                        output_field=models.FloatField(),
-                    ),
-                    win_pct=(Sum("singles_points") + Sum("doubles_points"))
-                        / (F("num_games") * Value(10.0)),
-                    avg_stars_per_game=Sum("total_stars") / (F("num_games") * Value(10.0)),
-            ).annotate(
+                avg_ppd=ExpressionWrapper(
+                    ((Value(1001.0) * F("num_games")) - F("total_score_left"))
+                    / F("total_darts_thrown"),
+                    output_field=models.FloatField(),
+                ),
+                win_pct=(Sum("singles_points") + Sum("doubles_points"))
+                / (F("num_games") * Value(10.0)),
+                avg_stars_per_game=Sum("total_stars") / (F("num_games") * Value(10.0)),
+            )
+            .annotate(
                 rating_score=Greatest(
                     (Ln(F("avg_ppd")) * 3.5)
                     + (F("win_pct") * 8.0)
@@ -265,19 +271,24 @@ class TeamScoreSummaryQuerySet(models.QuerySet):
         )
 
     def weekly_doubles_ppd(self):
-        return self.filter(Q(darts_thrown1__gte=1) & Q(darts_thrown2__gte=1)).annotate(
-            weekly_doubles_ppd=(
-                ((501.0 * 2) - (F("score_left1") + F("score_left2")))
-                / (F("darts_thrown1") + F("darts_thrown2"))
+        return (
+            self.filter(Q(darts_thrown1__gte=1) & Q(darts_thrown2__gte=1))
+            .annotate(
+                weekly_doubles_ppd=(
+                    ((501.0 * 2) - (F("score_left1") + F("score_left2")))
+                    / (F("darts_thrown1") + F("darts_thrown2"))
+                )
             )
+            .values("team", "weekly_doubles_ppd")
         )
 
     def avg_doubles_ppd(self):
         return (
             self.weekly_doubles_ppd()
             .values("team")
-            .annotate(avg_doubles_ppd=Avg(F("weekly_doubles_ppd")))
-        ).with_names()
+            .annotate(avg_doubles_ppd=Avg(F("weekly_doubles_ppd"), default=Value(0.0)))
+            .values("team", "avg_doubles_ppd")
+        )
 
     def best_501_game(self):
         return (

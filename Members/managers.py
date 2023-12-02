@@ -53,6 +53,7 @@ class TeamStatsQuerySet(models.QuerySet):
         return self.annotate(
             best_week_ppd=Max(
                 team_stats.filter(team=OuterRef("id")).values("best_week_doubles_ppd"),
+                default=0.0,
             )
         )
 
@@ -167,13 +168,11 @@ class TeamStatsQuerySet(models.QuerySet):
         )
 
     def stats(self, *args, **kwargs):
-        # Return the total number of points scored by the team in all games. Can be filtered.
         from Schedule.models import Season
         from Scores.models import TeamScoreSummary
 
-        season = (
-            kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
-        )
+        season = kwargs.get("season") or Season.objects.latest().id
+
         pts_qs = self.total_points(season=season).values("id", "total_points")
         best_ppd_qs = self.best_ppd(season=season).values("id", "best_week_ppd")
         rating_qs = self.rating(season=season).values(
@@ -185,64 +184,125 @@ class TeamStatsQuerySet(models.QuerySet):
             .values("team", "avg_doubles_ppd")
         )
 
-        return self.names().annotate(
-            best_501_game=Least(
-                Min(
-                    "teamscoresummary__darts_thrown1",
-                    filter=Q(
-                        teamscoresummary__score_left1=0,
-                        teamscoresummary__match__week__season=season,
+        return (
+            self.names()
+            .annotate(
+                best_501_game=Least(
+                    Min(
+                        "teamscoresummary__darts_thrown1",
+                        filter=Q(
+                            teamscoresummary__score_left1=0,
+                            teamscoresummary__match__week__season=season,
+                        ),
                     ),
-                ),
-                Min(
-                    "teamscoresummary__darts_thrown2",
-                    filter=Q(
-                        teamscoresummary__score_left2=0,
-                        teamscoresummary__match__week__season=season,
+                    Min(
+                        "teamscoresummary__darts_thrown2",
+                        filter=Q(
+                            teamscoresummary__score_left2=0,
+                            teamscoresummary__match__week__season=season,
+                        ),
                     ),
+                    Value(1000),
                 ),
-                Value(1000),
-            ),
-            avg_ppd=Greatest(
-                Subquery(
-                    avg_ppd_qs.filter(team=OuterRef("id"))
-                    .distinct()
-                    .values("avg_doubles_ppd")
+            )
+            .values(
+                "id",
+                "team_name",
+                "best_501_game",
+                "division__id",
+                total_points=Subquery(
+                    pts_qs.filter(id=OuterRef("id")).values("total_points")
                 ),
-                Value(0.0),
-                output_field=models.FloatField(),
-            ),
-            best_week_ppd=Greatest(
-                Subquery(
-                    best_ppd_qs.filter(id=OuterRef("id"))
-                    .distinct()
-                    .values("best_week_ppd")
+                best_week_ppd=Subquery(
+                    best_ppd_qs.filter(id=OuterRef("id")).values("best_week_ppd")
                 ),
-                Value(0.0),
-                output_field=models.FloatField(),
-            ),
-            team_rating_score=Greatest(
-                Subquery(
-                    rating_qs.filter(id=OuterRef("id"))
-                    .distinct()
-                    .values("team_rating_score")
+                team_rating_score=Subquery(
+                    rating_qs.filter(id=OuterRef("id")).values("team_rating_score")
                 ),
-                Value(0.0),
-                output_field=models.FloatField(),
-            ),
-            team_rating=Coalesce(
-                Subquery(
-                    rating_qs.filter(id=OuterRef("id")).distinct().values("team_rating")
+                team_rating=Subquery(
+                    rating_qs.filter(id=OuterRef("id")).values("team_rating")
                 ),
-                Value(""),
-            ),
-            total_points=Greatest(
-                Subquery(
-                    pts_qs.filter(id=OuterRef("id")).distinct().values("total_points")
+                avg_doubles_ppd=Subquery(
+                    avg_ppd_qs.filter(team=OuterRef("id")).values("avg_doubles_ppd")
                 ),
-                Value(0),
-            ),
+            )
         )
+        # # Return the total number of points scored by the team in all games. Can be filtered.
+        # from Schedule.models import Season
+        # from Scores.models import TeamScoreSummary
+
+        # season = (
+        #     kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
+        # )
+        # pts_qs = self.total_points(season=season)
+        # best_ppd_qs = self.best_ppd(season=season).values("id", "best_week_ppd")
+        # rating_qs = self.rating(season=season).values(
+        #     "id", "team_rating_score", "team_rating"
+        # )
+        # avg_ppd_qs = (
+        #     TeamScoreSummary.stats.filter(match__week__season=season)
+        #     .avg_doubles_ppd()
+        #     .values("team", "avg_doubles_ppd")
+        # )
+
+        # return self.names().annotate(
+        #     best_501_game=Least(
+        #         Min(
+        #             "teamscoresummary__darts_thrown1",
+        #             filter=Q(
+        #                 teamscoresummary__score_left1=0,
+        #                 teamscoresummary__match__week__season=season,
+        #             ),
+        #         ),
+        #         Min(
+        #             "teamscoresummary__darts_thrown2",
+        #             filter=Q(
+        #                 teamscoresummary__score_left2=0,
+        #                 teamscoresummary__match__week__season=season,
+        #             ),
+        #         ),
+        #         Value(1000),
+        #     ),
+        #     avg_ppd=Greatest(
+        #         Subquery(
+        #             avg_ppd_qs.filter(team=OuterRef("id"))
+        #             .distinct()
+        #             .values("avg_doubles_ppd")
+        #         ),
+        #         Value(0.0),
+        #         output_field=models.FloatField(),
+        #     ),
+        #     best_week_ppd=Greatest(
+        #         Subquery(
+        #             best_ppd_qs.filter(id=OuterRef("id"))
+        #             .distinct()
+        #             .values("best_week_ppd")
+        #         ),
+        #         Value(0.0),
+        #         output_field=models.FloatField(),
+        #     ),
+        #     team_rating_score=Greatest(
+        #         Subquery(
+        #             rating_qs.filter(id=OuterRef("id"))
+        #             .distinct()
+        #             .values("team_rating_score")
+        #         ),
+        #         Value(0.0),
+        #         output_field=models.FloatField(),
+        #     ),
+        #     team_rating=Coalesce(
+        #         Subquery(
+        #             rating_qs.filter(id=OuterRef("id")).distinct().values("team_rating")
+        #         ),
+        #         Value(""),
+        #     ),
+        #     total_points=Greatest(
+        #         Subquery(
+        #             pts_qs.filter(id=OuterRef("id")).distinct().values("total_points")
+        #         ),
+        #         Value(0),
+        #     ),
+        # )
 
 
 class TeamStatsManager(models.Manager.from_queryset(TeamStatsQuerySet)):
