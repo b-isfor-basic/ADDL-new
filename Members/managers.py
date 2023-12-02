@@ -222,8 +222,11 @@ class TeamStatsQuerySet(models.QuerySet):
                 team_rating=Subquery(
                     rating_qs.filter(id=OuterRef("id")).values("team_rating")
                 ),
-                avg_doubles_ppd=Subquery(
-                    avg_ppd_qs.filter(team=OuterRef("id")).values("avg_doubles_ppd")
+                avg_ppd=Max(
+                    Subquery(
+                        avg_ppd_qs.filter(team=OuterRef("id")).values("avg_doubles_ppd")
+                    ),
+                    default=0.0000,
                 ),
             )
         )
