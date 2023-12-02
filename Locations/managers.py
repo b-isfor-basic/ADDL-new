@@ -41,8 +41,8 @@ class DivisionQuerySet(models.QuerySet):
             Team.stats.filter(scoresummary__match__week__season=season)
             .filter(division=models.OuterRef("id"))
             .rating(season=season)
-            .values('division')
-            .annotate(team_ratings=F('team_rating_score'))
+            .values("division")
+            .annotate(team_ratings=F("team_rating_score"))
         )
         return self.annotate(
             area_avg_rating=models.Avg(team_rating.values("team_ratings"), default=0),
@@ -50,10 +50,25 @@ class DivisionQuerySet(models.QuerySet):
 
     def get_schedule_weeks(self, *args, **kwargs):
         from Schedule.models import Season
-        season = kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
-        return self.annotate(num_weeks=models.Count('scheduleweek', distinct=True, filter=models.Q(scheduleweek__season=season)))
-    
+
+        season = (
+            kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
+        )
+        return self.annotate(
+            num_weeks=models.Count(
+                "scheduleweek",
+                distinct=True,
+                filter=models.Q(scheduleweek__season=season),
+            )
+        )
+
 
 class DivisionManager(models.Manager.from_queryset(DivisionQuerySet)):
     def get_queryset(self):
-        return super().get_queryset().select_related('area').with_names()
+        return (
+            super()
+            .get_queryset()
+            .select_related("area")
+            .prefetch_related("season_set", "team_set")
+            .with_names()
+        )
