@@ -3,12 +3,12 @@
             {{ forloop.counter }}
     </td>
     <td class="p-1 text-sm text-center">
-        {% if record.player__first_name %}
-            {{ record.player__first_name }} {{ record.player__last_name }}
+        {% if record.team_name %}
+            {{ record.team_name }}
         {% elif record.first_name %}
             {{ record.first_name }} {{ record.last_name }}
-        {% elif record.team_name %}
-            {{ record.team_name }}
+        {% elif record.player__first_name %}
+            {{ record.player__first_name }} {{ record.player__last_name }}
         {% else %}
             ERROR
         {% endif %}
