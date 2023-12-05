@@ -231,7 +231,6 @@ class TeamStatsQuerySet(models.QuerySet):
 
     def stats(self, *args, **kwargs):
         from Schedule.models import Season
-        from Scores.models import TeamScoreSummary
 
         season = kwargs.get("season") or Season.objects.latest().id
 
