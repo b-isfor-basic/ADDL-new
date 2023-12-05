@@ -16,7 +16,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Least, Ln, Coalesce, Greatest
+from django.db.models.functions import Least, Ln, Greatest
 from django.db.models.lookups import (
     GreaterThanOrEqual,
     LessThan,

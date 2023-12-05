@@ -15,7 +15,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Concat, JSONObject, Least, Greatest, Coalesce
+from django.db.models.functions import Concat, JSONObject, Least, Greatest
 from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqual
 
 
