@@ -15,7 +15,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Concat, JSONObject, Least, Greatest, Coalesce
+from django.db.models.functions import Concat, JSONObject, Least, Greatest
 from django.db.models.lookups import GreaterThanOrEqual, LessThan, LessThanOrEqual
 
 
@@ -231,7 +231,6 @@ class TeamStatsQuerySet(models.QuerySet):
 
     def stats(self, *args, **kwargs):
         from Schedule.models import Season
-        from Scores.models import TeamScoreSummary
 
         season = kwargs.get("season") or Season.objects.latest().id
 
