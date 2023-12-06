@@ -48,7 +48,11 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
     """
     template = "scores/standings.html"
 
-    season = get_season(season_number)
+    season = (
+        Season.objects.get(season_number=season_number)
+        if season_number
+        else Season.objects.latest()
+    )
     season_list = get_latest_seasons(qty)
     active_divisions = season.divisions.all()
     division_set = Division.details.filter(season=season.id)
