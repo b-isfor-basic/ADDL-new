@@ -3,8 +3,8 @@
             {{ forloop.counter }}
     </td>
     <td class="p-1 text-sm text-center">
-        {% if record.team_name %}
-            {{ record.team_name }}
+        {% if name %}
+            {{ name }}
         {% elif record.first_name %}
             {{ record.first_name }} {{ record.last_name }}
         {% elif record.player__first_name %}
