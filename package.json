@@ -23,10 +23,13 @@
     "tailwindcss": "^3.3.6"
   },
   "name": "addl",
-  "version": "1.0.1",
+  "version": "1.2.2",
   "main": "tailwind.config.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/b-isfor-basic/ADDL-new.git"
+  },
+  "bugs": {
+    "url": "https://github.com/b-isfor-basic/ADDL-new/issues"
   }
 }
