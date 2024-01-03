@@ -1,0 +1,18 @@
+{% extends 'base_tabs.html' %}
+
+{% block tab_list %}
+{% for tab in tab_list %}
+  <button type="button" id="{{ tab.html_id }}" data-hs-tab="#{{ tab.html_id }}" aria-controls="{{ tab.html_id }}" role="tab" class="hs-tab-active:font-semibold hs-tab-active:border-amber-500 hs-tab-active:text-amber-500 py-4 px-1 inline-flex items-center gap-2 border-b-[3px] border-transparent text-sm whitespace-nowrap text-slate-400 hover:text-amber-500 {% if forloop.first %}active{% endfor %}">
+    {{ tab.title }}
+  </button>
+{% endfor %}
+{% endblock tab_list %}
+
+{% block tab_content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ tab.title }}</h1>
+            <p>{{ tab_description }}</p>
+        </div>
+    </div>
+{% endblock %}
