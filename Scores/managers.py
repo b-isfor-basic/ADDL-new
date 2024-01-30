@@ -25,6 +25,31 @@ from django.db.models.lookups import (
 )
 
 
+class ScoreDetailFormQuerySet(models.QuerySet):
+    def player_list(self, *match):
+        from Members.models import Player
+
+        if match:
+            return (
+                Player.objects.prefetch_related(
+                    "teams__season", "teams__awayMatches", "teams__homeMatches"
+                )
+                .exclude(team__season=match.week.season)
+                .union(
+                    Player.objects.filter(
+                        Q(teams__awayMatches__id=match.id)
+                        | Q(teams__homeMatches__id=match.id)
+                    )
+                )
+            )
+        else:
+            return (
+                Player.objects.all()
+                .values("id", "first_name", "last_name")
+                .order_by("first_name", "last_name")
+            )
+
+
 class PlayerScoreSummaryQuerySet(models.QuerySet):
     def group_by_players(self):
         return self.values("player", "player__first_name", "player__last_name")

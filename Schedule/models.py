@@ -63,13 +63,15 @@ class Season(models.Model):
         """
         num_weeks = (self.match_play_end_dt - self.match_play_start_dt).days // 7
         return list(range(1, num_weeks, 1))
-    
+
     @property
     def get_schedule_weeks_by_division(self):
         """
         Returns a list of schedule weeks for each division.
         """
-        return self.scheduleweek_set.all().order_by("division__area__number", "week_number")
+        return self.scheduleweek_set.all().order_by(
+            "division__area__number", "week_number"
+        )
 
 
 class ScheduleWeek(models.Model):
@@ -78,7 +80,7 @@ class ScheduleWeek(models.Model):
     """
 
     class Meta:
-        unique_together = ["season", "week_number", "division"]
+        unique_together = ["season", "division", "match_date", "week_number"]
         ordering = ["-season", "division", "week_number"]
 
     season = models.ForeignKey(Season, models.CASCADE, db_index=True)
@@ -104,7 +106,17 @@ class ScheduleWeek(models.Model):
 
 class Match(models.Model):
     """
-    Scheduled matches.
+    Matches are the individual contests between two teams. A player will have 10 games
+    per match, 4 singles and 6 doubles. Each game is worth 1 point. The team with the
+    most points at the end of the match wins. Matches can result in a tie.
+
+    Match status is updated automatically when scores are entered or a forfeit is
+    reported.
+
+    Status Codes:
+        S - Scheduled
+        P - Played
+        F - Forfeit
     """
 
     class Meta:
@@ -114,15 +126,22 @@ class Match(models.Model):
     week = models.ForeignKey(ScheduleWeek, models.CASCADE, null=True, db_index=True)
     awayTeam = models.ForeignKey(
         Team,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="awayMatches",
         db_index=True,
+        null=True,
     )
     homeTeam = models.ForeignKey(
         Team,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="homeMatches",
         db_index=True,
+        null=True,
+    )
+    status = models.CharField(
+        max_length=1,
+        choices=[("S", "Scheduled"), ("P", "Played"), ("F", "Forfeit")],
+        default="S",
     )
 
     objects = models.Manager()
@@ -144,6 +163,15 @@ class Match(models.Model):
             away_pts=Sum(F("singles_points") + F("doubles_points"), default=0)
         )
         return awayScore["away_pts"]
+
+    def update_status(self):
+        if self.scoresummary_set.exists():
+            self.status = "P"
+        elif self.forfeit_set.exists():
+            self.status = "F"
+        else:
+            self.status = "S"
+        self.save()
 
 
 class Announcement(models.Model):
