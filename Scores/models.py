@@ -104,7 +104,7 @@ class ScoreSummary(TimeStampedModel, models.Model):
     """
     Holds summarized scores for each Player in a Match. Creation of this model
     is limited to area managers and admins.
-    Objects may also be created by the create_summary method in the ScoreDetail
+    Objects may also be created by the create_player_summary method in the ScoreDetail
     model.
     """
 
@@ -132,7 +132,6 @@ class ScoreSummary(TimeStampedModel, models.Model):
     score_left2 = models.IntegerField(blank=True, null=True)
 
     objects = models.Manager()
-    stats = PlayerScoreSummaryManager.from_queryset(PlayerScoreSummaryQuerySet)()
     stats = PlayerScoreSummaryManager.from_queryset(PlayerScoreSummaryQuerySet)()
 
     @property
@@ -176,6 +175,9 @@ class ScoreDetail(TimeStampedModel, models.Model):
     score_summary = models.OneToOneField(
         ScoreSummary, on_delete=models.CASCADE, blank=True, null=True
     )
+    team_score_summary = models.ForeignKey(
+        TeamScoreSummary, on_delete=models.CASCADE, blank=True, null=True
+    )
     stars_list = ArrayField(
         models.PositiveIntegerField(), max_length=10, blank=True, null=True
     )
@@ -190,13 +192,13 @@ class ScoreDetail(TimeStampedModel, models.Model):
     )
     darts_thrown_list = ArrayField(
         models.PositiveIntegerField(MaxValueValidator(50)),
-        max_length=2,
+        max_length=4,
         blank=True,
         null=True,
     )
     score_left_list = ArrayField(
         models.PositiveIntegerField(MaxValueValidator(501)),
-        max_length=2,
+        max_length=4,
         blank=True,
         null=True,
     )
@@ -208,7 +210,67 @@ class ScoreDetail(TimeStampedModel, models.Model):
     )
     out_list = ArrayField(
         models.PositiveIntegerField(MaxValueValidator(170)),
-        max_length=4,
+        max_length=6,
         blank=True,
         null=True,
     )
+
+    def create_player_scoresummary(self):
+        """
+        Creates a ScoreSummary object from the ScoreDetail object.
+        """
+        try:
+            singles_points = sum(self.points_list[0:1]) + sum(self.points_list[4:5])
+            doubles_points = sum(self.points_list[2:3]) + sum(self.points_list[6:])
+
+            summary = ScoreSummary.objects.create(
+                match=self.match,
+                player=self.player,
+                team=self.team,
+                total_stars=sum(self.stars_list),
+                total_perfects=sum(self.perfects_list),
+                singles_points=singles_points,
+                doubles_points=doubles_points,
+                high_in=max(self.in_list) if self.in_list else None,
+                high_out=max(self.out_list) if self.out_list else None,
+                darts_thrown1=self.darts_thrown_list[0],
+                score_left1=self.score_left_list[0],
+                darts_thrown2=self.darts_thrown_list[1],
+                score_left2=self.score_left_list[1],
+            )
+            summary.save()
+            return summary
+        except:
+            return None
+
+    def create_team_scoresummary(self):
+        """
+        Creates a TeamScoreSummary object from the ScoreDetail object.
+        """
+        try:
+            summary = TeamScoreSummary.objects.create(
+                match=self.match,
+                team=self.team,
+                darts_thrown1=self.darts_thrown_list[2],
+                score_left1=self.score_left_list[2],
+                darts_thrown2=self.darts_thrown_list[3],
+                score_left2=self.score_left_list[3],
+            )
+            summary.save()
+            return summary
+        except:
+            return None
+
+    def save(self, **kwargs):
+        """
+        Updates a ScoreSummary and TeamScoreSummary object from the ScoreDetail object upon save.
+        """
+        super().save(**kwargs)
+        try:
+            self.score_summary.delete()
+            self.team_score_summary.delete()
+        except:
+            pass
+        self.score_summary = self.create_player_scoresummary()
+        self.team_score_summary = self.create_team_scoresummary()
+        self.save()
