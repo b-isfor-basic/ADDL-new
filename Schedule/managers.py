@@ -124,7 +124,7 @@ class MatchManager(Manager.from_queryset(MatchQuerySet)):
             | Q(homeTeam__players__contains=player)
         )
 
-    def status(self):
+    def result(self):
         from Scores.models import ScoreSummary
 
         qs = self.with_names()
@@ -149,14 +149,18 @@ class MatchManager(Manager.from_queryset(MatchQuerySet)):
                 )
             ),
         ).annotate(
-            status=Case(
+            result=Case(
                 When(
                     Exact(F("forfeit__team"), F("homeTeam")),
-                    then=Value('Away <span class="pl-1 text-rose-400 text-xs align-center text-center">F</span>'),
+                    then=Value(
+                        'Away <span class="pl-1 text-rose-400 text-xs align-center text-center">F</span>'
+                    ),
                 ),
                 When(
                     Exact(F("forfeit__team"), F("awayTeam")),
-                    then=Value('Home <span class="pl-1 text-rose-400 text-xs align-center text-center">F</span>'),
+                    then=Value(
+                        'Home <span class="pl-1 text-rose-400 text-xs align-center text-center">F</span>'
+                    ),
                 ),
                 When(
                     Exact(F("home_score"), 0) & Exact(F("away_score"), 0),
@@ -202,12 +206,12 @@ class SeasonManager(Manager):
         season_weeks = ScheduleWeek.objects.filter(season=OuterRef("id")).order_by(
             "division", "week_number"
         )
-        matches = Match.details.status().values(
+        matches = Match.details.result().values(
             json=JSONObject(
                 id=F("id"),
                 home_team=F("home_team"),
                 away_team=F("away_team"),
-                status=F("status"),
+                result=F("result"),
             )
         )
 

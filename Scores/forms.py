@@ -1,14 +1,18 @@
 import uuid
+from math import floor
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models import Avg
+from django.db.models import Avg, Q
 
 from Members.models import Player
-from Scores.models import Forfeit, ScoreSummary, TeamScoreSummary
+from Scores.models import Forfeit, ScoreSummary, TeamScoreSummary, ScoreDetail
 
 CLASS_ATTRS = "w-full h-fit px-3 text-sm placeholder-slate-400 text-slate-200 bg-slate-800 border border-slate-900/30 rounded-full shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+CLASS_LEFT = "inline-block w-fit h-fit rounded-l-lg text-center text-sm placeholder-slate-400 text-slate-200 bg-slate-800 border border-slate-900/30 shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+CLASS_CENTER = "inline-block w-fit h-fit text-center text-sm placeholder-slate-400 text-slate-200 bg-slate-800 border border-slate-900/30 shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
+CLASS_RIGHT = "inline-block w-fit h-fit rounded-r-lg text-center text-sm placeholder-slate-400 text-slate-200 bg-slate-800 border border-slate-900/30 shadow-inner shadow-slate-900/30 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:ring-opacity-100 focus:border-transparent"
 
 
 class BaseTeamScoreFormSet(forms.BaseModelFormSet):
@@ -121,6 +125,7 @@ class TeamScoreSummaryForm(forms.ModelForm):
             team = cleaned_data.get("team")
             Forfeit.details.create(match=match, team=team)
             return cleaned_data
+        return cleaned_data
 
 
 class BasePlayerScoreFormSet(forms.BaseModelFormSet):
@@ -237,6 +242,7 @@ class PlayerScoreSummaryForm(forms.ModelForm):
             "match",
             "team",
             "player",
+            "is_sub",
             "darts_thrown1",
             "score_left1",
             "darts_thrown2",
@@ -252,6 +258,7 @@ class PlayerScoreSummaryForm(forms.ModelForm):
         widgets = {
             "match": forms.HiddenInput(),
             "team": forms.HiddenInput(),
+            "is_sub": forms.HiddenInput(),
             "darts_thrown1": forms.widgets.NumberInput(attrs={"class": CLASS_ATTRS}),
             "score_left1": forms.widgets.NumberInput(attrs={"class": CLASS_ATTRS}),
             "darts_thrown2": forms.widgets.NumberInput(attrs={"class": CLASS_ATTRS}),
@@ -319,7 +326,7 @@ class PlayerScoreSummaryForm(forms.ModelForm):
         if player in team.players.all():
             return
         else:
-            self.data["is_"]
+            self.data["is_sub"] = True
 
     def clean(self):
         """
@@ -340,3 +347,218 @@ class PlayerScoreSummaryForm(forms.ModelForm):
             return
 
         return cleaned_data
+
+
+class BaseGameForm(forms.Form):
+    """
+    Game form to hold shared fields required by all games.
+    """
+
+    def get_kwargs(self, *args, **kwargs):
+        self.MATCH = kwargs.pop("match")
+        self.TEAM = kwargs.pop("team")
+        return {
+            "match": self.MATCH,
+            "team": self.TEAM,
+        }
+
+    def get_player_choices(self):
+        """
+        Returns a list of players for the given match.
+        """
+        if self.MATCH:
+            return (
+                Player.objects.prefetch_related(
+                    "teams__season", "teams__awayMatches", "teams__homeMatches"
+                )
+                .exclude(team__season=self.MATCH.week.season)
+                .union(
+                    Player.objects.filter(
+                        Q(teams__awayMatches__id=self.MATCH.id)
+                        | Q(teams__homeMatches__id=self.MATCH.id)
+                    )
+                )
+                .values("id", "first_name", "last_name")
+                .order_by("first_name", "last_name")
+            )
+        else:
+            return (
+                Player.objects.all()
+                .values("id", "first_name", "last_name")
+                .order_by("first_name", "last_name")
+            )
+
+    match = forms.ModelChoiceField(
+        widget=forms.widgets.HiddenInput(),
+        queryset=None,
+    )
+    player = forms.ModelChoiceField(
+        widget=forms.widgets.Select(
+            attrs={
+                "class": CLASS_ATTRS,
+                "x-ref": "select",
+                ":value": " selectedPlayer() ",
+            }
+        ),
+        queryset=Player.objects.all(),
+    )
+    team = forms.ModelChoiceField(
+        widget=forms.widgets.HiddenInput(),
+        queryset=None,
+    )
+    stars = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(0)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_LEFT,
+            }
+        ),
+    )
+    perfects = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(0)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_CENTER,
+            }
+        ),
+    )
+    point = forms.IntegerField(
+        required=True,
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_RIGHT,
+            }
+        ),
+    )
+
+
+class Game501Form(BaseGameForm, forms.Form):
+    """
+    Game form for 501 games.
+    """
+
+    point = forms.IntegerField(
+        required=True,
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_CENTER,
+            }
+        ),
+    )
+    darts_thrown = forms.IntegerField(
+        required=True,
+        validators=[MinValueValidator(0), MaxValueValidator(50)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_CENTER,
+            }
+        ),
+    )
+    score_left = forms.IntegerField(
+        required=True,
+        validators=[MinValueValidator(0), MaxValueValidator(501)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_CENTER,
+            }
+        ),
+    )
+    high_out = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(0), MaxValueValidator(170)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_RIGHT,
+            }
+        ),
+    )
+
+
+class Base301GameForm(BaseGameForm, forms.Form):
+    point = forms.IntegerField(
+        required=True,
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_CENTER,
+            }
+        ),
+    )
+    high_in = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(0), MaxValueValidator(170)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_CENTER,
+            }
+        ),
+    )
+    high_out = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(0), MaxValueValidator(170)],
+        widget=forms.widgets.NumberInput(
+            attrs={
+                "class": CLASS_RIGHT,
+            }
+        ),
+    )
+
+
+class CricketBaseFormSet(forms.BaseFormSet):
+    form = BaseGameForm
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_form_count = 8
+        self.add_prefix = "cricket"
+
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        if index == 0 or index == 2:
+            kwargs.update(
+                {
+                    "prefix": f"away-0-singles-cricket-{index // 2}",
+                    "initial": {
+                        "match": self.match.id,
+                        "team": self.match.awayTeam,
+                    },
+                }
+            )
+        elif index == 1 or index == 3:
+            kwargs.update(
+                {
+                    "prefix": f"away-1-singles-cricket-{floor(index // 2)}",
+                    "initial": {
+                        "match": self.match.id,
+                        "team": self.match.awayTeam,
+                    },
+                }
+            )
+        elif index == 4 or index == 7:
+            kwargs.update(
+                {
+                    "prefix": f"home-0-singles-cricket-{floor((index - 4) // 2)}",
+                    "initial": {
+                        "match": self.match.id,
+                        "team": self.match.homeTeam,
+                    },
+                }
+            )
+        elif index == 5 or index == 6:
+            kwargs.update(
+                {
+                    "prefix": f"home-1-singles-cricket-{floor((index - 4) // 2)}",
+                    "initial": {
+                        "match": self.match.id,
+                        "team": self.match.homeTeam,
+                    },
+                }
+            )
+        return kwargs
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean(*args, **kwargs)
