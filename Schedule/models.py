@@ -3,22 +3,11 @@ import uuid
 from django.db import models
 from django.db.models import F, Sum
 
-from recurrence.fields import RecurrenceField
 from smart_selects.db_fields import ChainedForeignKey
 
 from Locations.models import Division, Establishment
 from Members.models import Player, Team
 from Schedule.managers import MatchManager, ScheduleManager, SeasonManager
-
-
-class ScheduleRule(models.Model):
-    class Meta:
-        verbose_name_plural = "Schedule Rules"
-        verbose_name = "Schedule Rule"
-
-    title = models.CharField(max_length=48)
-    description = models.TextField(null=True, blank=True)
-    frequency = RecurrenceField()
 
 
 class Season(models.Model):

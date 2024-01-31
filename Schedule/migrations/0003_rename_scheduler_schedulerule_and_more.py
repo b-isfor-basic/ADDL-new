@@ -11,17 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameModel(
-            old_name="Scheduler",
-            new_name="ScheduleRule",
-        ),
-        migrations.AlterModelOptions(
-            name="schedulerule",
-            options={
-                "verbose_name": "Schedule Rule",
-                "verbose_name_plural": "Schedule Rules",
-            },
-        ),
         migrations.RemoveField(
             model_name="match",
             name="boards",

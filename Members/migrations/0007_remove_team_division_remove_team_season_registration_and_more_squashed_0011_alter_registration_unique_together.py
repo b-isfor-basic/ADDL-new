@@ -9,17 +9,6 @@ import smart_selects.db_fields
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        (
-            "Members",
-            "0007_remove_team_division_remove_team_season_registration_and_more",
-        ),
-        ("Members", "0008_alter_registration_options_registration_created_and_more"),
-        ("Members", "0009_alter_registration_options_registration_created_by_and_more"),
-        ("Members", "0010_alter_registration_division_and_more"),
-        ("Members", "0011_alter_registration_unique_together"),
-    ]
-
     dependencies = [
         ("Members", "0006_alter_player_options"),
         ("Locations", "0005_establishment_numberofboards"),
