@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Announcement, Match, ScheduleRule, ScheduleWeek, Season
+from .models import Announcement, Match, ScheduleWeek, Season
 
 
 @admin.register(Season)
@@ -38,11 +38,6 @@ class AnnouncementAdmin(admin.ModelAdmin):
         "inactive_date",
     ]
     list_display = ["title", "created_by", "active_date", "inactive_date"]
-
-
-@admin.register(ScheduleRule)
-class RecurringEventAdmin(admin.ModelAdmin):
-    list_display = ["title"]
 
 
 class MatchInline(admin.TabularInline):
