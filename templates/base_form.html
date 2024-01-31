@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Score Entry
+{% endblock title %}
+
+{% block headerScripts %}
+  <svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+    <symbol id="chevron-r" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+    </symbol>
+  </svg>
+{% endblock headerScripts %}
+
+{% block content %}
+    <div class="w-full p-5 justify-center content-center">
+        <div class="justify-items-start flex-auto">
+          <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">
+            {% block main_heading %}
+            {% endblock main_heading %}
+          </h2>
+          <h3 class="text-slate-200 text-sm md:text-base font-semibold tracking-wider">
+            {% block breadcrumb_1 %}
+            {% endblock breadcrumb_1 %}
+            {% block breadcrumb_2 %}
+              <svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5">
+                <use href="#chevron-r" />
+              </svg>
+            {% endblock breadcrumb_2 %}
+            {% block breadcrumb_3 %}
+              <svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5">
+                <use href="#chevron-r" />
+              </svg>
+            {% endblock breadcrumb_3 %}
+          </h3>
+          <p class="pt-4 text-slate-400">
+            Complete the form below to record scores. Fields marked with <span class="text-rose-400">*</span> are required.
+          </p>
+        </div>
+        <div class="justify-evenly items-center pt-4">
+        {% block main %}{% endblock main %}
+        </div>
+    </div>
+{% endblock content %}
+
+{% for fieldset in form.fieldsets %}
+<div class="w-full p-4 justify-center align-center rounded-lg shadow-xl bg-slate-700/50 shadow-slate-900/40 border border-slate-900">
+    <fieldset class="md:grid md:grid-flow-col md:grid-cols-3 md:gap-3 w-full">
+      <div class="md:col-span-1 border-b md:border-r md:border-b-0 border-slate-600">
+        <h3 class="text-amber-500 text-2xl font-black place-self-start justify-start pb-2">{{ fieldset.title }}</h3>
+        <div class="text-slate-400 text-sm space-y-3 p-1">
+            {% block section_instructions %}
+                {% if fieldset.description %}
+                <p>{{ fieldset.description }}</p>
+                {% endif %}
+          {% endblock section_instructions %}
+        </div>
+      </div>
+      {% for form in formset.forms %}
+        <div class="md:col-span-1 items-center space-y-2 md:space-y-4 py-5 md:m-2">
+          <div class="grid grid-flow-row grid-rows-8">
+            <div class="row-span-1 inline-flex">
+              <h3 class="text-amber-400 text-lg font-black mr-4">
+                {% if forloop.first %}
+                  Away Team
+                {% else %}
+                  Home Team
+                {% endif %}
+              </h3>
+              <h4 class="text-slate-400 text-lg">
+                {% if match %}
+                {% if forloop.first %}
+                  {{ match.awayTeam.name }}
+                {% else %}
+                  {{ match.homeTeam.name }}
+                {% endif %}
+                {% endif %}
+              </h4>
+            </div>
+            {{ form.match }}
+            {{ form.team }}
+            {{ form.id }}
+            {% if form.non_field_errors %}
+              <div id="errorBox" class="relative flex justify-center items-center">
+                {% include "../components/error.html" with target_element="#errorBox" message=form.non_field_errors %}
+              </div>
+            {% endif %}
+            <div class="row-span-1 pl-2 inline-flex items-baseline">
+              <label for="{{ form.mark_as_forfeit.id_for_label }}"
+                     class="text-sm font-medium text-slate-400">Forfeit Match?</label>
+              <div class="ml-2">{{ form.mark_as_forfeit }}</div>
+              <div class="text-sm text-rose-400">{{ form.mark_as_forfeit.errors }}</div>
+            </div>
+            <div class="row-start-3 row-span-3 mt-2">
+              <h4 class="text-slate-200 font-bold place-self-start">Game 1</h4>
+              <fieldset class="mx-2 grid grid-flow-col md:grid-cols-2 gap-5">
+                <div class="col-span-1">
+                  <label for="{{ form.darts_thrown1.id_for_label }}"
+                         class="text-sm font-medium text-slate-400">
+                    Darts Thrown<span class="text-rose-400">*</span>
+                  </label>
+                  <div class="mt-1">{{ form.darts_thrown1 }}</div>
+                  <div class="text-sm text-rose-400">{{ form.darts_thrown1.errors }}</div>
+                </div>
+                <div class="col-span-1">
+                  <label for="{{ form.score_left1.id_for_label }}"
+                         class="text-sm font-medium text-slate-400">
+                    Score Left<span class="text-rose-400">*</span>
+                  </label>
+                  <div class="mt-1">{{ form.score_left1 }}</div>
+                  <div class="text-sm text-rose-400">{{ form.score_left1.errors }}</div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="row-start-6 row-span-3 mt-2">
+              <h4 class="text-slate-200 font-bold place-self-start">Game 2</h4>
+              <fieldset class="mx-2 grid grid-flow-col md:grid-cols-2 gap-5">
+                <div class="col-span-1">
+                  <label for="{{ form.darts_thrown2.id_for_label }}"
+                         class="text-sm font-medium text-slate-400">
+                    Darts Thrown<span class="text-rose-400">*</span>
+                  </label>
+                  <div class="mt-1">{{ form.darts_thrown2 }}</div>
+                  <div class="text-sm text-rose-400">{{ form.darts_thrown2.errors }}</div>
+                </div>
+                <div class="col-span-1">
+                  <label for="{{ form.score_left2.id_for_label }}"
+                         class="text-sm font-medium text-slate-400">
+                    Score Left<span class="text-rose-400">*</span>
+                  </label>
+                  <div class="mt-1">{{ form.score_left2 }}</div>
+                  <div class="text-sm text-rose-400">{{ form.score_left2.errors }}</div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </fieldset>
+  </div>
+
