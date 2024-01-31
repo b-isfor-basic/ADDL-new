@@ -5,23 +5,7 @@ on:
     branches: [ "prod" ]
   pull_request:
     branches: [ "prod" ]
-jobs:
-  run-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          # Full git history is needed to get a proper list of changed files within `super-linter`
-          fetch-depth: 0
-
-      - name: Lint Code Base
-        uses: github/super-linter@v4
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: "prod"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
+jobs:    
   update-release:
       runs-on: ubuntu-latest
       steps:
@@ -40,3 +24,10 @@ jobs:
           environment: 'production'
           version_prefix: 'v'
           set_commits: auto
+  coverage:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
