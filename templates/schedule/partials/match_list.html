@@ -37,27 +37,27 @@
                                         class="p-1 text-center align-center items-center content-center
                                                {% if forloop.first %}border-t border-t-amber-800{% endif %}">
                                         <a href="{% url 'add_scoresheet' match.id %}"
-                                        {% if match.status == "Missing" %}
-                                            class="text-sm mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase">
+                                        {% if match.result == "Missing" %}
+                                            class="mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase">
                                             <span class="text-xs text-amber-400 underline underline-offset-1 hover:text-cyan-300">ENTER</span>
                                         {% else %}
                                            class="group mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase hover:ring-1
-                                                  {% if "Home" in match.status %}
+                                                  {% if "Home" in match.result %}
                                                       bg-emerald-900/75 hover:ring-emerald-300
-                                                  {% elif "Away" in match.status %}
+                                                  {% elif "Away" in match.result %}
                                                       bg-blue-900/75 hover:ring-blue-300
-                                                  {% elif match.status == "Draw" %}
+                                                  {% elif match.result == "Draw" %}
                                                       bg-amber-900/75 hover:ring-amber-300
                                                   {% endif %}
                                                   hover:ease-in-out hover:duration-150">
-                                            <p class="text-sm
-                                                         {% if "Home" in match.status %}
+                                            <span class="text-xs
+                                                         {% if "Home" in match.result %}
                                                              text-emerald-300 group-hover:text-emerald-200
-                                                         {% elif "Away" in match.status %}
+                                                         {% elif "Away" in match.result %}
                                                              text-blue-300 group-hover:text-blue-200
-                                                         {% elif match.status == "Draw" %}
+                                                         {% elif match.result == "Draw" %}
                                                              text-amber-400 group-hover:text-amber-200
-                                                         {% endif %}">{{ match.status|safe }}
+                                                         {% endif %}">{{ match.result|safe }}
                                             </p>
                                         {% endif %}
                                         </a>
