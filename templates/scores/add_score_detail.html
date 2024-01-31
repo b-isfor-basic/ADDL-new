@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  Score Entry
+{% endblock title %}
+
+{% block headerScripts %}
+  <svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+    <symbol id="chevron-r" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+    </symbol>
+  </svg>
+{% endblock headerScripts %}
+
+{% block content %}
+  <div class="w-full p-5 justify-center align-center">
+    <div class="justify-items-start flex-auto">
+      <h2 class="text-amber-400 text-xl md:text-2xl font-black py-2">Match Play Score Entry</h2>
+      <h3 class="text-slate-200 text-sm md:text-base font-semibold tracking-wider">
+        {{ match.week.season }}
+        <svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5">
+          <use href="#chevron-r" />
+        </svg>
+        Week {{ match.week.week_number }}
+        <svg fill="currentColor" class="inline-block align-middle mx-1 w-5 h-5">
+          <use href="#chevron-r" />
+        </svg>
+        {{ match.week.division }}
+      </h3>
+      <p class="pt-4 text-slate-400">
+        Complete the form below to record scores. Fields marked with <span class="text-rose-400">*</span> are required.
+      </p>
+    </div>
+    <form method="post" class="justify-evenly items-center pt-4">
+      {% csrf_token %}
+      {{ singles_cricket_scores.management_form }}
+      {{ doubles_cricket_scores.management_form }}
+      {{ singles_501_scores.management_form }}
+      {{ doubles_301_scores.management_form }}
+      {{ doubles_501_scores.management_form }}
