@@ -1,0 +1,15 @@
+name: Upload Coverage Report
+
+on:
+  pull_request:
+    branches: [ "prod" ]
+jobs:
+    test-report:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@master
+            - uses: codecov/codecov-action@main
+              with:
+                verbose: true # optional (default = false)
+              env:
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

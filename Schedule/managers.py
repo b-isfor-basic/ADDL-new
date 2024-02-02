@@ -1,7 +1,3 @@
-from collections.abc import Iterable, Sequence
-from datetime import datetime as dt
-from datetime import timedelta
-
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db.models import (
     Case,

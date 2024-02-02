@@ -10,10 +10,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          
+        uses: actions/checkout@v4.1.1   
       - name: Sentry Release
         uses: getsentry/action-release@v1.2.1
         env:
@@ -24,10 +21,3 @@ jobs:
           environment: 'production'
           version_prefix: 'v'
           set_commits: auto
-  coverage:
-      runs-on: ubuntu-latest
-      steps:
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
