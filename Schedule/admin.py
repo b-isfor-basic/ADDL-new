@@ -1,6 +1,9 @@
 from django.contrib import admin
+from django.contrib.admin.widgets import AutocompleteSelect
+from django import forms
 
 from .models import Announcement, Match, ScheduleWeek, Season
+from Members.models import Team
 
 
 @admin.register(Season)
@@ -20,13 +23,10 @@ class MatchAdmin(admin.ModelAdmin):
         "week__division",
         "week__week_number",
     ]
-    list_display = [
-        "awayTeam",
-        "homeTeam",
-    ]
+    list_display = ["awayTeam", "homeTeam", "status"]
     search_fields = [
-        "awayTeam",
-        "homeTeam",
+        "awayTeam__players__last_name",
+        "homeTeam__players__last_name",
     ]
 
 
@@ -40,9 +40,24 @@ class AnnouncementAdmin(admin.ModelAdmin):
     list_display = ["title", "created_by", "active_date", "inactive_date"]
 
 
+class MatchForm(forms.ModelForm):
+    class Meta:
+        model = Match
+        fields = ["awayTeam", "homeTeam"]
+        widgets = {
+            "awayTeam": AutocompleteSelect(
+                Match._meta.get_field("awayTeam"), admin.site
+            ),
+            "homeTeam": AutocompleteSelect(
+                Match._meta.get_field("homeTeam"), admin.site
+            ),
+        }
+
+
 class MatchInline(admin.TabularInline):
     model = Match
-    extra = 5
+    form = MatchForm
+    extra = 6
 
 
 @admin.register(ScheduleWeek)
