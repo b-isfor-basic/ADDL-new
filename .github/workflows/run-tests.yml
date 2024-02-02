@@ -1,4 +1,4 @@
-name: Test
+name: Upload Coverage Report
 
 on:
   pull_request:
@@ -12,4 +12,4 @@ jobs:
               with:
                 verbose: true # optional (default = false)
               env:
-                token: ${{ secrets.CODECOV_TOKEN }}
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
