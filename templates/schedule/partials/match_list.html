@@ -1,11 +1,11 @@
-<div class="w-full mb-10 justify-center align-center rounded-lg shadow-xl bg-slate-800 shadow-slate-900/30 border border-amber-500 p-1">
-    <h2 class="text-slate-400 text-xl md:text-2xl font-black p-2 leading-6">
+<div class="w-full mb-10 justify-center align-center rounded-lg shadow-xl bg-slate-900 shadow-slate-950/30 border border-amber-500 p-1">
+    <h2 class="text-slate-300 text-xl md:text-2xl font-black p-2 leading-6">
         {% if division %}{{ division.div_name }}{% endif %}
     </h2>
     <div class="w-full overflow-x-scroll">
         {% if division.weeks|length > 0 %}
             <table class="p-1 w-full">
-                <thead class="text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30 sticky">
+                <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-900 border-b border-slate-950/30 sticky">
                     <tr>
                         <th id="week" class="p-2 font-light">Week</th>
                         <th id="date" class="p-2 font-light">Match Date</th>
@@ -14,51 +14,43 @@
                         <th id="results" class="p-2 font-light">Results</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="bg-slate-800 ">
                     {% for week in division.weeks %}
-                        <tr class="text-sm bg-slate-700 text-slate-300 border-b border-b-slate-500 border-t border-t-amber-800 ">
+                        <tr class="text-sm  text-gray-300 border-b border-b-slate-600 border-t border-t-cyan-600 ">
                             <th id="trWeek{{ forloop.counter }}"
                                 rowspan="{{ week.matches|length }}"
-                                class="p-1 text-center border-t border-t-amber-800">{{ week.week_num }}</th>
+                                class="p-1 text-center border-t border-t-cyan-600">{{ week.week_num }}</th>
                             <th id="trDate{{ forloop.counter }}"
                                 rowspan="{{ week.matches|length }}"
-                                class="p-1 text-center border-t border-t-amber-800">{{ week.date }}</th>
+                                class="p-1 text-center border-t border-t-cyan-600">{{ week.date }}</th>
                             {% for match in week.matches %}
                                 {% if not forloop.first %}
-                                    <tr class="text-sm bg-slate-700 text-slate-300 border-b border-slate-500 ">
+                                    <tr class="text-sm bg-slate-800 text-gray-300 border-b border-slate-600 ">
                                     {% endif %}
                                     <td headers="away trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}"
                                         class="p-1 text-center align-center items-center
-                                               {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.away_team }}</td>
+                                               {% if forloop.first %}border-t border-t-cyan-600{% endif %}">{{ match.away_team }}</td>
                                     <td headers="home trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}"
                                         class="p-1 text-center align-center items-center
-                                               {% if forloop.first %}border-t border-t-amber-800{% endif %}">{{ match.home_team }}</td>
+                                               {% if forloop.first %}border-t border-t-cyan-600{% endif %}">{{ match.home_team }}</td>
                                     <td headers="results trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}"
                                         class="p-1 text-center align-center items-center content-center
-                                               {% if forloop.first %}border-t border-t-amber-800{% endif %}">
+                                               {% if forloop.first %}border-t border-t-cyan-600{% endif %}">
                                         <a href="{% url 'add_scoresheet' match.id %}"
                                         {% if match.result == "Missing" %}
                                             class="mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase">
-                                            <span class="text-xs text-amber-400 underline underline-offset-1 hover:text-cyan-300">ENTER</span>
+                                            <span class="text-xs text-amber-500 hover:text-cyan-300">ENTER</span>
                                         {% else %}
-                                           class="group mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase hover:ring-1
-                                                  {% if "Home" in match.result %}
-                                                      bg-emerald-900/75 hover:ring-emerald-300
-                                                  {% elif "Away" in match.result %}
-                                                      bg-blue-900/75 hover:ring-blue-300
-                                                  {% elif match.result == "Draw" %}
-                                                      bg-amber-900/75 hover:ring-amber-300
-                                                  {% endif %}
-                                                  hover:ease-in-out hover:duration-150">
+                                           class="mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase">
                                             <span class="text-xs
                                                          {% if "Home" in match.result %}
-                                                             text-emerald-300 group-hover:text-emerald-200
+                                                             text-emerald-300 hover:text-emerald-200
                                                          {% elif "Away" in match.result %}
-                                                             text-blue-300 group-hover:text-blue-200
+                                                             text-purple-300 hover:text-purple-200
                                                          {% elif match.result == "Draw" %}
-                                                             text-amber-400 group-hover:text-amber-200
+                                                             text-orange-300 hover:text-orange-200
                                                          {% endif %}">{{ match.result|safe }}
-                                            </p>
+                                            </span>
                                         {% endif %}
                                         </a>
                                     </td>
