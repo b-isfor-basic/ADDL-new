@@ -5,14 +5,16 @@ from django.utils import timezone
 
 from Schedule.models import Season, ScheduleWeek, Match
 
+FIXTURES = [
+    "./tests/fixtures/locations_data.json",
+    "./tests/fixtures/members_data.json",
+    "./tests/fixtures/schedule_data.json",
+    "./tests/fixtures/scores_data.json",
+]
+
 
 class SeasonTestCase(TestCase):
-    fixtures = [
-        "Locations/fixtures/data.json",
-        "Members/fixtures/data.json",
-        "Schedule/fixtures/data.json",
-        "Scores/fixtures/data.json",
-    ]
+    fixtures = FIXTURES
 
     @classmethod
     def setUpTestData(cls):

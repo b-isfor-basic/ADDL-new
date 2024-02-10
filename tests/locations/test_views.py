@@ -7,10 +7,10 @@ from Members.models import Player
 
 
 FIXTURES = [
-    "Locations/fixtures/data.json",
-    "Members/fixtures/data.json",
-    "Schedule/fixtures/data.json",
-    "Scores/fixtures/data.json",
+    "./tests/fixtures/locations_data.json",
+    "./tests/fixtures/members_data.json",
+    "./tests/fixtures/schedule_data.json",
+    "./tests/fixtures/scores_data.json",
 ]
 
 
