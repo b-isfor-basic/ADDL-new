@@ -5,10 +5,10 @@ from Members.models import Player, Team
 
 
 FIXTURES = [
-    "Locations/fixtures/data.json",
-    "Members/fixtures/data.json",
-    "Scores/fixtures/data.json",
-    "Schedules/fixtures/data.json",
+    "./tests/fixtures/locations_data.json",
+    "./tests/fixtures/members_data.json",
+    "./tests/fixtures/schedule_data.json",
+    "./tests/fixtures/scores_data.json",
 ]
 
 
@@ -82,4 +82,3 @@ class TeamModelTestCase(TestCase):
         names = [plyr.last_name for plyr in self.team.players.all()]
         team_name = "/".join(names)
         self.assertEqual(str(self.team), team_name)
-    

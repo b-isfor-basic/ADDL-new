@@ -8,11 +8,12 @@ from Scores.models import ScoreSummary, TeamScoreSummary, Forfeit
 from Schedule.models import Match
 
 FIXTURES = [
-    "Locations/fixtures/data.json",
-    "Members/fixtures/data.json",
-    "Schedule/fixtures/data.json",
-    "Scores/fixtures/data.json",
+    "./tests/fixtures/locations_data.json",
+    "./tests/fixtures/members_data.json",
+    "./tests/fixtures/schedule_data.json",
+    "./tests/fixtures/scores_data.json",
 ]
+
 
 class ScoreSummaryModelTest(TestCase):
     fixtures = FIXTURES
@@ -70,8 +71,10 @@ class ScoreSummaryModelTest(TestCase):
 
     def test_scoresummary_total_points(self):
         data = self.scores
-        return self.assertEqual(data.total_points, data.singles_points + data.doubles_points)
-    
+        return self.assertEqual(
+            data.total_points, data.singles_points + data.doubles_points
+        )
+
 
 class ScoreSummaryManagerTest(TestCase):
     def test_get_queryset(self):
@@ -157,7 +160,7 @@ class ForfeitModelTest(TestCase):
             Forfeit.details.create(
                 match=self.match,
                 team=self.match.homeTeam,
-            )      
+            )
 
     def test_creating_forfeit_creates_winning_team_score(self):
         test_forfeit = self.forfeit
