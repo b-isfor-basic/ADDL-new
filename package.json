@@ -14,7 +14,7 @@
     "@preline/tabs": "^2.0.1",
     "@preline/tooltip": "^2.0.1",
     "@tailwindcss/forms": "^0.5.7",
-    "alpinejs": "^3.13.3",
+    "alpinejs": "^3.13.7",
     "htmx": "^0.0.2",
     "jquery": "^3.7.1",
     "jquery-mask-plugin": "^1.14.16",
