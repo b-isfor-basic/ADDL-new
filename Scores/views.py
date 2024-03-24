@@ -55,7 +55,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
     )
     season_list = get_latest_seasons(qty)
     active_divisions = season.divisions.all()
-    division_set = Division.details.filter(season=season.id)
+    division_set = Division.details.filter(season=season.id).get_schedule_weeks()
     teams = Team.stats.filter(season=season.id)
     player_stats = ScoreSummary.stats.filter(match__week__season=season.id)
     player_ratings = ScoreSummary.stats.filter(match__week__season=season.id).rating(

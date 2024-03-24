@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import F, Value
 from django.db.models.functions import Concat, Coalesce
 from django.db.models.query import QuerySet
+from django.contrib.postgres.aggregates import ArrayAgg
 
 
 def _get_latest_season():
@@ -55,9 +56,8 @@ class DivisionQuerySet(models.QuerySet):
             kwargs.get("season") if "season" in kwargs else Season.objects.latest().id
         )
         return self.annotate(
-            num_weeks=models.Count(
-                "scheduleweek",
-                distinct=True,
+            schedule_weeks=ArrayAgg(
+                "scheduleweek__week_number",
                 filter=models.Q(scheduleweek__season=season),
             )
         )

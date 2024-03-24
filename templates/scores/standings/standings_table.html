@@ -14,10 +14,10 @@
         </div>
         <div class="w-full overflow-x-scroll">
             <table id="div{{ division.id }}Standings" class="p-1 w-full">
-                <thead class="text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
+                <thead class="w-full text-sm text-amber-400 tk-objektiv-mk2 uppercase bg-slate-800 border-b border-slate-900/30">
                     <tr>
-                        <th scope="col" class="p-2 font-light">Team</th>
-                        {% for week in season.num_weeks_regular_season %}
+                        <th scope="col" class="p-2 font-light text-right">Team</th>
+                        {% for week in division.schedule_weeks %}
                             <th scope="col" class="p-2 font-light">Week {{ week }}</th>
                         {% endfor %}
                         <th scope="col" class="p-2 font-light">Total</th>
@@ -39,7 +39,7 @@
                                         {{ team.team_name }}
                                     </div>
                                 </td>
-                                {% for season_week in season.num_weeks_regular_season %}
+                                {% for season_week in division.schedule_weeks %}
                                     <td class="p-2 text-sm text-center">
                                         {% for score in team.scores %}
                                             {% if season_week == score.week %}{% if score.points >= 0 %} {{ score.points }} {% elif score.points < 0 %}<span class="text-rose-400"> F </span>{% endif %}{% endif %}
