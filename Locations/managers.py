@@ -59,6 +59,7 @@ class DivisionQuerySet(models.QuerySet):
             schedule_weeks=ArrayAgg(
                 "scheduleweek__week_number",
                 filter=models.Q(scheduleweek__season=season),
+                distinct=True,
             )
         )
 
