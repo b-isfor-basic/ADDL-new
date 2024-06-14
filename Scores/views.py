@@ -68,7 +68,7 @@ def StandingsView(request, season_number=None, division_id=None, qty=None, **kwa
         division_set = division_set.filter(id=division_id)
         player_stats = player_stats.filter(match__week__division=division_id)
         teams = teams.filter(division__id=division_id)
-        team_stats = team_stats.filter(division__id=division_id)
+        team_stats = teams.stats(season=season.id)
         team_standings = team_standings.filter(division__id=division_id)
         player_ratings = player_ratings.filter(match__week__division=division_id)
 
