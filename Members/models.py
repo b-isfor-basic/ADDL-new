@@ -110,6 +110,8 @@ class Team(models.Model):
     @property
     def name(self):
         plyrs = self.players.all()
+        if len(plyrs) == 1:
+            return plyrs[0].last_name
         return plyrs[0].last_name + "/" + plyrs[1].last_name
 
     def __str__(self):
