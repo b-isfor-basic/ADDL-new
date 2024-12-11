@@ -23,7 +23,7 @@ class MatchAdmin(admin.ModelAdmin):
         "week__division",
         "week__week_number",
     ]
-    list_display = ["awayTeam", "homeTeam", "status"]
+    list_display = ["awayTeam", "awayBye", "homeTeam", "homeBye", "status"]
     search_fields = [
         "awayTeam__players__last_name",
         "homeTeam__players__last_name",

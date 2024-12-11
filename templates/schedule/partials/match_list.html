@@ -29,13 +29,16 @@
                                     {% endif %}
                                     <td headers="away trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}"
                                         class="p-1 text-center align-center items-center
-                                               {% if forloop.first %}border-t border-t-cyan-600{% endif %}">{{ match.away_team }}</td>
+                                               {% if forloop.first %}border-t border-t-cyan-600{% endif %}">{{ match.away_team|safe }}</td>
                                     <td headers="home trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}"
                                         class="p-1 text-center align-center items-center
-                                               {% if forloop.first %}border-t border-t-cyan-600{% endif %}">{{ match.home_team }}</td>
+                                               {% if forloop.first %}border-t border-t-cyan-600{% endif %}">{{ match.home_team|safe }}</td>
                                     <td headers="results trWeek{{ forloop.parentloop.counter }} trDate{{ forloop.parentloop.counter }}"
                                         class="p-1 text-center align-center items-center content-center
                                                {% if forloop.first %}border-t border-t-cyan-600{% endif %}">
+                                        {% if match.result == "Bye" %}
+                                        <span class="mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase text-xs text-rose-400">BYE</span>
+                                        {% else %}
                                         <a href="{% url 'add_scoresheet' match.id %}"
                                         {% if match.result == "Missing" %}
                                             class="mx-1 px-2 content-center align-center inline-flex items-center rounded-full tk-rustica uppercase">
@@ -53,6 +56,7 @@
                                             </span>
                                         {% endif %}
                                         </a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -100,11 +100,27 @@ class MatchManager(Manager.from_queryset(MatchQuerySet)):
 
         qs = self.get_queryset()
         return qs.annotate(
-            away_team=Subquery(
-                Team.details.filter(id=OuterRef("awayTeam")).values("team_name")
+            away_team=Case(
+                When(
+                    awayBye=True,
+                    then=Value(
+                        '<span class="pl-1 text-rose-400 text-xs align-center text-center">BYE</span>'
+                    ),
+                ),
+                default=Subquery(
+                    Team.details.filter(id=OuterRef("awayTeam")).values("team_name")
+                ),
             ),
-            home_team=Subquery(
-                Team.details.filter(id=OuterRef("homeTeam")).values("team_name")
+            home_team=Case(
+                When(
+                    homeBye=True,
+                    then=Value(
+                        '<span class="pl-1 text-rose-400 text-xs align-center text-center">BYE</span>'
+                    ),
+                ),
+                default=Subquery(
+                    Team.details.filter(id=OuterRef("homeTeam")).values("team_name")
+                ),
             ),
         )
 
@@ -134,18 +150,28 @@ class MatchManager(Manager.from_queryset(MatchQuerySet)):
         )
 
         return qs.annotate(
-            home_score=Subquery(
-                scores.filter(match=OuterRef("id"), team=OuterRef("homeTeam")).values(
-                    "points"
-                )
+            home_score=Case(
+                When(homeBye=True, then=Value(-1)),
+                default=Subquery(
+                    scores.filter(
+                        match=OuterRef("id"), team=OuterRef("homeTeam")
+                    ).values("points")
+                ),
             ),
-            away_score=Subquery(
-                scores.filter(match=OuterRef("id"), team=OuterRef("awayTeam")).values(
-                    "points"
-                )
+            away_score=Case(
+                When(awayBye=True, then=Value(-1)),
+                default=Subquery(
+                    scores.filter(
+                        match=OuterRef("id"), team=OuterRef("awayTeam")
+                    ).values("points")
+                ),
             ),
         ).annotate(
             result=Case(
+                When(
+                    Exact(F("home_score"), -1) | Exact(F("away_score"), -1),
+                    then=Value("Bye"),
+                ),
                 When(
                     Exact(F("forfeit__team"), F("homeTeam")),
                     then=Value(
