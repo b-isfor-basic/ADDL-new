@@ -43,7 +43,7 @@ class AnnouncementAdmin(admin.ModelAdmin):
 class MatchForm(forms.ModelForm):
     class Meta:
         model = Match
-        fields = ["awayTeam", "homeTeam"]
+        fields = ["awayTeam", "awayBye", "homeTeam", "homeBye"]
         widgets = {
             "awayTeam": AutocompleteSelect(
                 Match._meta.get_field("awayTeam"), admin.site
