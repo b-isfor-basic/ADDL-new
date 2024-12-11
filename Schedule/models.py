@@ -119,17 +119,21 @@ class Match(models.Model):
         related_name="awayMatches",
         db_index=True,
         null=True,
+        blank=True,
     )
+    awayBye = models.BooleanField(default=False)
     homeTeam = models.ForeignKey(
         Team,
         on_delete=models.SET_NULL,
         related_name="homeMatches",
         db_index=True,
         null=True,
+        blank=True,
     )
+    homeBye = models.BooleanField(default=False)
     status = models.CharField(
         max_length=1,
-        choices=[("S", "Scheduled"), ("P", "Played"), ("F", "Forfeit")],
+        choices=[("S", "Scheduled"), ("P", "Played"), ("F", "Forfeit"), ("B", "Bye")],
         default="S",
     )
 
@@ -137,23 +141,33 @@ class Match(models.Model):
     details = MatchManager()
 
     def __str__(self):
+        if self.awayBye:
+            return f"{self.homeTeam} (Bye)"
+        if self.homeBye:
+            return f"{self.awayTeam} (Bye)"
         return f"{self.awayTeam} v. {self.homeTeam}"
 
     @property
     def homeScore(self):
-        homeScore = self.scoresummary_set.filter(team=self.homeTeam).aggregate(
-            home_pts=Sum(F("singles_points") + F("doubles_points"), default=0)
-        )
-        return homeScore["home_pts"]
+        if self.scoresummary_set.filter(team=self.homeTeam).exists():
+            homeScore = self.scoresummary_set.filter(team=self.homeTeam).aggregate(
+                home_pts=Sum(F("singles_points") + F("doubles_points"), default=0)
+            )
+            return homeScore["home_pts"]
+        return "N/A"
 
     @property
     def awayScore(self):
-        awayScore = self.scoresummary_set.filter(team=self.awayTeam).aggregate(
-            away_pts=Sum(F("singles_points") + F("doubles_points"), default=0)
-        )
-        return awayScore["away_pts"]
+        if self.scoresummary_set.filter(team=self.awayTeam).exists():
+            awayScore = self.scoresummary_set.filter(team=self.awayTeam).aggregate(
+                away_pts=Sum(F("singles_points") + F("doubles_points"), default=0)
+            )
+            return awayScore["away_pts"]
+        return "N/A"
 
     def update_status(self):
+        if self.awayBye or self.homeBye:
+            self.status = "B"
         if self.scoresummary_set.exists():
             self.status = "P"
         elif self.forfeit_set.exists():
