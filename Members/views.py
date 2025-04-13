@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (
     LoginView,
+    LogoutView,
     PasswordResetConfirmView,
     PasswordResetDoneView,
     PasswordResetView,
@@ -50,3 +51,8 @@ class LoginView(SuccessMessageMixin, LoginView):
     template_name = "registration/login.html"
     success_url = "members/profile"
     success_message = "Login successful!"
+
+
+class LogoutView(SuccessMessageMixin, LogoutView):
+    success_url = "members/login"
+    success_message = "Logout successful!"
